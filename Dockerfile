@@ -41,11 +41,11 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Create app directories for data and config
-RUN mkdir -p /app/data /app/config
-RUN chown -R nextjs:nodejs /app/data /app/config
+# Create app directories for data, config, and logs
+RUN mkdir -p /app/data /app/config /app/logs
 
-USER nextjs
+# Don't switch to nextjs user - we'll handle this in docker-compose
+# USER nextjs
 
 EXPOSE 3000
 

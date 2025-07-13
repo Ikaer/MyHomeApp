@@ -36,10 +36,14 @@ export default function Home({ subApps }: HomeProps) {
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
+    console.log('Starting dashboard data loading...');
+    
     // Initialize data directories on first run
     initializeDataDirectories();
+    console.log('Data directories initialized successfully');
     
     const subApps = getSubApps();
+    console.log(`Loaded ${subApps.length} sub-applications`);
     
     return {
       props: {
@@ -48,9 +52,28 @@ export const getServerSideProps: GetServerSideProps = async () => {
     };
   } catch (error) {
     console.error('Error loading dashboard data:', error);
+    
+    // Return empty data instead of failing completely
     return {
       props: {
-        subApps: [],
+        subApps: [
+          {
+            id: 'services',
+            name: 'Services',
+            description: 'Quick access to all your services',
+            icon: '🔗',
+            route: '/services',
+            enabled: true
+          },
+          {
+            id: 'error',
+            name: 'Configuration Error',
+            description: 'Check container logs for details',
+            icon: '⚠️',
+            route: '#',
+            enabled: false
+          }
+        ],
       },
     };
   }

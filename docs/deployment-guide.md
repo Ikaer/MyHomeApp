@@ -2,11 +2,37 @@
 
 ## Prerequisites
 
-1. **Portainer** is running on your Synology NAS
+1. **Portainer** is running o## File Structure on NAS
+
+After deployment, your NAS should have:
+
+```
+/volume4/root4/AppData/MyHomeApp/
+├── database/              # Auto-created by app
+│   ├── bookmarks/        # For Phase 2
+│   ├── anime/           # For Phase 3
+│   └── services/        # For Phase 3
+├── config/               # Auto-created by app
+│   └── app.json         # Auto-generated config
+└── logs/                 # Application logs
+    └── app.log          # Detailed application logs
+```
+
+## Troubleshooting
+
+### Check Application Logs
+```bash
+# View latest logs
+tail -f /volume4/root4/AppData/MyHomeApp/logs/app.log
+
+# View all logs
+cat /volume4/root4/AppData/MyHomeApp/logs/app.log
+``` NAS
 2. **Data directories** exist on your NAS:
    ```bash
    mkdir -p /volume4/root4/AppData/MyHomeApp/database
    mkdir -p /volume4/root4/AppData/MyHomeApp/config
+   mkdir -p /volume4/root4/AppData/MyHomeApp/logs
    ```
 
 ## Deployment Steps

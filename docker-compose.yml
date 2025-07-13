@@ -8,6 +8,7 @@ services:
     volumes:
       - /volume4/root4/AppData/MyHomeApp/database:/app/data
       - /volume4/root4/AppData/MyHomeApp/config:/app/config
+      - /volume4/root4/AppData/MyHomeApp/logs:/app/logs
       - /volume1:/nas/volume1:ro
       - /volume2:/nas/volume2:ro
       - /volume3:/nas/volume3:ro
@@ -16,5 +17,7 @@ services:
       - NODE_ENV=production
       - DATA_PATH=/app/data
       - CONFIG_PATH=/app/config
+      - LOGS_PATH=/app/logs
     restart: unless-stopped
     container_name: myhomeapp
+    user: "0:0"  # Run as root to fix permission issues
