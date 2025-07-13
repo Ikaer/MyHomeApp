@@ -13,6 +13,9 @@ Create a centralized web application hosted on Synology NAS (via Portainer/Docke
 
 ## Technical Stack
 - **Frontend**: Next.js with React
+- **Styling**: Custom CSS with modern features
+- **Theme**: Dark theme only
+- **Target Display**: TV browser (4K) - no mobile responsiveness needed
 - **Deployment**: Docker container via Portainer
 - **Data Storage**: JSON files (file-based database)
 - **Hosting**: Synology NAS
@@ -34,26 +37,30 @@ Create a centralized web application hosted on Synology NAS (via Portainer/Docke
 ## Data Management
 ### Storage Strategy
 - JSON file-based database system
-- Configurable data directory path
+- Data directory: `/volume4/root4/AppData/MyHomeApp/database`
 - Each sub-application maintains its own data folder
-- Structure: `[config_data_path]/[subapp_name]/data.json`
+- Structure: `/volume4/root4/AppData/MyHomeApp/database/[subapp_name]/data.json`
+- Automatic directory creation as needed
 
 ## Planned Sub-Applications
 
 ### 1. Anime List Manager
 - **Purpose**: Track anime watching progress
-- **Integration**: MyAnimeList API
+- **Integration**: MyAnimeList API (placeholder implementation initially)
 - **Features**: 
   - View/update watch status
   - Personal ratings and notes
   - Discover new anime
+- **Note**: API integration to be implemented in later phase
 
 ### 2. File Explorer
 - **Purpose**: Browse and manage NAS files
+- **Scope**: Access to NAS volumes (volume1, volume2, etc.)
+- **Permissions**: Read-only access initially
 - **Features**:
-  - Directory navigation
-  - File preview capabilities
-  - Basic file operations
+  - Directory navigation across all NAS volumes
+  - File preview capabilities for all file types
+  - File information display (size, date, etc.)
 
 ### 3. Bookmark Manager
 - **Purpose**: Organize and access bookmarks
@@ -64,25 +71,36 @@ Create a centralized web application hosted on Synology NAS (via Portainer/Docke
 
 ### 4. Service Dashboard
 - **Purpose**: Quick access to other self-hosted services
+- **Services List**:
+  - DSM: http://syno:5000
+  - Portainer: http://syno:9000/
+  - Sonarr: http://syno:8989/
+  - QbitTorrent: http://syno:8088/
+  - Jackett: http://syno:9117/
 - **Features**:
-  - Service status monitoring
-  - Direct links to services (Portainer, DSM, Sonarr, etc.)
-  - Service health checks
+  - Simple service list with direct links
+  - Service icons and descriptions
+  - Quick access grid layout
 
 ## Deployment Requirements
 
 ### Docker Configuration
-- Base image: Node.js runtime
-- Port mapping for web access
-- Volume mounts for:
-  - Configuration files
-  - Data directory
-  - Potential NAS file access
+- **Base image**: Node.js runtime
+- **Port**: 12344 (host) → 3000 (container)
+- **Volume mounts**:
+  - `/volume4/root4/AppData/MyHomeApp/database` → `/app/data`
+  - `/volume4/root4/AppData/MyHomeApp/config` → `/app/config`
+  - NAS volumes for file explorer → `/nas` (read-only)
 
 ### Environment Configuration
-- Data directory path
-- Service URLs for dashboard
-- API keys (MyAnimeList, etc.)
+- Configuration file path: `/app/config/app.json`
+- Service URLs (predefined):
+  - DSM: http://syno:5000
+  - Portainer: http://syno:9000/
+  - Sonarr: http://syno:8989/
+  - QbitTorrent: http://syno:8088/
+  - Jackett: http://syno:9117/
+- MyAnimeList API configuration (placeholder)
 
 ## Security Considerations
 - Internal network access only (behind NAS firewall)

@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  myhomeapp:
+    build: .
+    ports:
+      - "12344:3000"
+    volumes:
+      - /volume4/root4/AppData/MyHomeApp/database:/app/data
+      - /volume4/root4/AppData/MyHomeApp/config:/app/config
+      - /volume1:/nas/volume1:ro
+      - /volume2:/nas/volume2:ro
+      - /volume3:/nas/volume3:ro
+      - /volume4:/nas/volume4:ro
+    environment:
+      - NODE_ENV=production
+      - DATA_PATH=/app/data
+      - CONFIG_PATH=/app/config
+    restart: unless-stopped
+    container_name: myhomeapp
