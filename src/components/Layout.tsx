@@ -42,6 +42,12 @@ export default function Layout({ children }: LayoutProps) {
               >
                 Bookmarks
               </Link>
+              <Link 
+                href="/files" 
+                className={`nav-link ${isActive('/files') ? 'active' : ''}`}
+              >
+                Files
+              </Link>
             </nav>
           </div>
         </div>

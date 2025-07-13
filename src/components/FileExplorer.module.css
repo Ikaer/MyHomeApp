@@ -1,0 +1,250 @@
+.fileExplorer {
+  display: flex;
+  height: 600px;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.fileTreePane {
+  flex: 0 0 300px;
+  border-right: 1px solid #e1e1e1;
+  display: flex;
+  flex-direction: column;
+}
+
+.fileDetailsPane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.paneHeader {
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e1e1e1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.paneHeader h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.refreshBtn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.refreshBtn:hover {
+  background-color: #e9ecef;
+}
+
+.refreshBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.fileTree {
+  flex: 1;
+  border: none;
+  border-radius: 0;
+}
+
+.loadingState,
+.errorState,
+.emptySelection {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+}
+
+.errorState button {
+  margin-top: 1rem;
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.fileDetails {
+  padding: 20px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.directoryDetails {
+  padding: 20px;
+  flex: 1;
+}
+
+.fileIconLarge {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.fileInfo {
+  margin-bottom: 24px;
+}
+
+.fileName {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  color: #333;
+  word-break: break-word;
+}
+
+.fileProperties {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.property {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.propertyLabel {
+  font-weight: 600;
+  color: #666;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.propertyValue {
+  color: #333;
+  word-break: break-word;
+  flex: 1;
+}
+
+.filePreview {
+  border-top: 1px solid #e1e1e1;
+  padding-top: 20px;
+}
+
+.filePreview h5 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.previewContent {
+  background: #f8f9fa;
+  border: 1px solid #e1e1e1;
+  border-radius: 6px;
+  padding: 16px;
+  min-height: 120px;
+}
+
+.textPreview .previewContent {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  color: #333;
+}
+
+.imagePreview .previewContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.imagePlaceholder {
+  font-size: 24px;
+}
+
+.noPreview {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 40px 20px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .fileExplorer {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .fileTreePane {
+    flex: none;
+    height: 300px;
+    border-right: none;
+    border-bottom: 1px solid #e1e1e1;
+  }
+  
+  .fileDetailsPane {
+    min-height: 300px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .fileExplorer {
+    background: #2d2d2d;
+    border-color: #4a4a4a;
+  }
+  
+  .fileTreePane,
+  .fileDetailsPane {
+    border-color: #4a4a4a;
+  }
+  
+  .paneHeader {
+    background: #3a3a3a;
+    border-color: #4a4a4a;
+  }
+  
+  .paneHeader h3 {
+    color: #e0e0e0;
+  }
+  
+  .refreshBtn:hover {
+    background-color: #4a4a4a;
+  }
+  
+  .fileName {
+    color: #e0e0e0;
+  }
+  
+  .propertyLabel {
+    color: #b0b0b0;
+  }
+  
+  .propertyValue {
+    color: #e0e0e0;
+  }
+  
+  .previewContent {
+    background: #3a3a3a;
+    border-color: #4a4a4a;
+    color: #e0e0e0;
+  }
+  
+  .loadingState,
+  .errorState,
+  .emptySelection,
+  .noPreview {
+    color: #b0b0b0;
+  }
+}
