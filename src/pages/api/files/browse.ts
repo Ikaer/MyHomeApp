@@ -1,15 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import { promises as fs } from 'fs';
-
-export interface FileSystemItem {
-  path: string;
-  name: string;
-  type: 'file' | 'directory';
-  size?: number;
-  modified?: string;
-  extension?: string;
-}
+import type { FileSystemItem } from '@/models/files';
 
 export default async function handler(
   req: NextApiRequest,

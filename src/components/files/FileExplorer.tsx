@@ -1,15 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import TreeView, { TreeNode, buildTreeFromPaths } from './TreeView';
+import TreeView, { TreeNode, buildTreeFromPaths } from '@/components/shared/TreeView';
 import styles from './FileExplorer.module.css';
+import type { FileSystemItem } from '@/models';
 
-interface FileItem {
-  path: string;
-  name: string;
-  type: 'file' | 'directory';
-  size?: number;
-  modified?: string;
-  extension?: string;
-}
+interface FileItem extends FileSystemItem {} // Legacy alias
 
 interface FileExplorerProps {
   rootPath?: string;
@@ -60,9 +54,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     setError(null);
     
     try {
-      console.log('Loading file system for root:', rootPath);
-      
-      const response = await fetch('/api/filesystem/browse', {
+      console.log('Loading file system for root:', rootPath);        const response = await fetch('/api/files/browse', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -211,7 +203,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         
         console.log('API call for path:', relativePath);
         
-        const response = await fetch('/api/filesystem/browse', {
+        const response = await fetch('/api/files/browse', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 

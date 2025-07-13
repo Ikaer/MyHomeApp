@@ -1,15 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import FileExplorer from '@/components/FileExplorer';
-
-interface FileRoot {
-  id: string;
-  name: string;
-  path: string;
-  description?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import FileExplorer from '@/components/files/FileExplorer';
+import type { FileRoot, FileSystemItem } from '@/models/files';
 
 export default function Files() {
   const [fileRoots, setFileRoots] = useState<FileRoot[]>([]);
@@ -26,7 +18,7 @@ export default function Files() {
     try {
       setIsLoading(true);
       console.log('Loading file roots...');
-      const response = await fetch('/api/file-roots');
+      const response = await fetch('/api/files/roots');
       if (response.ok) {
         const data = await response.json();
         console.log('Loaded file roots:', data);
@@ -48,7 +40,7 @@ export default function Files() {
   const handleAddRoot = async (rootData: Omit<FileRoot, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       console.log('Adding root:', rootData);
-      const response = await fetch('/api/file-roots', {
+      const response = await fetch('/api/files/roots', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(rootData)
@@ -79,7 +71,7 @@ export default function Files() {
     if (!confirm('Are you sure you want to remove this file root?')) return;
 
     try {
-      const response = await fetch(`/api/file-roots/${rootId}`, {
+      const response = await fetch(`/api/files/roots/${rootId}`, {
         method: 'DELETE'
       });
 

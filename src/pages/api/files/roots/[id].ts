@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import { promises as fs } from 'fs';
-import type { FileRoot } from './index';
+import type { FileRoot } from '@/models/files';
 
 const DATA_PATH = process.env.DATA_PATH || path.join(process.cwd(), 'data');
 const DATA_FILE = path.join(DATA_PATH, 'file-roots.json');

@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
-import ServiceCard from '@/components/ServiceCard';
+import ServiceCard from '@/components/services/ServiceCard';
 import { ServiceLink } from '@/types';
 import { getAppConfig } from '@/lib/data';
 

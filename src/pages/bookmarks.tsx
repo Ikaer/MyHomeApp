@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import BookmarkCard from '@/components/BookmarkCard';
-import BookmarkForm from '@/components/BookmarkForm';
+import BookmarkCard from '@/components/bookmarks/BookmarkCard';
+import BookmarkForm from '@/components/bookmarks/BookmarkForm';
 import { Bookmark, BookmarkCategory } from '@/types';
 
 export default function Bookmarks() {

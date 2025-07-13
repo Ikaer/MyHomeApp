@@ -1,43 +1,16 @@
-export interface SubApp {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  route: string;
-  enabled: boolean;
-}
+/**
+ * @deprecated This file is deprecated. Please import from @/models instead.
+ * This file is kept for backward compatibility only.
+ */
 
-export interface ServiceLink {
-  id: string;
-  name: string;
-  url: string;
-  icon: string;
-  description: string;
-}
+// Re-export everything from the new models directory
+export * from '@/models';
 
-export interface AppConfig {
-  services: ServiceLink[];
-  dataPath: string;
-  version: string;
-}
-
-export interface Bookmark {
-  id: string;
-  title: string;
-  url: string;
-  description?: string;
-  category: string;
-  tags: string[];
-  path?: string; // Chrome bookmark folder path (e.g., "Bookmarks Bar/Work/Tools")
-  favicon?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface BookmarkCategory {
-  id: string;
-  name: string;
-  description?: string;
-  color: string;
-  icon: string;
-}
+// Legacy direct exports for backward compatibility
+export type {
+  SubApp,
+  ServiceLink,
+  AppConfig,
+  Bookmark,
+  BookmarkCategory
+} from '@/models';
