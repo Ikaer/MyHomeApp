@@ -5,9 +5,6 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Cache busting argument - change this value to force rebuild
-ARG BUILD_DATE=default
-
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
 RUN npm ci
@@ -15,8 +12,16 @@ RUN npm ci
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
+
+# Cache busting argument - change this value to force rebuild
+ARG BUILD_DATE=default
+RUN echo "Build date: $BUILD_DATE" && echo "Timestamp: $(date)" > /tmp/buildinfo
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Force cache invalidation by adding current timestamp to build
+RUN echo "Source copied at: $(date)" >> /tmp/buildinfo
 
 # Next.js collects completely anonymous telemetry data about general usage.
 ENV NEXT_TELEMETRY_DISABLED 1

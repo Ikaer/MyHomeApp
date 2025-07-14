@@ -5,7 +5,7 @@ services:
     build: 
       context: .
       args:
-        - BUILD_DATE=2025-07-14-v2
+        - BUILD_DATE=2025-07-14-v4
     ports:
       - "12344:3000"
     volumes:
