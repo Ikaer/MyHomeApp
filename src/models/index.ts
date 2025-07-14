@@ -8,6 +8,7 @@ export * from './bookmarks';
 export * from './files';  
 export * from './services';
 export * from './shared';
+export * from './anime';
 
 // Legacy compatibility - keeping the old structure for now
 // TODO: Remove these when all imports are updated

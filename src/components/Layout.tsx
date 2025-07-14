@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useState, useEffect } from 'react';
+import { SubApp } from '@/types';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -7,6 +9,24 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const router = useRouter();
+  const [subApps, setSubApps] = useState<SubApp[]>([]);
+
+  useEffect(() => {
+    // Load subApps from API
+    const loadSubApps = async () => {
+      try {
+        const response = await fetch('/api/subapps');
+        if (response.ok) {
+          const data = await response.json();
+          setSubApps(data.subApps || []);
+        }
+      } catch (error) {
+        console.error('Failed to load subapps:', error);
+      }
+    };
+    
+    loadSubApps();
+  }, []);
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -24,30 +44,15 @@ export default function Layout({ children }: LayoutProps) {
               MyHomeApp
             </Link>
             <nav className="nav">
-              <Link 
-                href="/" 
-                className={`nav-link ${isActive('/') ? 'active' : ''}`}
-              >
-                Dashboard
-              </Link>
-              <Link 
-                href="/services" 
-                className={`nav-link ${isActive('/services') ? 'active' : ''}`}
-              >
-                Services
-              </Link>
-              <Link 
-                href="/bookmarks" 
-                className={`nav-link ${isActive('/bookmarks') ? 'active' : ''}`}
-              >
-                Bookmarks
-              </Link>
-              <Link 
-                href="/files" 
-                className={`nav-link ${isActive('/files') ? 'active' : ''}`}
-              >
-                Files
-              </Link>
+              {subApps.map((subApp) => (
+                <Link 
+                  key={subApp.id}
+                  href={subApp.route} 
+                  className={`nav-link ${isActive(subApp.route) ? 'active' : ''}`}
+                >
+                  {subApp.name}
+                </Link>
+              ))}
             </nav>
           </div>
         </div>

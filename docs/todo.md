@@ -1,0 +1,1 @@
+- ✅ Files explorer: file-roots.json now properly organized in files/ subdirectory

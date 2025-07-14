@@ -4,13 +4,13 @@ import { promises as fs } from 'fs';
 import type { FileRoot } from '@/models/files';
 
 const DATA_PATH = process.env.DATA_PATH || path.join(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_PATH, 'file-roots.json');
+const FILES_DATA_PATH = path.join(DATA_PATH, 'files');
+const DATA_FILE = path.join(FILES_DATA_PATH, 'file-roots.json');
 
 async function ensureDataFile() {
   try {
-    // Ensure data directory exists
-    const dataDir = path.dirname(DATA_FILE);
-    await fs.mkdir(dataDir, { recursive: true });
+    // Ensure files data directory exists
+    await fs.mkdir(FILES_DATA_PATH, { recursive: true });
     
     // Check if file exists
     await fs.access(DATA_FILE);

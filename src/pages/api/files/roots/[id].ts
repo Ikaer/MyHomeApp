@@ -4,7 +4,8 @@ import { promises as fs } from 'fs';
 import type { FileRoot } from '@/models/files';
 
 const DATA_PATH = process.env.DATA_PATH || path.join(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_PATH, 'file-roots.json');
+const FILES_DATA_PATH = path.join(DATA_PATH, 'files');
+const DATA_FILE = path.join(FILES_DATA_PATH, 'file-roots.json');
 
 async function readFileRoots(): Promise<FileRoot[]> {
   try {
@@ -16,8 +17,7 @@ async function readFileRoots(): Promise<FileRoot[]> {
 }
 
 async function writeFileRoots(roots: FileRoot[]): Promise<void> {
-  const dataDir = path.dirname(DATA_FILE);
-  await fs.mkdir(dataDir, { recursive: true });
+  await fs.mkdir(FILES_DATA_PATH, { recursive: true });
   await fs.writeFile(DATA_FILE, JSON.stringify(roots, null, 2));
 }
 

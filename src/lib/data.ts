@@ -178,7 +178,7 @@ export function getSubApps(): SubApp[] {
         description: 'Track your anime progress',
         icon: '📺',
         route: '/anime',
-        enabled: false // Will be enabled in Phase 3
+        enabled: true // Enabled in Phase 3
       },
       {
         id: 'files',
