@@ -20,6 +20,27 @@ export default function AnimeExtensionForm({ anime, onSave, onCancel, onClose }:
     loadExistingData();
   }, [anime.id]);
 
+  // Handle escape key and prevent background scroll
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleCancel();
+      }
+    };
+
+    // Add event listener
+    document.addEventListener('keydown', handleKeyDown);
+    
+    // Prevent background scroll
+    document.body.style.overflow = 'hidden';
+
+    // Cleanup
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
+
   const loadExistingData = async () => {
     try {
       const response = await fetch(`/api/anime/animes/${anime.id}/extensions`);
@@ -126,16 +147,23 @@ export default function AnimeExtensionForm({ anime, onSave, onCancel, onClose }:
     }
   };
 
+  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    // Only close if clicking on the overlay itself, not its children
+    if (event.target === event.currentTarget) {
+      handleCancel();
+    }
+  };
+
   const getAnimeTitle = () => {
     return anime.alternative_titles?.en || anime.title;
   };
 
   return (
-    <div className={styles.extensionFormOverlay}>
+    <div className={styles.extensionFormOverlay} onClick={handleOverlayClick}>
       <div className={styles.extensionForm}>
         <div className={styles.formHeader}>
           <h3>Edit Anime Extensions</h3>
-          <button onClick={onClose} className={styles.closeButton}>×</button>
+          <button onClick={handleCancel} className={styles.closeButton}>×</button>
         </div>
 
         <div className={styles.animeInfo}>

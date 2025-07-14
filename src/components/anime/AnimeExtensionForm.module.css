@@ -287,23 +287,3 @@
   padding: 0;
   margin-left: 0.5rem;
 }
-
-@media (max-width: 768px) {
-  .extensionFormOverlay {
-    padding: 0.5rem;
-  }
-
-  .providerRow {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  .removeProvider {
-    align-self: flex-start;
-  }
-
-  .animeDetails {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
