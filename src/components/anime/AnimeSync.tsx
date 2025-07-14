@@ -130,26 +130,28 @@ export default function AnimeSync({ authState, onSyncComplete }: AnimeSyncProps)
 
       <style jsx>{`
         .anime-sync {
-          margin-bottom: 1.5rem;
-          padding: 1rem;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          background: #f9f9f9;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
         }
 
         .sync-controls {
-          margin-bottom: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
         }
 
         .sync-button {
-          padding: 0.75rem 1.5rem;
+          padding: 0.5rem 0.875rem;
           background: #16a34a;
           color: white;
           border: none;
-          border-radius: 4px;
+          border-radius: 6px;
           cursor: pointer;
           font-weight: 500;
-          transition: background-color 0.2s;
+          font-size: 0.875rem;
+          transition: all 0.2s;
+          white-space: nowrap;
         }
 
         .sync-button:hover:not(:disabled) {
@@ -162,64 +164,17 @@ export default function AnimeSync({ authState, onSyncComplete }: AnimeSyncProps)
         }
 
         .sync-hint {
-          margin-top: 0.5rem;
           color: #6b7280;
-          font-size: 0.875rem;
+          font-size: 0.75rem;
+          white-space: nowrap;
         }
 
         .sync-result {
-          padding: 1rem;
-          border-radius: 4px;
-          margin-bottom: 1rem;
-        }
-
-        .sync-result.success {
-          background: #d1fae5;
-          border: 1px solid #10b981;
-          color: #064e3b;
-        }
-
-        .sync-result h4 {
-          margin: 0 0 0.5rem 0;
-          color: #065f46;
-        }
-
-        .sync-stats p {
-          margin: 0.25rem 0;
+          display: none; /* Hide detailed sync results in inline mode */
         }
 
         .sync-metadata {
-          border-top: 1px solid #e5e7eb;
-          padding-top: 1rem;
-        }
-
-        .sync-metadata h4 {
-          margin: 0 0 1rem 0;
-          color: #374151;
-        }
-
-        .metadata-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 0.75rem;
-        }
-
-        .metadata-item {
-          display: flex;
-          justify-content: space-between;
-          padding: 0.5rem;
-          background: white;
-          border-radius: 4px;
-          border: 1px solid #e5e7eb;
-        }
-
-        .label {
-          font-weight: 500;
-          color: #6b7280;
-        }
-
-        .value {
-          color: #374151;
+          display: none; /* Hide metadata in inline mode */
         }
 
         .error-message {

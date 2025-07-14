@@ -4,6 +4,7 @@
  */
 
 // Re-export all subapp models
+export * from './anime';
 export * from './bookmarks';
 export * from './files';  
 export * from './services';

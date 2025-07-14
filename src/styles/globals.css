@@ -46,7 +46,7 @@ a:hover {
 
 /* Main Layout */
 .container {
-  max-width: 1200px;
+  max-width: 2560px;
   margin: 0 auto;
   padding: 0 2rem;
 }
@@ -245,7 +245,7 @@ a:hover {
 /* TV/4K optimizations */
 @media (min-width: 1920px) {
   .container {
-    max-width: 1600px;
+    max-width: 2560px;
   }
   
   .page-title {

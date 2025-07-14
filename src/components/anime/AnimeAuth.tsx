@@ -140,31 +140,32 @@ export default function AnimeAuth({ onAuthChange }: AnimeAuthProps) {
 
       <style jsx>{`
         .anime-auth {
-          margin-bottom: 1rem;
-          padding: 1rem;
-          border: 1px solid #ddd;
-          border-radius: 8px;
-          background: #f9f9f9;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
         }
 
         .auth-connected {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 1rem;
+          gap: 0.75rem;
         }
 
         .user-info {
-          color: #333;
+          color: #9ca3af;
+          font-size: 0.875rem;
+          white-space: nowrap;
         }
 
         .auth-button {
-          padding: 0.5rem 1rem;
+          padding: 0.5rem 0.875rem;
           border: none;
-          border-radius: 4px;
+          border-radius: 6px;
           cursor: pointer;
           font-weight: 500;
-          transition: background-color 0.2s;
+          font-size: 0.875rem;
+          transition: all 0.2s;
+          white-space: nowrap;
         }
 
         .auth-button:disabled {
@@ -173,12 +174,12 @@ export default function AnimeAuth({ onAuthChange }: AnimeAuthProps) {
         }
 
         .auth-button.connect {
-          background: #2e51a2;
+          background: #2563eb;
           color: white;
         }
 
         .auth-button.connect:hover:not(:disabled) {
-          background: #1e3a8a;
+          background: #1d4ed8;
         }
 
         .auth-button.disconnect {
@@ -200,10 +201,11 @@ export default function AnimeAuth({ onAuthChange }: AnimeAuthProps) {
           color: #dc2626;
           padding: 0.5rem;
           border-radius: 4px;
-          margin-bottom: 1rem;
+          margin-bottom: 0.5rem;
           display: flex;
           justify-content: space-between;
           align-items: center;
+          font-size: 0.875rem;
         }
 
         .close-error {
@@ -211,16 +213,9 @@ export default function AnimeAuth({ onAuthChange }: AnimeAuthProps) {
           border: none;
           color: #dc2626;
           cursor: pointer;
-          font-size: 1.2rem;
+          font-size: 1.1rem;
           padding: 0;
           margin-left: 0.5rem;
-        }
-
-        @media (max-width: 768px) {
-          .auth-connected {
-            flex-direction: column;
-            align-items: stretch;
-          }
         }
       `}</style>
     </div>

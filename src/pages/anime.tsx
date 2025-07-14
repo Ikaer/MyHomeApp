@@ -76,10 +76,10 @@ export default function AnimePage() {
 
       <div className="anime-page">
         <div className="page-header">
-          <h1>Anime List</h1>
-          <p className="page-description">
-            Track current and previous season anime with MyAnimeList integration
-          </p>
+          <div className="header-controls">
+            <AnimeAuth onAuthChange={setAuthState} />
+            <AnimeSync authState={authState} onSyncComplete={handleSyncComplete} />
+          </div>
         </div>
 
         {error && (
@@ -88,11 +88,6 @@ export default function AnimePage() {
             <button onClick={() => setError('')} className="close-error">×</button>
           </div>
         )}
-
-        <div className="controls-section">
-          <AnimeAuth onAuthChange={setAuthState} />
-          <AnimeSync authState={authState} onSyncComplete={handleSyncComplete} />
-        </div>
 
         <div className="content-section">
           {isLoading ? (
@@ -118,26 +113,22 @@ export default function AnimePage() {
 
         <style jsx>{`
           .anime-page {
-              max-width: 1400px;
+              max-width: 2560px;
               margin: 0 auto;
-              padding: 2rem;
+              padding: 1rem 2rem;
             }
 
             .page-header {
               margin-bottom: 2rem;
+              display: flex;
+              justify-content: flex-end;
+              align-items: center;
             }
 
-            .page-header h1 {
-              margin: 0 0 0.5rem 0;
-              color: #111827;
-              font-size: 2rem;
-              font-weight: 700;
-            }
-
-            .page-description {
-              margin: 0;
-              color: #6b7280;
-              font-size: 1.125rem;
+            .header-controls {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
             }
 
             .error-banner {
@@ -162,17 +153,10 @@ export default function AnimePage() {
               margin-left: 1rem;
             }
 
-            .controls-section {
-              margin-bottom: 2rem;
-              display: flex;
-              flex-direction: column;
-              gap: 1rem;
-            }
-
             .content-section {
-              background: white;
+              background: #1f2937;
               border-radius: 8px;
-              border: 1px solid #e5e7eb;
+              border: 1px solid #374151;
               overflow: hidden;
             }
 
@@ -180,20 +164,6 @@ export default function AnimePage() {
               text-align: center;
               padding: 3rem;
               color: #6b7280;
-            }
-
-            @media (max-width: 768px) {
-              .anime-page {
-                padding: 1rem;
-              }
-
-              .page-header h1 {
-                font-size: 1.5rem;
-              }
-
-              .page-description {
-                font-size: 1rem;
-              }
             }
           `}</style>
       </div>
