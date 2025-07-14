@@ -1,6 +1,6 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AnimeWithExtensions, SortColumn, SortDirection } from '@/models/anime';
-import { detectProviderFromUrl, getProviderLogoPath } from '@/lib/providers';
+import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
 import styles from './AnimeTable.module.css';
 
 interface AnimeTableProps {
@@ -62,6 +62,18 @@ export default function AnimeTable({ animes, onEditExtensions }: AnimeTableProps
       setSortColumn(column);
       setSortDirection('desc');
     }
+  };
+
+  const handleManualSearch = (anime: AnimeWithExtensions) => {
+    const searchTitle = anime.alternative_titles?.en || anime.title;
+    const googleUrl = generateGoogleORQuery(searchTitle);
+    window.open(googleUrl, '_blank');
+  };
+
+  const handleJustWatchSearch = (anime: AnimeWithExtensions) => {
+    const searchTitle = anime.alternative_titles?.en || anime.title;
+    const justWatchUrl = generateJustWatchQuery(searchTitle);
+    window.open(justWatchUrl, '_blank');
   };
 
   const getSortIcon = (column: SortColumn) => {
@@ -237,6 +249,24 @@ export default function AnimeTable({ animes, onEditExtensions }: AnimeTableProps
                     title="Edit providers and notes"
                   >
                     Edit
+                  </button>
+                  <button 
+                    onClick={() => handleManualSearch(anime)}
+                    className={styles.searchButton}
+                    title="Search providers manually on Google"
+                  >
+                    🔍
+                  </button>
+                  <button 
+                    onClick={() => handleJustWatchSearch(anime)}
+                    className={styles.justWatchButton}
+                    title="Search on JustWatch"
+                  >
+                    <img 
+                      src="/justwatch.png" 
+                      alt="JustWatch" 
+                      className={styles.justWatchIcon}
+                    />
                   </button>
                 </td>
               </tr>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnimeWithExtensions, AnimeExtension, AnimeProvider } from '@/models/anime';
-import { detectProviderFromUrl, getAllProviders, getProviderLogoPath, formatProviderOption } from '@/lib/providers';
+import { detectProviderFromUrl, getAllProviders, getProviderLogoPath, formatProviderOption, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
 import styles from './AnimeExtensionForm.module.css';
 
 interface AnimeExtensionFormProps {
@@ -158,6 +158,18 @@ export default function AnimeExtensionForm({ anime, onSave, onCancel, onClose }:
     return anime.alternative_titles?.en || anime.title;
   };
 
+  const handleGoogleSearch = () => {
+    const searchTitle = getAnimeTitle();
+    const googleUrl = generateGoogleORQuery(searchTitle);
+    window.open(googleUrl, '_blank');
+  };
+
+  const handleJustWatchSearch = () => {
+    const searchTitle = getAnimeTitle();
+    const justWatchUrl = generateJustWatchQuery(searchTitle);
+    window.open(justWatchUrl, '_blank');
+  };
+
   return (
     <div className={styles.extensionFormOverlay} onClick={handleOverlayClick}>
       <div className={styles.extensionForm}>
@@ -197,6 +209,29 @@ export default function AnimeExtensionForm({ anime, onSave, onCancel, onClose }:
             <p className={styles.helpText}>
               Enter the direct URL to the anime page. Supported providers: Netflix, Crunchyroll, ADN, Disney+, Prime Video
             </p>
+            <div className={styles.searchButtons}>
+              <button 
+                type="button"
+                onClick={handleGoogleSearch}
+                className={styles.searchButton}
+                title="Search providers on Google"
+              >
+                🔍 Search on Google
+              </button>
+              <button 
+                type="button"
+                onClick={handleJustWatchSearch}
+                className={styles.justWatchButton}
+                title="Search on JustWatch"
+              >
+                <img 
+                  src="/justwatch.png" 
+                  alt="JustWatch" 
+                  className={styles.justWatchIcon}
+                />
+                JustWatch
+              </button>
+            </div>
             <div className={styles.providersList}>
               {providers.map((provider, index) => {
                 const detectedProvider = detectProviderFromUrl(provider.url);
