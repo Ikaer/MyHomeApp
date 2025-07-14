@@ -186,7 +186,7 @@ export function getSubApps(): SubApp[] {
         description: 'Browse your NAS files',
         icon: '📁',
         route: '/files',
-        enabled: false // Will be enabled in Phase 3
+        enabled: true // Will be enabled in Phase 3
       }
     ];
     

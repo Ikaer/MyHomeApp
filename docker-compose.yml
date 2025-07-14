@@ -13,6 +13,7 @@ services:
       - /volume2:/nas/volume2:ro
       - /volume3:/nas/volume3:ro
       - /volume4:/nas/volume4:ro
+      - /volume5:/nas/volume5:ro
     environment:
       - NODE_ENV=production
       - DATA_PATH=/app/data
