@@ -2,8 +2,8 @@ version: '3.8'
 
 services:
   myhomeapp:
+    image: myhomeapp:${BUILD_VERSION:-latest}
     build: 
-      image: myhomeapp:${BUILD_VERSION:-latest}
       context: .
       args:
         - BUILD_DATE=2025-07-14-v4
