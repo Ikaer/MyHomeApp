@@ -5,7 +5,7 @@ services:
     build: 
       context: .
       args:
-        - CACHEBUST=${CACHEBUST:-1}
+        - BUILD_DATE=2025-07-14-v2
     ports:
       - "12344:3000"
     volumes:

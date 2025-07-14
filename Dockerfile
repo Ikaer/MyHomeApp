@@ -5,8 +5,8 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Cache busting argument
-ARG CACHEBUST=1
+# Cache busting argument - change this value to force rebuild
+ARG BUILD_DATE=default
 
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
