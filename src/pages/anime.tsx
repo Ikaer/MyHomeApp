@@ -67,6 +67,47 @@ export default function AnimePage() {
     setEditingAnime(null);
   };
 
+  const handleUpdateMALStatus = async (animeId: number, updates: any) => {
+    try {
+      setError('');
+      
+      const response = await fetch(`/api/anime/animes/${animeId}/mal-status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (response.ok) {
+        // Update local state immediately to reflect changes
+        setAnimes(prevAnimes => 
+          prevAnimes.map(anime => {
+            if (anime.id === animeId) {
+              return {
+                ...anime,
+                my_list_status: {
+                  ...anime.my_list_status,
+                  ...updates,
+                  updated_at: new Date().toISOString()
+                }
+              };
+            }
+            return anime;
+          })
+        );
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to update MAL status');
+        throw new Error(errorData.error || 'Failed to update MAL status');
+      }
+    } catch (error) {
+      console.error('Error updating MAL status:', error);
+      setError('Failed to update MAL status');
+      throw error;
+    }
+  };
+
   return (
     <>
       <Head>
@@ -98,6 +139,7 @@ export default function AnimePage() {
               <AnimeTable 
                 animes={animes} 
                 onEditExtensions={handleEditExtensions}
+                onUpdateMALStatus={handleUpdateMALStatus}
               />
             )}
         </div>

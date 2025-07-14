@@ -14,6 +14,7 @@
   border-collapse: collapse;
   background: #1f2937;
   color: #f9fafb;
+  table-layout: fixed; /* Prevent table from growing beyond container */
 }
 
 .animeTable th,
@@ -21,6 +22,8 @@
   padding: 0.75rem;
   text-align: left;
   border-bottom: 1px solid #374151;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .animeTable th {
@@ -115,6 +118,25 @@
   width: 120px;
 }
 
+.malStatusCell {
+  width: 120px;
+  text-align: center;
+}
+
+.malScoreCell {
+  width: 80px;
+  text-align: center;
+}
+
+.malEpisodesCell {
+  width: 120px;
+  min-width: 120px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .status {
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
@@ -135,6 +157,43 @@
 .status.notYetAired {
   background: #d97706;
   color: #fef3c7;
+}
+
+.malStatus {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  width: 100%;
+  background: #374151;
+  border: 1px solid #4b5563;
+  color: #f9fafb;
+}
+
+.malStatus.watching {
+  background: #3b82f6;
+  color: white;
+}
+
+.malStatus.completed {
+  background: #10b981;
+  color: white;
+}
+
+.malStatus.onHold {
+  background: #f59e0b;
+  color: white;
+}
+
+.malStatus.dropped {
+  background: #ef4444;
+  color: white;
+}
+
+.malStatus.planToWatch {
+  background: #8b5cf6;
+  color: white;
 }
 
 .episodesCell {
@@ -294,4 +353,260 @@
   text-align: center;
   padding: 3rem;
   color: #9ca3af;
+}
+
+.malScore {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 500;
+  min-width: 40px;
+  width: 100%;
+  background: #374151;
+  border: 1px solid #4b5563;
+  color: #f9fafb;
+}
+
+.malScore.editable {
+  background: #374151;
+  border: 1px solid #4b5563;
+  cursor: pointer;
+  color: #f9fafb;
+}
+
+.malScore.editable:hover {
+  background: #4b5563;
+  border-color: #6b7280;
+}
+
+.episodesCell {
+  width: 80px;
+  text-align: center;
+}
+
+.genresCell {
+  max-width: 150px;
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+.providersCell {
+  min-width: 80px;
+}
+
+.providersList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.providerLink {
+  display: inline-block;
+  padding: 0.25rem;
+  border-radius: 4px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  transition: all 0.2s;
+}
+
+.providerLink:hover {
+  background: #374151;
+  border-color: #60a5fa;
+  transform: scale(1.05);
+}
+
+.providerLinkText {
+  font-size: 0.75rem;
+  color: #60a5fa;
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #374151;
+  background: #1f2937;
+  display: inline-block;
+}
+
+.providerLinkText:hover {
+  background: #374151;
+  border-color: #60a5fa;
+}
+
+.providerLogo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 2px;
+  display: block;
+}
+
+.providerName {
+  white-space: nowrap;
+}
+
+.noProviders {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.linksCell {
+  width: 60px;
+}
+
+.malLink {
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #60a5fa;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background: transparent;
+}
+
+.malLink:hover {
+  background: #60a5fa;
+  color: #111827;
+}
+
+.actionsCell {
+  width: 160px;
+}
+
+.actionsCell button {
+  margin-right: 0.5rem;
+}
+
+.editButton {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.editButton:hover {
+  background: #d97706;
+}
+
+.searchButton {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.375rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.searchButton:hover {
+  background: #059669;
+}
+
+.justWatchButton {
+  background: #fff;
+  color: #000;
+  border: 1px solid #ddd;
+  padding: 0.375rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.justWatchButton:hover {
+  background: #f0f0f0;
+  border-color: #bbb;
+}
+
+.justWatchIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: #9ca3af;
+}
+
+.episodeCounter {
+  background: #374151;
+  border: 1px solid #4b5563;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  color: #f9fafb;
+  font-size: 0.875rem;
+  min-width: 30px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.episodeCounter:hover {
+  background: #4b5563;
+  border-color: #6b7280;
+}
+
+.episodeButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.episodeButton {
+  background: #6b7280;
+  border: none;
+  color: white;
+  width: 20px;
+  height: 16px;
+  font-size: 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.episodeButton:hover {
+  background: #9ca3af;
+}
+
+.updateButton {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-left: 0.5rem;
+}
+
+.updateButton:hover {
+  background: #2563eb;
+}
+
+.updateButton:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+}
+
+/* Actions button group for proper alignment */
+.actionsButtonGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Override margin for buttons inside button group */
+.actionsButtonGroup button {
+  margin-right: 0 !important;
 }
