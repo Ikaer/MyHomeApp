@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   myhomeapp:
-    build: .
+    build: 
+      context: .
+      args:
+        - CACHEBUST=${CACHEBUST:-1}
     ports:
       - "12344:3000"
     volumes:
