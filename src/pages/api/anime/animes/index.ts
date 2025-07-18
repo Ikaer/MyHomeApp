@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getFilteredAnimeList } from '@/lib/anime';
+import { getFilteredAnimeList, getAnimeWithExtensions } from '@/lib/anime';
 import { AnimeWithExtensions, SortColumn, SortDirection } from '@/models/anime';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -19,8 +19,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       sortDir = 'desc' 
     } = req.query;
 
-    // Get filtered anime list (current season + previous season still airing)
-    let animeList = getFilteredAnimeList();
+    // Get all anime data for testing visual modifications
+    let animeList = getAnimeWithExtensions();
 
     // Apply search filter
     if (search && typeof search === 'string') {
