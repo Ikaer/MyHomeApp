@@ -6,7 +6,7 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  setup:
+  copilot-setup-steps:
     name: Setup MyHomeApp Development Environment
     runs-on: ubuntu-latest
     
