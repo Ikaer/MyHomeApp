@@ -7,6 +7,8 @@
   border: 1px solid #374151;
   border-radius: 8px;
   background: #1f2937;
+  /* Improve scrolling behavior for high zoom */
+  scroll-behavior: smooth;
 }
 
 .animeTable {
@@ -14,7 +16,8 @@
   border-collapse: collapse;
   background: #1f2937;
   color: #f9fafb;
-  table-layout: fixed; /* Prevent table from growing beyond container */
+  table-layout: auto; /* Allow flexible column sizing for responsive behavior */
+  min-width: 1200px; /* Ensure minimum width for proper layout */
 }
 
 .animeTable th,
@@ -44,7 +47,8 @@
 }
 
 .imageCell {
-  width: 60px;
+  width: 4rem; /* Use rem units for better zoom scaling */
+  min-width: 4rem;
   text-align: center;
 }
 
@@ -69,8 +73,9 @@
 }
 
 .titleCell {
-  min-width: 200px;
-  max-width: 300px;
+  min-width: 12rem; /* Use rem for better scaling */
+  max-width: 20rem;
+  width: 20%;
 }
 
 .primaryTitle {
@@ -85,7 +90,8 @@
 }
 
 .scoreCell {
-  width: 80px;
+  width: 5rem; /* Use rem for better scaling */
+  min-width: 5rem;
   text-align: center;
 }
 
@@ -115,22 +121,25 @@
 }
 
 .statusCell {
-  width: 120px;
+  width: 8rem; /* Use rem for better scaling */
+  min-width: 8rem;
 }
 
 .malStatusCell {
-  width: 120px;
+  width: 8rem; /* Use rem for better scaling */
+  min-width: 8rem;
   text-align: center;
 }
 
 .malScoreCell {
-  width: 80px;
+  width: 5rem; /* Use rem for better scaling */
+  min-width: 5rem;
   text-align: center;
 }
 
 .malEpisodesCell {
-  width: 120px;
-  min-width: 120px;
+  width: 8rem; /* Use rem for better scaling */
+  min-width: 8rem;
   text-align: center;
   display: flex;
   align-items: center;
@@ -197,18 +206,21 @@
 }
 
 .episodesCell {
-  width: 80px;
+  width: 5rem; /* Use rem for better scaling */
+  min-width: 5rem;
   text-align: center;
 }
 
 .genresCell {
-  max-width: 150px;
+  max-width: 10rem; /* Use rem for better scaling */
+  min-width: 8rem;
   font-size: 0.875rem;
   color: #9ca3af;
 }
 
 .providersCell {
-  min-width: 80px;
+  min-width: 6rem; /* Use rem for better scaling */
+  width: 8rem;
 }
 
 .providersList {
@@ -268,7 +280,8 @@
 }
 
 .linksCell {
-  width: 60px;
+  width: 4rem; /* Use rem for better scaling */
+  min-width: 4rem;
 }
 
 .malLink {
@@ -288,7 +301,8 @@
 }
 
 .actionsCell {
-  width: 160px;
+  width: 12rem; /* Increased from 160px to accommodate buttons at high zoom */
+  min-width: 12rem; /* Ensure minimum width for buttons */
 }
 
 .actionsCell button {
@@ -299,11 +313,12 @@
   background: #f59e0b;
   color: white;
   border: none;
-  padding: 0.375rem 0.75rem;
+  padding: 0.25rem 0.5rem; /* Reduced padding for more compact layout */
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.75rem; /* Slightly smaller font */
   font-weight: 500;
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 .editButton:hover {
@@ -314,11 +329,16 @@
   background: #10b981;
   color: white;
   border: none;
-  padding: 0.375rem 0.5rem;
+  padding: 0.25rem 0.375rem; /* More compact padding */
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.875rem;
   line-height: 1;
+  width: 2rem; /* Fixed width for icon button */
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .searchButton:hover {
@@ -329,7 +349,7 @@
   background: #fff;
   color: #000;
   border: 1px solid #ddd;
-  padding: 0.375rem 0.5rem;
+  padding: 0.25rem 0.375rem; /* More compact padding */
   border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
@@ -337,6 +357,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 2rem; /* Fixed width for icon button */
+  height: 2rem;
 }
 
 .justWatchButton:hover {
@@ -376,165 +398,6 @@
 .malScore.editable:hover {
   background: #4b5563;
   border-color: #6b7280;
-}
-
-.episodesCell {
-  width: 80px;
-  text-align: center;
-}
-
-.genresCell {
-  max-width: 150px;
-  font-size: 0.875rem;
-  color: #9ca3af;
-}
-
-.providersCell {
-  min-width: 80px;
-}
-
-.providersList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  align-items: center;
-}
-
-.providerLink {
-  display: inline-block;
-  padding: 0.25rem;
-  border-radius: 4px;
-  border: 1px solid #374151;
-  background: #1f2937;
-  transition: all 0.2s;
-}
-
-.providerLink:hover {
-  background: #374151;
-  border-color: #60a5fa;
-  transform: scale(1.05);
-}
-
-.providerLinkText {
-  font-size: 0.75rem;
-  color: #60a5fa;
-  text-decoration: none;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  border: 1px solid #374151;
-  background: #1f2937;
-  display: inline-block;
-}
-
-.providerLinkText:hover {
-  background: #374151;
-  border-color: #60a5fa;
-}
-
-.providerLogo {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
-  border-radius: 2px;
-  display: block;
-}
-
-.providerName {
-  white-space: nowrap;
-}
-
-.noProviders {
-  font-size: 0.875rem;
-  color: #9ca3af;
-  font-style: italic;
-}
-
-.linksCell {
-  width: 60px;
-}
-
-.malLink {
-  color: #60a5fa;
-  text-decoration: none;
-  font-weight: 500;
-  padding: 0.25rem 0.5rem;
-  border: 1px solid #60a5fa;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  background: transparent;
-}
-
-.malLink:hover {
-  background: #60a5fa;
-  color: #111827;
-}
-
-.actionsCell {
-  width: 160px;
-}
-
-.actionsCell button {
-  margin-right: 0.5rem;
-}
-
-.editButton {
-  background: #f59e0b;
-  color: white;
-  border: none;
-  padding: 0.375rem 0.75rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.editButton:hover {
-  background: #d97706;
-}
-
-.searchButton {
-  background: #10b981;
-  color: white;
-  border: none;
-  padding: 0.375rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  line-height: 1;
-}
-
-.searchButton:hover {
-  background: #059669;
-}
-
-.justWatchButton {
-  background: #fff;
-  color: #000;
-  border: 1px solid #ddd;
-  padding: 0.375rem 0.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.justWatchButton:hover {
-  background: #f0f0f0;
-  border-color: #bbb;
-}
-
-.justWatchIcon {
-  width: 16px;
-  height: 16px;
-}
-
-.emptyState {
-  text-align: center;
-  padding: 3rem;
-  color: #9ca3af;
 }
 
 .episodeCounter {
@@ -582,12 +445,13 @@
   background: #3b82f6;
   color: white;
   border: none;
-  padding: 0.375rem 0.75rem;
+  padding: 0.25rem 0.5rem; /* More compact padding */
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.75rem; /* Slightly smaller font */
   font-weight: 500;
-  margin-left: 0.5rem;
+  margin-left: 0; /* Remove left margin since we use gap now */
+  white-space: nowrap; /* Prevent text wrapping */
 }
 
 .updateButton:hover {
@@ -603,10 +467,52 @@
 .actionsButtonGroup {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem; /* Reduced gap to fit more buttons */
+  flex-wrap: wrap; /* Allow wrapping for high zoom scenarios */
+  justify-content: flex-start;
 }
 
 /* Override margin for buttons inside button group */
 .actionsButtonGroup button {
   margin-right: 0 !important;
+  flex-shrink: 0; /* Prevent buttons from shrinking */
+  min-width: fit-content; /* Ensure buttons maintain their size */
+}
+
+/* Responsive improvements for high zoom scenarios (300% zoom on 4K displays) */
+@media (max-width: 1600px) {
+  .animeTable {
+    min-width: 1000px; /* Reduce minimum width for smaller viewports */
+  }
+  
+  .titleCell {
+    max-width: 15rem; /* Reduce max width for title */
+  }
+  
+  .genresCell {
+    max-width: 8rem; /* Reduce genres column width */
+  }
+}
+
+/* For very high zoom levels or smaller screens */
+@media (max-width: 1200px) {
+  .animeTable {
+    min-width: 800px; /* Further reduce minimum width */
+    font-size: 0.875rem; /* Slightly smaller text for better fit */
+  }
+  
+  .animeTable th,
+  .animeTable td {
+    padding: 0.5rem; /* Reduce padding for more compact layout */
+  }
+  
+  .actionsButtonGroup {
+    gap: 0.125rem; /* Even smaller gap between buttons */
+  }
+  
+  .editButton,
+  .updateButton {
+    font-size: 0.7rem; /* Smaller font size for text buttons */
+    padding: 0.2rem 0.4rem; /* Even more compact padding */
+  }
 }
