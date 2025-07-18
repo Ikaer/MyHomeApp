@@ -1,0 +1,79 @@
+name: Setup Development Environment for GitHub Copilot
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  setup:
+    name: Setup MyHomeApp Development Environment
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Initialize MyHomeApp data directories
+      run: |
+        echo "📁 Creating MyHomeApp data structure..."
+        mkdir -p data/{bookmarks,files,services,anime}
+        mkdir -p config logs
+        
+        # Create sample data files if they don't exist
+        if [ ! -f "data/bookmarks/bookmarks.json" ]; then
+          echo "[]" > data/bookmarks/bookmarks.json
+        fi
+        
+        if [ ! -f "data/bookmarks/categories.json" ]; then
+          echo "[]" > data/bookmarks/categories.json
+        fi
+        
+        if [ ! -f "data/files/roots.json" ]; then
+          echo "[]" > data/files/roots.json
+        fi
+        
+        if [ ! -f "data/services/services.json" ]; then
+          echo "[]" > data/services/services.json
+        fi
+        
+        echo "✅ MyHomeApp data directories initialized"
+        
+    - name: Build project
+      run: npm run build
+      
+    - name: Verify project structure
+      run: |
+        echo "🔍 Verifying MyHomeApp subapp structure..."
+        
+        # Check subapp components
+        test -d "src/components/bookmarks" && echo "✅ Bookmarks components"
+        test -d "src/components/files" && echo "✅ Files components" 
+        test -d "src/components/services" && echo "✅ Services components"
+        test -d "src/components/shared" && echo "✅ Shared components"
+        
+        # Check subapp models
+        test -d "src/models/bookmarks" && echo "✅ Bookmark models"
+        test -d "src/models/files" && echo "✅ File models"
+        test -d "src/models/shared" && echo "✅ Shared models"
+        
+        # Check API routes
+        test -d "src/pages/api/bookmarks" && echo "✅ Bookmark APIs"
+        test -d "src/pages/api/files" && echo "✅ File APIs"
+        test -d "src/pages/api/services" && echo "✅ Service APIs"
+        
+        # Check main pages
+        test -f "src/pages/bookmarks.tsx" && echo "✅ Bookmarks page"
+        test -f "src/pages/files.tsx" && echo "✅ Files page"
+        test -f "src/pages/services.tsx" && echo "✅ Services page"
+        
+        echo "🎉 MyHomeApp development environment ready for GitHub Copilot!"
