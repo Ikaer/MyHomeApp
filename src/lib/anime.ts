@@ -98,8 +98,31 @@ export function getAnimeWithExtensions(): AnimeWithExtensions[] {
   }));
 }
 
-export function getFilteredAnimeList(): AnimeWithExtensions[] {
+export function getFilteredAnimeList(view: 'new_season' | 'find_shows' | 'watching' | 'completed' = 'new_season'): AnimeWithExtensions[] {
   const allAnime = getAnimeWithExtensions();
+  
+  if (view === 'find_shows') {
+    // Return top 100 TV shows with no my_list_status (shows to discover)
+    return allAnime
+      .filter(anime => 
+        anime.media_type === 'tv' && 
+        !anime.my_list_status
+      )
+      .sort((a, b) => (b.mean || 0) - (a.mean || 0)) // Sort by MAL score descending
+      .slice(0, 100); // Limit to top 100
+  }
+  
+  if (view === 'watching') {
+    // Return anime currently being watched
+    return allAnime.filter(anime => anime.my_list_status?.status === 'watching');
+  }
+  
+  if (view === 'completed') {
+    // Return completed anime
+    return allAnime.filter(anime => anime.my_list_status?.status === 'completed');
+  }
+  
+  // Default: new_season view (current implementation)
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   

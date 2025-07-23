@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { AnimeAuth, AnimeSync, AnimeTable, AnimeExtensionForm } from '@/components/anime';
-import { AnimeWithExtensions, MALAuthState } from '@/models/anime';
+import { AnimeAuth, AnimeSync, AnimeTable, AnimeExtensionForm, AnimeViewSelector } from '@/components/anime';
+import { AnimeWithExtensions, MALAuthState, AnimeView } from '@/models/anime';
 
 export default function AnimePage() {
   const [authState, setAuthState] = useState<MALAuthState>({ isAuthenticated: false });
@@ -9,10 +9,11 @@ export default function AnimePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [editingAnime, setEditingAnime] = useState<AnimeWithExtensions | null>(null);
+  const [currentView, setCurrentView] = useState<AnimeView>('new_season');
 
   useEffect(() => {
     loadAnimes();
-  }, []);
+  }, [currentView]);
 
   useEffect(() => {
     // Check for auth success/error from OAuth redirect
@@ -34,7 +35,7 @@ export default function AnimePage() {
       setIsLoading(true);
       setError('');
       
-      const response = await fetch('/api/anime/animes');
+      const response = await fetch(`/api/anime/animes?view=${currentView}`);
       if (response.ok) {
         const data = await response.json();
         setAnimes(data.animes || []);
@@ -48,6 +49,10 @@ export default function AnimePage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleViewChange = (view: AnimeView) => {
+    setCurrentView(view);
   };
 
   const handleSyncComplete = () => {
@@ -129,6 +134,13 @@ export default function AnimePage() {
             <button onClick={() => setError('')} className="close-error">×</button>
           </div>
         )}
+
+        <AnimeViewSelector 
+          currentView={currentView} 
+          onViewChange={handleViewChange}
+          animeCount={animes.length}
+          isLoading={isLoading}
+        />
 
         <div className="content-section">
           {isLoading ? (

@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getFilteredAnimeList } from '@/lib/anime';
-import { AnimeWithExtensions, SortColumn, SortDirection } from '@/models/anime';
+import { AnimeWithExtensions, SortColumn, SortDirection, AnimeView } from '@/models/anime';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -16,11 +16,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       status, 
       minScore, 
       sortBy = 'mean', 
-      sortDir = 'desc' 
+      sortDir = 'desc',
+      view = 'new_season'
     } = req.query;
 
-    // Get filtered anime list (current season + previous season still airing)
-    let animeList = getFilteredAnimeList();
+    // Validate view parameter
+    const animeView = (['new_season', 'find_shows', 'watching', 'completed'].includes(view as string)) 
+      ? view as AnimeView 
+      : 'new_season';
+
+    // Get filtered anime list based on view
+    let animeList = getFilteredAnimeList(animeView);
 
     // Apply search filter
     if (search && typeof search === 'string') {
@@ -106,6 +112,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     res.json({
       animes: animeList,
       total: animeList.length,
+      view: animeView,
       filters: {
         search: search || null,
         genres: genres || null,

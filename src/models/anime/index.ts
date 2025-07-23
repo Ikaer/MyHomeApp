@@ -149,6 +149,9 @@ export interface SyncMetadata {
 export type SortColumn = 'title' | 'mean' | 'start_date' | 'status' | 'num_episodes';
 export type SortDirection = 'asc' | 'desc';
 
+// View types
+export type AnimeView = 'new_season' | 'find_shows' | 'watching' | 'completed';
+
 export interface AnimeFilters {
   search?: string;
   genres?: string[];
