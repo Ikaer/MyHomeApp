@@ -211,6 +211,13 @@
   text-align: center;
 }
 
+.seasonCell {
+  width: 7rem; /* Use rem for better scaling */
+  min-width: 7rem;
+  text-align: center;
+  font-size: 0.875rem;
+}
+
 .genresCell {
   max-width: 10rem; /* Use rem for better scaling */
   min-width: 8rem;

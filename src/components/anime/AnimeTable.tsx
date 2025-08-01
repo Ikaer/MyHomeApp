@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { AnimeWithExtensions, SortColumn, SortDirection } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
+import { formatSeason } from '@/lib/animeUtils';
 import styles from './AnimeTable.module.css';
 
 interface MALStatusUpdate {
@@ -265,6 +266,7 @@ export default function AnimeTable({ animes, onEditExtensions, onUpdateMALStatus
               >
                 Episodes {getSortIcon('num_episodes')}
               </th>
+              <th>Starting Season</th>
               <th>Genres</th>
               <th>My Status</th>
               <th>My Score</th>
@@ -308,6 +310,20 @@ export default function AnimeTable({ animes, onEditExtensions, onUpdateMALStatus
                 </td>
                 <td className={styles.episodesCell}>
                   {anime.num_episodes || 'TBA'}
+                </td>
+                <td className={styles.seasonCell}>
+                  {anime.start_season ? (
+                    <span 
+                      style={{ 
+                        color: formatSeason(anime.start_season.year, anime.start_season.season).color,
+                        fontWeight: 'bold'
+                      }}
+                    >
+                      {formatSeason(anime.start_season.year, anime.start_season.season).label}
+                    </span>
+                  ) : (
+                    <span style={{ color: '#6B7280' }}>Unknown</span>
+                  )}
                 </td>
                 <td className={styles.genresCell}>
                   {formatGenres(anime.genres || [])}

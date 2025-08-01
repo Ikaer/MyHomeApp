@@ -153,8 +153,8 @@ export function getFilteredAnimeList(view: 'new_season' | 'find_shows' | 'watchi
       return true;
     }
     
-    // Include anime from previous season that are still airing
-    if (animeYear === prevYear && animeSeason === prevSeason && anime.status === 'currently_airing') {
+    // Include all anime from previous season (any status)
+    if (animeYear === prevYear && animeSeason === prevSeason) {
       return true;
     }
     
