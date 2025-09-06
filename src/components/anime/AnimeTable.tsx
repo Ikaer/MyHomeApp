@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { AnimeWithExtensions, SortColumn, SortDirection } from '@/models/anime';
+import { AnimeWithExtensions, SortColumn, SortDirection, AnimeScoresHistoryData } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
 import { formatSeason } from '@/lib/animeUtils';
 import styles from './AnimeTable.module.css';
+import { ScoreEvolution } from '.';
 
 interface MALStatusUpdate {
   status?: string;
@@ -12,11 +13,12 @@ interface MALStatusUpdate {
 
 interface AnimeTableProps {
   animes: AnimeWithExtensions[];
+  scoresHistory: AnimeScoresHistoryData;
   onEditExtensions?: (anime: AnimeWithExtensions) => void;
   onUpdateMALStatus?: (animeId: number, updates: MALStatusUpdate) => void;
 }
 
-export default function AnimeTable({ animes, onEditExtensions, onUpdateMALStatus }: AnimeTableProps) {
+export default function AnimeTable({ animes, scoresHistory, onEditExtensions, onUpdateMALStatus }: AnimeTableProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>('mean');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [pendingUpdates, setPendingUpdates] = useState<Map<number, MALStatusUpdate>>(new Map());
@@ -274,6 +276,7 @@ export default function AnimeTable({ animes, onEditExtensions, onUpdateMALStatus
               <th>Providers</th>
               <th>Links</th>
               <th>Actions</th>
+              <th>Score Evolution</th>
             </tr>
           </thead>
           <tbody>
@@ -427,6 +430,9 @@ export default function AnimeTable({ animes, onEditExtensions, onUpdateMALStatus
                       </button>
                     )}
                   </div>
+                </td>
+                <td>
+                  <ScoreEvolution animeId={anime.id} scoresHistory={scoresHistory} />
                 </td>
               </tr>
             ))}

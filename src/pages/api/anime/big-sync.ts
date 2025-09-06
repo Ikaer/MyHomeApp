@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getMALAuthData, isMALTokenValid, upsertMALAnime, getSyncMetadata } from '@/lib/anime';
+import { getMALAuthData, isMALTokenValid, upsertMALAnime, getSyncMetadata, updateAnimeScoresHistory } from '@/lib/anime';
 import { AnimeSeasonResponse, MALAnime } from '@/models/anime';
 
 // Store ongoing big sync processes
@@ -222,6 +222,7 @@ async function performBigSyncAsync(accessToken: string, syncId: string) {
     // Upsert all anime data
     if (allAnime.length > 0) {
       upsertMALAnime(allAnime);
+      updateAnimeScoresHistory(allAnime);
     }
 
     console.log(`Big sync ${syncId} completed: ${allAnime.length} anime from ${processedSeasons} seasons`);

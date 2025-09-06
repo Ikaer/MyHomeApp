@@ -1,0 +1,48 @@
+.evolutionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.9em;
+}
+
+.controls {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.weekSelector {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.metricsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.change {
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.increase {
+  color: #4caf50; /* Green */
+}
+
+.decrease {
+  color: #f44336; /* Red */
+}
+
+.neutral {
+  color: var(--text-secondary);
+}

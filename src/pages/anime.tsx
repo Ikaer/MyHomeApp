@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { AnimeAuth, AnimeSync, AnimeTable, AnimeExtensionForm, AnimeViewSelector } from '@/components/anime';
-import { AnimeWithExtensions, MALAuthState, AnimeView } from '@/models/anime';
+import { AnimeWithExtensions, MALAuthState, AnimeView, AnimeScoresHistoryData } from '@/models/anime';
 
 export default function AnimePage() {
   const [authState, setAuthState] = useState<MALAuthState>({ isAuthenticated: false });
   const [animes, setAnimes] = useState<AnimeWithExtensions[]>([]);
+  const [scoresHistory, setScoresHistory] = useState<AnimeScoresHistoryData>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [editingAnime, setEditingAnime] = useState<AnimeWithExtensions | null>(null);
@@ -13,6 +14,7 @@ export default function AnimePage() {
 
   useEffect(() => {
     loadAnimes();
+    loadScoresHistory();
   }, [currentView]);
 
   useEffect(() => {
@@ -51,12 +53,25 @@ export default function AnimePage() {
     }
   };
 
+  const loadScoresHistory = async () => {
+    try {
+      const response = await fetch('/api/anime/scores-history');
+      if (response.ok) {
+        const data = await response.json();
+        setScoresHistory(data.history || {});
+      }
+    } catch (error) {
+      console.error('Error loading scores history:', error);
+    }
+  };
+
   const handleViewChange = (view: AnimeView) => {
     setCurrentView(view);
   };
 
   const handleSyncComplete = () => {
     loadAnimes();
+    loadScoresHistory();
   };
 
   const handleEditExtensions = (anime: AnimeWithExtensions) => {
@@ -150,6 +165,7 @@ export default function AnimePage() {
             ) : (
               <AnimeTable 
                 animes={animes} 
+                scoresHistory={scoresHistory}
                 onEditExtensions={handleEditExtensions}
                 onUpdateMALStatus={handleUpdateMALStatus}
               />

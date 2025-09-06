@@ -163,3 +163,21 @@ export interface AnimeSortOptions {
   column: SortColumn;
   direction: SortDirection;
 }
+
+// Score history tracking
+export interface AnimeScoreHistory {
+  mean?: number;
+  rank?: number;
+  popularity?: number;
+  num_list_users?: number;
+  num_scoring_users?: number;
+  my_list_status?: {
+    status: string;
+    score: number;
+    num_episodes_watched: number;
+    is_rewatching: boolean;
+    updated_at: string;
+  };
+}
+
+export type AnimeScoresHistoryData = Record<number, Record<string, AnimeScoreHistory>>;

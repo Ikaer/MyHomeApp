@@ -23,6 +23,16 @@ services:
       - DATA_PATH=/app/data
       - CONFIG_PATH=/app/config
       - LOGS_PATH=/app/logs
+      - CRON_SECRET=mysecretcronjobkey # Change this in production
     restart: unless-stopped
     container_name: myhomeapp
     user: "0:0"  # Run as root to fix permission issues
+
+  cron:
+    image: alpine:latest
+    depends_on:
+      - myhomeapp
+    command: >
+      sh -c "apk add --no-cache curl && echo '0 2 * * * curl -X POST -H \"Authorization: Bearer mysecretcronjobkey\" http://myhomeapp:3000/api/anime/cron-sync' > /etc/crontabs/root && crond -f -d 8"
+    restart: unless-stopped
+    container_name: myhomeapp-cron
