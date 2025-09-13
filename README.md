@@ -1,6 +1,6 @@
 # MyHomeApp
 
-A unified dashboard application for personal home server management. This app is mostly develop around anime watching management with a few additional features, this is also a test for a full "vibe-coding" project with copilot.
+A unified dashboard application for personal home server management. This app is mostly developed around anime watching management with a few additional features, this is also a test for a full "vibe-coding" project with copilot.
 
 ## Development
 
