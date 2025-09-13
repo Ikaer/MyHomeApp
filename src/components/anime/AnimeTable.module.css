@@ -138,12 +138,16 @@
 }
 
 .malEpisodesCell {
-  width: 8rem; /* Use rem for better scaling */
-  min-width: 8rem;
+  width: 6rem; /* Use rem for better scaling */
+  min-width: 6rem;
   text-align: center;
+}
+
+.malEpisodes {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
 }
 
 .status {
@@ -287,8 +291,8 @@
 }
 
 .linksCell {
-  width: 4rem; /* Use rem for better scaling */
-  min-width: 4rem;
+  width: 12rem; /* Use rem for better scaling */
+  min-width: 12rem;
 }
 
 .malLink {
@@ -300,20 +304,15 @@
   border-radius: 4px;
   font-size: 0.875rem;
   background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
 }
 
 .malLink:hover {
   background: #60a5fa;
   color: #111827;
-}
-
-.actionsCell {
-  width: 12rem; /* Increased from 160px to accommodate buttons at high zoom */
-  min-width: 12rem; /* Ensure minimum width for buttons */
-}
-
-.actionsCell button {
-  margin-right: 0.5rem;
 }
 
 .editButton {

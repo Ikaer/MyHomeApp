@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { AnimeAuth, AnimeSync, AnimeTable, AnimeExtensionForm, AnimeViewSelector } from '@/components/anime';
+import { AnimeAuth, AnimeSync, AnimeTable, AnimeViewSelector } from '@/components/anime';
 import { AnimeWithExtensions, MALAuthState, AnimeView, AnimeScoresHistoryData } from '@/models/anime';
 
 export default function AnimePage() {
@@ -9,7 +9,6 @@ export default function AnimePage() {
   const [scoresHistory, setScoresHistory] = useState<AnimeScoresHistoryData>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [editingAnime, setEditingAnime] = useState<AnimeWithExtensions | null>(null);
   const [currentView, setCurrentView] = useState<AnimeView>('new_season');
 
   useEffect(() => {
@@ -72,19 +71,6 @@ export default function AnimePage() {
   const handleSyncComplete = () => {
     loadAnimes();
     loadScoresHistory();
-  };
-
-  const handleEditExtensions = (anime: AnimeWithExtensions) => {
-    setEditingAnime(anime);
-  };
-
-  const handleExtensionSave = () => {
-    setEditingAnime(null);
-    loadAnimes(); // Refresh the list to show updated extensions
-  };
-
-  const handleExtensionCancel = () => {
-    setEditingAnime(null);
   };
 
   const handleUpdateMALStatus = async (animeId: number, updates: any) => {
@@ -166,20 +152,10 @@ export default function AnimePage() {
               <AnimeTable 
                 animes={animes} 
                 scoresHistory={scoresHistory}
-                onEditExtensions={handleEditExtensions}
                 onUpdateMALStatus={handleUpdateMALStatus}
               />
             )}
         </div>
-
-        {editingAnime && (
-          <AnimeExtensionForm
-            anime={editingAnime}
-            onSave={handleExtensionSave}
-            onCancel={handleExtensionCancel}
-            onClose={handleExtensionCancel}
-          />
-        )}
 
         <style jsx>{`
           .anime-page {

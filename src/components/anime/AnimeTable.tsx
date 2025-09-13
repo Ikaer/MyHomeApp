@@ -14,11 +14,10 @@ interface MALStatusUpdate {
 interface AnimeTableProps {
   animes: AnimeWithExtensions[];
   scoresHistory: AnimeScoresHistoryData;
-  onEditExtensions?: (anime: AnimeWithExtensions) => void;
   onUpdateMALStatus?: (animeId: number, updates: MALStatusUpdate) => void;
 }
 
-export default function AnimeTable({ animes, scoresHistory, onEditExtensions, onUpdateMALStatus }: AnimeTableProps) {
+export default function AnimeTable({ animes, scoresHistory, onUpdateMALStatus }: AnimeTableProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>('mean');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [pendingUpdates, setPendingUpdates] = useState<Map<number, MALStatusUpdate>>(new Map());
@@ -272,10 +271,8 @@ export default function AnimeTable({ animes, scoresHistory, onEditExtensions, on
               <th>Genres</th>
               <th>My Status</th>
               <th>My Score</th>
-              <th>Episodes</th>
-              <th>Providers</th>
+              <th>My Episodes</th>
               <th>Links</th>
-              <th>Actions</th>
               <th>Score Evolution</th>
             </tr>
           </thead>
@@ -380,28 +377,16 @@ export default function AnimeTable({ animes, scoresHistory, onEditExtensions, on
                     </span>
                   </div>
                 </td>
-                <td className={styles.providersCell}>
-                  {formatProviders(anime)}
-                </td>
                 <td className={styles.linksCell}>
-                  <a 
-                    href={`https://myanimelist.net/anime/${anime.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.malLink}
-                  >
-                    MAL
-                  </a>
-                </td>
-                <td className={styles.actionsCell}>
                   <div className={styles.actionsButtonGroup}>
-                    <button 
-                      onClick={() => onEditExtensions?.(anime)}
-                      className={styles.editButton}
-                      title="Edit providers and notes"
+                    <a 
+                      href={`https://myanimelist.net/anime/${anime.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.malLink}
                     >
-                      Edit
-                    </button>
+                      MAL
+                    </a>
                     <button 
                       onClick={() => handleManualSearch(anime)}
                       className={styles.searchButton}
