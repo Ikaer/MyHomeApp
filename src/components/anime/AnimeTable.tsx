@@ -14,10 +14,12 @@ interface MALStatusUpdate {
 interface AnimeTableProps {
   animes: AnimeWithExtensions[];
   scoresHistory: AnimeScoresHistoryData;
+  currentView: 'new_season' | 'find_shows' | 'watching' | 'completed' | 'hidden';
   onUpdateMALStatus?: (animeId: number, updates: MALStatusUpdate) => void;
+  onHideToggle?: (animeId: number, hide: boolean) => void;
 }
 
-export default function AnimeTable({ animes, scoresHistory, onUpdateMALStatus }: AnimeTableProps) {
+export default function AnimeTable({ animes, scoresHistory, currentView, onUpdateMALStatus, onHideToggle }: AnimeTableProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>('mean');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [pendingUpdates, setPendingUpdates] = useState<Map<number, MALStatusUpdate>>(new Map());
@@ -404,6 +406,13 @@ export default function AnimeTable({ animes, scoresHistory, onUpdateMALStatus }:
                         alt="JustWatch" 
                         className={styles.justWatchIcon}
                       />
+                    </button>
+                    <button
+                      onClick={() => onHideToggle?.(anime.id, !anime.hidden)}
+                      className={anime.hidden ? styles.showButton : styles.hideButton}
+                      title={anime.hidden ? 'Show this anime' : 'Hide this anime'}
+                    >
+                      {anime.hidden ? 'Unhide' : 'Hide'}
                     </button>
                     {hasPendingUpdates(anime.id) && (
                       <button 

@@ -29,6 +29,26 @@ export default function AnimeViewSelector({ currentView, onViewChange, animeCoun
       key: 'completed',
       label: 'Completed',
       description: 'Completed on MyAnimeList'
+    },
+    {
+      key: 'on_hold',
+      label: 'On Hold',
+      description: 'Shows currently on hold'
+    },
+    {
+      key: 'dropped',
+      label: 'Dropped',
+      description: 'Shows you have dropped'
+    },
+    {
+      key: 'plan_to_watch',
+      label: 'Plan to Watch',
+      description: 'Shows you plan to watch in the future'
+    },
+    {
+      key: 'hidden',
+      label: 'Hidden',
+      description: 'Shows you have hidden from other views'
     }
   ];
 

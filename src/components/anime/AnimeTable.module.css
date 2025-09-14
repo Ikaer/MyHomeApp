@@ -331,6 +331,38 @@
   background: #d97706;
 }
 
+.hideButton, .showButton {
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hideButton {
+  background: #ef4444;
+  color: white;
+}
+
+.hideButton:hover {
+  background: #dc2626;
+}
+
+.showButton {
+  background: #22c55e;
+  color: white;
+}
+
+.showButton:hover {
+  background: #16a34a;
+}
+
 .searchButton {
   background: #10b981;
   color: white;

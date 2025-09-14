@@ -9,6 +9,7 @@ const ANIME_DATA_PATH = path.join(DATA_PATH, 'anime');
 const ANIME_MAL_FILE = path.join(ANIME_DATA_PATH, 'animes_MAL.json');
 const ANIME_EXTENSIONS_FILE = path.join(ANIME_DATA_PATH, 'animes_extensions.json');
 const ANIME_SCORES_HISTORY_FILE = path.join(ANIME_DATA_PATH, 'anime_scores_history.json');
+const ANIME_HIDDEN_FILE = path.join(ANIME_DATA_PATH, 'animes_hidden.json');
 const MAL_AUTH_FILE = path.join(ANIME_DATA_PATH, 'mal_auth.json');
 
 // Utility function to ensure anime data directory exists
@@ -41,6 +42,25 @@ function writeJsonFile<T>(filePath: string, data: T): void {
     console.error(`Error writing ${filePath}:`, error);
     throw error;
   }
+}
+
+// Hidden anime IDs operations
+export function getHiddenAnimeIds(): number[] {
+  return readJsonFile<number[]>(ANIME_HIDDEN_FILE, []);
+}
+
+export function addHiddenAnimeId(animeId: number): void {
+  const hiddenIds = getHiddenAnimeIds();
+  if (!hiddenIds.includes(animeId)) {
+    hiddenIds.push(animeId);
+    writeJsonFile(ANIME_HIDDEN_FILE, hiddenIds);
+  }
+}
+
+export function removeHiddenAnimeId(animeId: number): void {
+  let hiddenIds = getHiddenAnimeIds();
+  hiddenIds = hiddenIds.filter(id => id !== animeId);
+  writeJsonFile(ANIME_HIDDEN_FILE, hiddenIds);
 }
 
 // MAL Anime data operations
@@ -119,19 +139,28 @@ export function deleteAnimeExtension(malId: string): void {
 export function getAnimeWithExtensions(): AnimeWithExtensions[] {
   const malAnime = getAllMALAnime();
   const extensions = getAllAnimeExtensions();
+  const hiddenIds = getHiddenAnimeIds();
   
   return Object.values(malAnime).map(anime => ({
     ...anime,
-    extensions: extensions[anime.id.toString()]
+    extensions: extensions[anime.id.toString()],
+    hidden: hiddenIds.includes(anime.id)
   }));
 }
 
-export function getFilteredAnimeList(view: 'new_season' | 'find_shows' | 'watching' | 'completed' = 'new_season'): AnimeWithExtensions[] {
+export function getFilteredAnimeList(view: 'new_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch' = 'new_season'): AnimeWithExtensions[] {
   const allAnime = getAnimeWithExtensions();
+  
+  if (view === 'hidden') {
+    return allAnime.filter(anime => anime.hidden);
+  }
+
+  // Always filter out hidden anime for all other views
+  const visibleAnime = allAnime.filter(anime => !anime.hidden);
   
   if (view === 'find_shows') {
     // Return top 100 TV shows with no my_list_status (shows to discover)
-    return allAnime
+    return visibleAnime
       .filter(anime => 
         anime.media_type === 'tv' && 
         !anime.my_list_status
@@ -140,14 +169,8 @@ export function getFilteredAnimeList(view: 'new_season' | 'find_shows' | 'watchi
       .slice(0, 100); // Limit to top 100
   }
   
-  if (view === 'watching') {
-    // Return anime currently being watched
-    return allAnime.filter(anime => anime.my_list_status?.status === 'watching');
-  }
-  
-  if (view === 'completed') {
-    // Return completed anime
-    return allAnime.filter(anime => anime.my_list_status?.status === 'completed');
+  if (['watching', 'completed', 'on_hold', 'dropped', 'plan_to_watch'].includes(view)) {
+    return visibleAnime.filter(anime => anime.my_list_status?.status === view);
   }
   
   // Default: new_season view (current implementation)
@@ -170,7 +193,7 @@ export function getFilteredAnimeList(view: 'new_season' | 'find_shows' | 'watchi
   else if (currentSeason === 'summer') prevSeason = 'spring';
   else prevSeason = 'summer';
   
-  return allAnime.filter(anime => {
+  return visibleAnime.filter(anime => {
     if (!anime.start_season) return false;
     
     const animeYear = anime.start_season.year;

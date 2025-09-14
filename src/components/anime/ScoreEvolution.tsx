@@ -68,23 +68,25 @@ const ScoreEvolution: React.FC<ScoreEvolutionProps> = ({ animeId, scoresHistory 
 
     const isImprovement = higherIsBetter ? delta > 0 : delta < 0;
     const color = isImprovement ? styles.increase : styles.decrease;
-    const arrow = delta > 0 ? '▲' : '▼';
+    const arrow = isImprovement ? '▲' : '▼';
     
-    const formattedDelta = (delta: number) => {
-      const sign = delta > 0 ? '+' : '';
-      if (Math.abs(delta) >= 10000) {
-        return `(${sign}${Math.round(delta / 1000)}k)`;
+    const displayDelta = higherIsBetter ? delta : -delta;
+
+    const formattedDelta = (deltaToFormat: number) => {
+      const sign = deltaToFormat > 0 ? '+' : '';
+      if (Math.abs(deltaToFormat) >= 10000) {
+        return `(${sign}${Math.round(deltaToFormat / 1000)}k)`;
       }
-      if (!Number.isInteger(delta)) {
-        return `(${sign}${delta.toFixed(2)})`;
+      if (!Number.isInteger(deltaToFormat)) {
+        return `(${sign}${deltaToFormat.toFixed(2)})`;
       }
-      return `(${sign}${delta})`;
+      return `(${sign}${deltaToFormat})`;
     };
 
     return (
-      <div className={`${styles.metric} ${color}`}>
+      <div className={styles.metric}>
         <span>{label}: {formatNumber(latestValue)}</span>
-        <span className={styles.change}>{arrow} {formattedDelta(delta)}</span>
+        <span className={`${styles.change} ${color}`}>{arrow} {formattedDelta(displayDelta)}</span>
       </div>
     );
   };

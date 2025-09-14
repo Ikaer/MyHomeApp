@@ -73,6 +73,25 @@ export default function AnimePage() {
     loadScoresHistory();
   };
 
+  const handleHideToggle = async (animeId: number, hide: boolean) => {
+    try {
+      const response = await fetch(`/api/anime/animes/${animeId}/hide`, {
+        method: hide ? 'POST' : 'DELETE',
+      });
+
+      if (response.ok) {
+        // Optimistically update the UI
+        setAnimes(prevAnimes => prevAnimes.filter(anime => anime.id !== animeId));
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || `Failed to ${hide ? 'hide' : 'show'} anime`);
+      }
+    } catch (error) {
+      console.error(`Error toggling hidden state for anime ${animeId}:`, error);
+      setError(`Failed to ${hide ? 'hide' : 'show'} anime`);
+    }
+  };
+
   const handleUpdateMALStatus = async (animeId: number, updates: any) => {
     try {
       setError('');
@@ -152,7 +171,9 @@ export default function AnimePage() {
               <AnimeTable 
                 animes={animes} 
                 scoresHistory={scoresHistory}
+                currentView={currentView}
                 onUpdateMALStatus={handleUpdateMALStatus}
+                onHideToggle={handleHideToggle}
               />
             )}
         </div>

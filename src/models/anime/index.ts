@@ -97,6 +97,7 @@ export interface AnimeExtension {
 // Combined data for display
 export interface AnimeWithExtensions extends MALAnime {
   extensions?: AnimeExtension;
+  hidden?: boolean;
 }
 
 // MAL Authentication
@@ -150,7 +151,7 @@ export type SortColumn = 'title' | 'mean' | 'start_date' | 'status' | 'num_episo
 export type SortDirection = 'asc' | 'desc';
 
 // View types
-export type AnimeView = 'new_season' | 'find_shows' | 'watching' | 'completed';
+export type AnimeView = 'new_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch';
 
 export interface AnimeFilters {
   search?: string;
