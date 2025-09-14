@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { AnimeWithExtensions, SortColumn, SortDirection, AnimeScoresHistoryData } from '@/models/anime';
+import { AnimeWithExtensions, SortColumn, SortDirection, AnimeScoresHistoryData,AnimeView } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
 import { formatSeason } from '@/lib/animeUtils';
 import styles from './AnimeTable.module.css';
@@ -14,7 +14,7 @@ interface MALStatusUpdate {
 interface AnimeTableProps {
   animes: AnimeWithExtensions[];
   scoresHistory: AnimeScoresHistoryData;
-  currentView: 'new_season' | 'find_shows' | 'watching' | 'completed' | 'hidden';
+  currentView: AnimeView;
   onUpdateMALStatus?: (animeId: number, updates: MALStatusUpdate) => void;
   onHideToggle?: (animeId: number, hide: boolean) => void;
 }
