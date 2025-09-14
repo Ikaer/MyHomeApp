@@ -23,6 +23,7 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
   const [sortColumn, setSortColumn] = useState<SortColumn>('mean');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [pendingUpdates, setPendingUpdates] = useState<Map<number, MALStatusUpdate>>(new Map());
+  const [scoreEvolutionPeriod, setScoreEvolutionPeriod] = useState(1);
 
   const sortedAnimes = useMemo(() => {
     const sorted = [...animes].sort((a, b) => {
@@ -275,7 +276,17 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
               <th>My Score</th>
               <th>My Episodes</th>
               <th>Links</th>
-              <th>Score Evolution</th>
+              <th>
+                Score Evolution
+                <select 
+                  value={scoreEvolutionPeriod} 
+                  onChange={(e) => setScoreEvolutionPeriod(Number(e.target.value))}
+                  className={styles.evolutionPeriodSelector}
+                  onClick={(e) => e.stopPropagation()} // Prevent sorting when clicking selector
+                >
+                  {[1, 2, 4, 8, 12, 24, 52].map(w => <option key={w} value={w}>{w} week{w > 1 ? 's' : ''}</option>)}
+                </select>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -426,7 +437,7 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
                   </div>
                 </td>
                 <td>
-                  <ScoreEvolution animeId={anime.id} scoresHistory={scoresHistory} />
+                  <ScoreEvolution animeId={anime.id} scoresHistory={scoresHistory} selectedWeeks={scoreEvolutionPeriod} />
                 </td>
               </tr>
             ))}

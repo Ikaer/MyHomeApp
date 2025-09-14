@@ -554,3 +554,12 @@
     padding: 0.2rem 0.4rem; /* Even more compact padding */
   }
 }
+
+.evolutionPeriodSelector {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px 4px;
+  margin-left: 8px;
+}

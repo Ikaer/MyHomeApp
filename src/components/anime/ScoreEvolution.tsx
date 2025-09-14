@@ -5,9 +5,8 @@ import { AnimeScoresHistoryData } from '@/models/anime';
 interface ScoreEvolutionProps {
   animeId: number;
   scoresHistory: AnimeScoresHistoryData;
+  selectedWeeks: number;
 }
-
-const WEEKS_OPTIONS = [1, 2, 4, 8, 12, 24, 52];
 
 const formatNumber = (num?: number) => {
   if (num === undefined) return 'N/A';
@@ -20,9 +19,7 @@ const formatNumber = (num?: number) => {
   return num.toFixed(2);
 };
 
-const ScoreEvolution: React.FC<ScoreEvolutionProps> = ({ animeId, scoresHistory }) => {
-  const [selectedWeeks, setSelectedWeeks] = React.useState(4);
-
+const ScoreEvolution: React.FC<ScoreEvolutionProps> = ({ animeId, scoresHistory, selectedWeeks }) => {
   const history = scoresHistory[animeId];
 
   if (!history || Object.keys(history).length < 2) {
@@ -93,15 +90,6 @@ const ScoreEvolution: React.FC<ScoreEvolutionProps> = ({ animeId, scoresHistory 
 
   return (
     <div className={styles.evolutionContainer}>
-      <div className={styles.controls}>
-        <select
-          value={selectedWeeks}
-          onChange={(e) => setSelectedWeeks(Number(e.target.value))}
-          className={styles.weekSelector}
-        >
-          {WEEKS_OPTIONS.map(w => <option key={w} value={w}>{w} week{w > 1 ? 's' : ''}</option>)}
-        </select>
-      </div>
       <div className={styles.metricsContainer}>
         {renderMetric('Score', latestData.mean, pastData?.mean, true)}
         {renderMetric('Rank', latestData.rank, pastData?.rank, false)}
