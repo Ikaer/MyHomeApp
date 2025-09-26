@@ -1,9 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import { AnimeWithExtensions, SortColumn, SortDirection, AnimeScoresHistoryData,AnimeView } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
-import { formatSeason } from '@/lib/animeUtils';
+import { formatSeason, getScoreEvolution } from '@/lib/animeUtils';
 import styles from './AnimeTable.module.css';
-import { ScoreEvolution } from '.';
+
+const formatNumber = (num?: number) => {
+  if (num === undefined) return 'N/A';
+  if (Math.abs(num) >= 10000) {
+    return `${Math.round(num / 1000)}k`;
+  }
+  if (Number.isInteger(num)) {
+    return num.toString();
+  }
+  return num.toFixed(2);
+};
 
 interface MALStatusUpdate {
   status?: string;
@@ -51,6 +61,42 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
           aValue = a.num_episodes || 0;
           bValue = b.num_episodes || 0;
           break;
+        case 'rank':
+          aValue = a.rank || Infinity;
+          bValue = b.rank || Infinity;
+          break;
+        case 'popularity':
+          aValue = a.popularity || Infinity;
+          bValue = b.popularity || Infinity;
+          break;
+        case 'num_list_users':
+          aValue = a.num_list_users || 0;
+          bValue = b.num_list_users || 0;
+          break;
+        case 'num_scoring_users':
+          aValue = a.num_scoring_users || 0;
+          bValue = b.num_scoring_users || 0;
+          break;
+        case 'delta_mean':
+          aValue = getScoreEvolution(a.id, scoresHistory, scoreEvolutionPeriod).deltas.mean || 0;
+          bValue = getScoreEvolution(b.id, scoresHistory, scoreEvolutionPeriod).deltas.mean || 0;
+          break;
+        case 'delta_rank':
+          aValue = getScoreEvolution(a.id, scoresHistory, scoreEvolutionPeriod).deltas.rank || 0;
+          bValue = getScoreEvolution(b.id, scoresHistory, scoreEvolutionPeriod).deltas.rank || 0;
+          break;
+        case 'delta_popularity':
+          aValue = getScoreEvolution(a.id, scoresHistory, scoreEvolutionPeriod).deltas.popularity || 0;
+          bValue = getScoreEvolution(b.id, scoresHistory, scoreEvolutionPeriod).deltas.popularity || 0;
+          break;
+        case 'delta_num_list_users':
+          aValue = getScoreEvolution(a.id, scoresHistory, scoreEvolutionPeriod).deltas.num_list_users || 0;
+          bValue = getScoreEvolution(b.id, scoresHistory, scoreEvolutionPeriod).deltas.num_list_users || 0;
+          break;
+        case 'delta_num_scoring_users':
+          aValue = getScoreEvolution(a.id, scoresHistory, scoreEvolutionPeriod).deltas.num_scoring_users || 0;
+          bValue = getScoreEvolution(b.id, scoresHistory, scoreEvolutionPeriod).deltas.num_scoring_users || 0;
+          break;
         default:
           aValue = a.mean || 0;
           bValue = b.mean || 0;
@@ -66,7 +112,7 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
     });
 
     return sorted;
-  }, [animes, sortColumn, sortDirection]);
+  }, [animes, sortColumn, sortDirection, scoresHistory, scoreEvolutionPeriod]);
 
   const handleSort = (column: SortColumn) => {
     if (sortColumn === column) {
@@ -231,6 +277,62 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
     );
   };
 
+  const renderMetric = (
+    anime: AnimeWithExtensions,
+    metric: 'rank' | 'popularity' | 'num_list_users' | 'num_scoring_users' | 'mean'
+  ) => {
+    const evolution = getScoreEvolution(anime.id, scoresHistory, scoreEvolutionPeriod);
+    const latestValue = evolution.latestData?.[metric as keyof typeof evolution.latestData];
+
+    let formattedValue;
+    if (latestValue === undefined) {
+      formattedValue = 'N/A';
+    } else if (metric === 'mean') {
+      formattedValue = formatScore(latestValue as number);
+    } else if (metric === 'rank' || metric === 'popularity') {
+        formattedValue = `#${formatNumber(latestValue as number)}`;
+    } else {
+        formattedValue = formatNumber(latestValue as number);
+    }
+    return <span>{formattedValue}</span>;
+  }
+
+  const renderDelta = (
+    anime: AnimeWithExtensions,
+    metric: 'rank' | 'popularity' | 'num_list_users' | 'num_scoring_users' | 'mean',
+    higherIsBetter: boolean
+  ) => {
+    const evolution = getScoreEvolution(anime.id, scoresHistory, scoreEvolutionPeriod);
+    const delta = evolution.deltas[metric as keyof typeof evolution.deltas];
+
+    if (delta === undefined || Math.abs(delta) < 0.001) {
+      return null;
+    }
+
+    const isImprovement = higherIsBetter ? delta > 0 : delta < 0;
+    const color = isImprovement ? styles.increase : styles.decrease;
+    const arrow = isImprovement ? '▲' : '▼';
+    
+    const displayDelta = (metric === 'rank' || metric === 'popularity') ? -delta : delta;
+
+    const formattedDelta = (deltaToFormat: number) => {
+      const sign = deltaToFormat > 0 ? '+' : '';
+      if (Math.abs(deltaToFormat) >= 10000) {
+        return `(${sign}${Math.round(deltaToFormat / 1000)}k)`;
+      }
+      if (!Number.isInteger(deltaToFormat)) {
+        return `(${sign}${deltaToFormat.toFixed(metric === 'mean' ? 2 : 0)})`;
+      }
+      return `(${sign}${deltaToFormat})`;
+    };
+
+    return (
+      <span className={`${styles.change} ${color}`}>{arrow} {formattedDelta(displayDelta)}</span>
+    );
+  }
+
+
+
   if (animes.length === 0) {
     return (
       <div className={styles.emptyState}>
@@ -254,12 +356,6 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
               </th>
               <th 
                 className={styles.sortable}
-                onClick={() => handleSort('mean')}
-              >
-                Score {getSortIcon('mean')}
-              </th>
-              <th 
-                className={styles.sortable}
                 onClick={() => handleSort('status')}
               >
                 Status {getSortIcon('status')}
@@ -271,20 +367,47 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
                 Episodes {getSortIcon('num_episodes')}
               </th>
               <th>Starting Season</th>
-              <th>Genres</th>
-              <th>My Status</th>
-              <th>My Score</th>
-              <th>My Episodes</th>
+              <th>Me</th>
               <th>Links</th>
+              <th className={styles.sortable} onClick={() => handleSort('mean')} title="Score">
+                S {getSortIcon('mean')}
+              </th>
+              <th className={styles.sortable} onClick={() => handleSort('delta_mean')} title="Score Evolution">
+                ΔS {getSortIcon('delta_mean')}
+              </th>
+              <th className={styles.sortable} onClick={() => handleSort('rank')} title="Rank">
+                R {getSortIcon('rank')}
+              </th>
+              <th className={styles.sortable} onClick={() => handleSort('delta_rank')} title="Rank Evolution">
+                ΔR {getSortIcon('delta_rank')}
+              </th>
+              <th className={styles.sortable} onClick={() => handleSort('popularity')} title="Popularity">
+                P {getSortIcon('popularity')}
+              </th>
+              <th className={styles.sortable} onClick={() => handleSort('delta_popularity')} title="Popularity Evolution">
+                ΔP {getSortIcon('delta_popularity')}
+              </th>
+              <th className={styles.sortable} onClick={() => handleSort('num_list_users')} title="Users">
+                U {getSortIcon('num_list_users')}
+              </th>
+              <th className={styles.sortable} onClick={() => handleSort('delta_num_list_users')} title="Users Evolution">
+                ΔU {getSortIcon('delta_num_list_users')}
+              </th>
+              <th className={styles.sortable} onClick={() => handleSort('num_scoring_users')} title="Scorers">
+                X {getSortIcon('num_scoring_users')}
+              </th>
+              <th className={styles.sortable} onClick={() => handleSort('delta_num_scoring_users')} title="Scorers Evolution">
+                ΔX {getSortIcon('delta_num_scoring_users')}
+              </th>
               <th>
-                Score Evolution
                 <select 
                   value={scoreEvolutionPeriod} 
                   onChange={(e) => setScoreEvolutionPeriod(Number(e.target.value))}
                   className={styles.evolutionPeriodSelector}
-                  onClick={(e) => e.stopPropagation()} // Prevent sorting when clicking selector
+                  onClick={(e) => e.stopPropagation()}
+                  title="Select evolution period"
                 >
-                  {[1, 2, 4, 8, 12, 24, 52].map(w => <option key={w} value={w}>{w} week{w > 1 ? 's' : ''}</option>)}
+                  {[1, 2, 4, 8, 12, 24, 52].map(w => <option key={w} value={w}>{w}w</option>)}
                 </select>
               </th>
             </tr>
@@ -310,11 +433,7 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
                       <div className={styles.japaneseTitle}>{anime.title}</div>
                     )}
                   </div>
-                </td>
-                <td className={styles.scoreCell}>
-                  <span className={`${styles.score} ${anime.mean ? (anime.mean >= 8 ? styles.high : anime.mean >= 7 ? styles.medium : styles.low) : styles.none}`}>
-                    {formatScore(anime.mean)}
-                  </span>
+                  <div className={styles.genresInTitle}>{formatGenres(anime.genres || [])}</div>
                 </td>
                 <td className={styles.statusCell}>
                   <span className={`${styles.status} ${anime.status === 'currently_airing' ? styles.currentlyAiring : anime.status === 'finished_airing' ? styles.finishedAiring : anime.status === 'not_yet_aired' ? styles.notYetAired : ''}`}>
@@ -338,36 +457,33 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
                     <span style={{ color: '#6B7280' }}>Unknown</span>
                   )}
                 </td>
-                <td className={styles.genresCell}>
-                  {formatGenres(anime.genres || [])}
-                </td>
-                <td className={styles.malStatusCell}>
-                  <select
-                    value={getDisplayStatus(anime)}
-                    onChange={(e) => handleStatusChange(anime.id, e.target.value)}
-                    className={`${styles.malStatus} ${getStatusClass(getDisplayStatus(anime))}`}
-                  >
-                    <option value="">Select Status</option>
-                    <option value="watching">Watching</option>
-                    <option value="completed">Completed</option>
-                    <option value="on_hold">On Hold</option>
-                    <option value="dropped">Dropped</option>
-                    <option value="plan_to_watch">Plan to Watch</option>
-                  </select>
-                </td>
-                <td className={styles.malScoreCell}>
-                  <select
-                    value={getDisplayScore(anime)}
-                    onChange={(e) => handleScoreChange(anime.id, parseInt(e.target.value))}
-                    className={`${styles.malScore} ${styles.editable}`}
-                  >
-                    <option value={0}>No Score</option>
-                    {[1,2,3,4,5,6,7,8,9,10].map(score => (
-                      <option key={score} value={score}>{score}</option>
-                    ))}
-                  </select>
-                </td>
-                <td className={styles.malEpisodesCell}>
+                <td className={styles.meCell}>
+                  <div>
+                    <select
+                      value={getDisplayStatus(anime)}
+                      onChange={(e) => handleStatusChange(anime.id, e.target.value)}
+                      className={`${styles.malStatus} ${getStatusClass(getDisplayStatus(anime))}`}
+                    >
+                      <option value="">Select Status</option>
+                      <option value="watching">Watching</option>
+                      <option value="completed">Completed</option>
+                      <option value="on_hold">On Hold</option>
+                      <option value="dropped">Dropped</option>
+                      <option value="plan_to_watch">Plan to Watch</option>
+                    </select>
+                  </div>
+                  <div>
+                    <select
+                      value={getDisplayScore(anime)}
+                      onChange={(e) => handleScoreChange(anime.id, parseInt(e.target.value))}
+                      className={`${styles.malScore} ${styles.editable}`}
+                    >
+                      <option value={0}>No Score</option>
+                      {[1,2,3,4,5,6,7,8,9,10].map(score => (
+                        <option key={score} value={score}>{score}</option>
+                      ))}
+                    </select>
+                  </div>
                   <div className={styles.malEpisodes}>
                     <div className={styles.episodeButtons}>
                       <button
@@ -436,8 +552,35 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
                     )}
                   </div>
                 </td>
+                <td className={styles.scoreCell}>
+                  {renderMetric(anime, 'mean')}
+                </td>
                 <td>
-                  <ScoreEvolution animeId={anime.id} scoresHistory={scoresHistory} selectedWeeks={scoreEvolutionPeriod} />
+                  {renderDelta(anime, 'mean', true)}
+                </td>
+                <td className={styles.scoreCell}>
+                  {renderMetric(anime, 'rank')}
+                </td>
+                <td>
+                  {renderDelta(anime, 'rank', false)}
+                </td>
+                <td className={styles.scoreCell}>
+                  {renderMetric(anime, 'popularity')}
+                </td>
+                <td>
+                  {renderDelta(anime, 'popularity', false)}
+                </td>
+                <td className={styles.scoreCell}>
+                  {renderMetric(anime, 'num_list_users')}
+                </td>
+                <td>
+                  {renderDelta(anime, 'num_list_users', true)}
+                </td>
+                <td className={styles.scoreCell}>
+                  {renderMetric(anime, 'num_scoring_users')}
+                </td>
+                <td>
+                  {renderDelta(anime, 'num_scoring_users', true)}
                 </td>
               </tr>
             ))}

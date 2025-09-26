@@ -8,4 +8,3 @@ export { default as AnimeTable } from './AnimeTable';
 export { default as AnimeExtensionForm } from './AnimeExtensionForm';
 export { default as AnimeViewSelector } from './AnimeViewSelector';
 export { default as ProviderDiscovery } from './ProviderDiscovery';
-export { default as ScoreEvolution } from './ScoreEvolution';

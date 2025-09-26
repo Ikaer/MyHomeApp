@@ -147,7 +147,7 @@ export interface SyncMetadata {
 }
 
 // Filter and sort options
-export type SortColumn = 'title' | 'mean' | 'start_date' | 'status' | 'num_episodes';
+export type SortColumn = 'title' | 'mean' | 'start_date' | 'status' | 'num_episodes' | 'rank' | 'popularity' | 'num_list_users' | 'num_scoring_users' | 'delta_mean' | 'delta_rank' | 'delta_popularity' | 'delta_num_list_users' | 'delta_num_scoring_users';
 export type SortDirection = 'asc' | 'desc';
 
 // View types
