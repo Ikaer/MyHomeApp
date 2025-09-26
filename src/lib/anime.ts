@@ -148,7 +148,7 @@ export function getAnimeWithExtensions(): AnimeWithExtensions[] {
   }));
 }
 
-export function getFilteredAnimeList(view: 'new_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch' = 'new_season'): AnimeWithExtensions[] {
+export function getFilteredAnimeList(view: 'new_season' | 'next_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch' = 'new_season'): AnimeWithExtensions[] {
   const allAnime = getAnimeWithExtensions();
   
   if (view === 'hidden') {
@@ -178,13 +178,13 @@ export function getFilteredAnimeList(view: 'new_season' | 'find_shows' | 'watchi
   const currentYear = currentDate.getFullYear();
   
   // Determine current season
-  const month = currentDate.getMonth() + 1; // getMonth() returns 0-11
+  const month = currentDate.getMonth(); // 0-11
   let currentSeason: string;
-  if (month >= 1 && month <= 3) currentSeason = 'winter';
-  else if (month >= 4 && month <= 6) currentSeason = 'spring';
-  else if (month >= 7 && month <= 9) currentSeason = 'summer';
+  if (month >= 0 && month <= 2) currentSeason = 'winter';
+  else if (month >= 3 && month <= 5) currentSeason = 'spring';
+  else if (month >= 6 && month <= 8) currentSeason = 'summer';
   else currentSeason = 'fall';
-  
+
   // Determine previous season
   let prevYear = currentYear;
   let prevSeason: string;
@@ -192,6 +192,21 @@ export function getFilteredAnimeList(view: 'new_season' | 'find_shows' | 'watchi
   else if (currentSeason === 'spring') prevSeason = 'winter';
   else if (currentSeason === 'summer') prevSeason = 'spring';
   else prevSeason = 'summer';
+
+  // Determine next season
+  let nextYear = currentYear;
+  let nextSeason: string;
+  if (currentSeason === 'winter') nextSeason = 'spring';
+  else if (currentSeason === 'spring') nextSeason = 'summer';
+  else if (currentSeason === 'summer') nextSeason = 'fall';
+  else { nextSeason = 'winter'; nextYear++; }
+
+  if (view === 'next_season') {
+    return visibleAnime.filter(anime => {
+      if (!anime.start_season) return false;
+      return anime.start_season.year === nextYear && anime.start_season.season === nextSeason;
+    });
+  }
   
   return visibleAnime.filter(anime => {
     if (!anime.start_season) return false;

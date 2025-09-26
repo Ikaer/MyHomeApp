@@ -16,6 +16,11 @@ export default function AnimeViewSelector({ currentView, onViewChange, animeCoun
       description: 'Current & previous season still airing'
     },
     {
+      key: 'next_season',
+      label: 'Next Season',
+      description: 'Animes that will air in the next season'
+    },
+    {
       key: 'find_shows',
       label: 'Find Shows',
       description: 'Top 100 highest-rated TV shows not in your list'

@@ -33,8 +33,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     else if (currentSeason === 'summer') prevSeason = 'spring';
     else prevSeason = 'summer';
 
+    // Determine next season
+    let nextYear = currentYear;
+    let nextSeason: string;
+    if (currentSeason === 'winter') nextSeason = 'spring';
+    else if (currentSeason === 'spring') nextSeason = 'summer';
+    else if (currentSeason === 'summer') nextSeason = 'fall';
+    else { nextSeason = 'winter'; nextYear++; }
+
     console.log(`Syncing anime for current season: ${currentYear} ${currentSeason}`);
     console.log(`Syncing anime for previous season: ${prevYear} ${prevSeason}`);
+    console.log(`Syncing anime for next season: ${nextYear} ${nextSeason}`);
 
     const allAnime: MALAnime[] = [];
 
@@ -45,6 +54,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Fetch previous season
     const prevSeasonAnime = await fetchSeasonalAnime(token.access_token, prevYear, prevSeason);
     allAnime.push(...prevSeasonAnime);
+
+    // Fetch next season
+    const nextSeasonAnime = await fetchSeasonalAnime(token.access_token, nextYear, nextSeason);
+    allAnime.push(...nextSeasonAnime);
 
     // Upsert all anime data
     upsertMALAnime(allAnime);

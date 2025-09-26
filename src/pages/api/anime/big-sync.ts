@@ -139,35 +139,18 @@ async function performBigSyncAsync(accessToken: string, syncId: string) {
     
     const seasonsToSync: Array<{ year: number; season: string }> = [];
     
-    // Generate list of seasons for last 10 years
-    for (let year = currentYear; year >= currentYear - 9; year--) {
+    // Generate list of seasons from 8 years ago to 2 years in the future
+    for (let year = currentYear + 2; year >= currentYear - 8; year--) {
       for (const season of seasons) {
-        // Skip future seasons
-        if (year === currentYear) {
-          const month = currentDate.getMonth() + 1;
-          let currentSeason: string;
-          if (month >= 1 && month <= 3) currentSeason = 'winter';
-          else if (month >= 4 && month <= 6) currentSeason = 'spring';
-          else if (month >= 7 && month <= 9) currentSeason = 'summer';
-          else currentSeason = 'fall';
-          
-          const seasonIndex = seasons.indexOf(season);
-          const currentSeasonIndex = seasons.indexOf(currentSeason);
-          
-          if (seasonIndex > currentSeasonIndex) {
-            continue; // Skip future seasons
-          }
-        }
-        
         seasonsToSync.push({ year, season });
       }
     }
 
-    console.log(`Big sync ${syncId}: Processing ${seasonsToSync.length} seasons from ${currentYear - 9} to ${currentYear}`);
+    console.log(`Big sync ${syncId}: Processing ${seasonsToSync.length} seasons from ${currentYear - 8} to ${currentYear + 2}`);
     
     addProgress({
       type: 'start',
-      message: `Starting big sync for ${seasonsToSync.length} seasons`,
+      message: `Starting big sync for ${seasonsToSync.length} seasons and upcoming ranking`,
       totalSeasons: seasonsToSync.length,
       currentSeason: 0
     });
@@ -175,7 +158,39 @@ async function performBigSyncAsync(accessToken: string, syncId: string) {
     const allAnime: MALAnime[] = [];
     let processedSeasons = 0;
 
-    // Process each season with rate limiting
+    // 1. Fetch top 500 upcoming anime
+    try {
+      addProgress({
+        type: 'progress',
+        message: 'Fetching top 500 upcoming anime...',
+        totalSeasons: seasonsToSync.length,
+        currentSeason: 0,
+      });
+      const upcomingAnime = await fetchUpcomingAnime(accessToken, addProgress);
+      allAnime.push(...upcomingAnime);
+      addProgress({
+        type: 'season_complete',
+        message: `Completed fetching upcoming anime - ${upcomingAnime.length} anime`,
+        totalSeasons: seasonsToSync.length,
+        currentSeason: 0,
+        seasonAnimeCount: upcomingAnime.length,
+        totalAnimeCount: allAnime.length,
+        year: 'N/A',
+        season: 'upcoming'
+      });
+      // Rate limiting
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    } catch (error) {
+      console.error('Error fetching upcoming anime:', error);
+      addProgress({
+        type: 'season_error',
+        message: `Failed to fetch upcoming anime: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        year: 'N/A',
+        season: 'upcoming'
+      });
+    }
+
+    // 2. Process each season with rate limiting
     for (const { year, season } of seasonsToSync) {
       try {
         addProgress({
@@ -252,6 +267,65 @@ async function performBigSyncAsync(accessToken: string, syncId: string) {
       syncProcess.isRunning = false;
     }
   }
+}
+
+async function fetchUpcomingAnime(
+  accessToken: string,
+  addProgress?: (progress: any) => void
+): Promise<MALAnime[]> {
+  const allAnime: MALAnime[] = [];
+  const limit = 500; // As requested
+
+  const fields = [
+    'id', 'title', 'main_picture', 'alternative_titles',
+    'start_date', 'end_date', 'synopsis', 'mean', 'rank', 'popularity',
+    'num_list_users', 'num_scoring_users', 'nsfw', 'genres',
+    'created_at', 'updated_at', 'media_type', 'status',
+    'my_list_status', 'num_episodes', 'start_season', 'broadcast',
+    'source', 'average_episode_duration', 'rating', 'pictures',
+    'background', 'related_anime', 'studios'
+  ].join(',');
+
+  const url = `https://api.myanimelist.net/v2/anime/ranking`;
+  const params = new URLSearchParams({
+    ranking_type: 'upcoming',
+    limit: limit.toString(),
+    fields,
+    nsfw: 'true'
+  });
+
+  console.log(`Fetching top ${limit} upcoming anime`);
+
+  const response = await fetch(`${url}?${params}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`MAL API request failed for upcoming ranking: ${response.status} ${response.statusText}`);
+  }
+
+  const data: AnimeSeasonResponse = await response.json();
+  
+  if (data.data && data.data.length > 0) {
+    const upcomingAnime = data.data.map(item => item.node);
+    allAnime.push(...upcomingAnime);
+    console.log(`Fetched ${upcomingAnime.length} upcoming anime`);
+
+    if (addProgress) {
+      addProgress({
+        type: 'fetch_progress',
+        message: `Fetched ${allAnime.length} upcoming anime`,
+        year: 'N/A',
+        season: 'upcoming',
+        fetched: allAnime.length
+      });
+    }
+  }
+
+  console.log(`Finished fetching upcoming anime: ${allAnime.length} anime`);
+  return allAnime;
 }
 
 async function fetchSeasonalAnime(

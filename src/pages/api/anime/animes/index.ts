@@ -21,7 +21,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     } = req.query;
 
     // Validate view parameter
-    const animeView = (['new_season', 'find_shows', 'watching', 'completed', 'hidden', 'dropped', 'on_hold', 'plan_to_watch'].includes(view as string)) 
+    const animeView = (['new_season', 'next_season', 'find_shows', 'watching', 'completed', 'hidden', 'dropped', 'on_hold', 'plan_to_watch'].includes(view as string)) 
       ? view as AnimeView 
       : 'new_season';
 
