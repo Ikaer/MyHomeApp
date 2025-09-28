@@ -25,15 +25,15 @@ interface AnimeTableProps {
   animes: AnimeWithExtensions[];
   scoresHistory: AnimeScoresHistoryData;
   currentView: AnimeView;
+  scoreEvolutionPeriod: number;
   onUpdateMALStatus?: (animeId: number, updates: MALStatusUpdate) => void;
   onHideToggle?: (animeId: number, hide: boolean) => void;
 }
 
-export default function AnimeTable({ animes, scoresHistory, currentView, onUpdateMALStatus, onHideToggle }: AnimeTableProps) {
+export default function AnimeTable({ animes, scoresHistory, currentView, scoreEvolutionPeriod, onUpdateMALStatus, onHideToggle }: AnimeTableProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>('mean');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [pendingUpdates, setPendingUpdates] = useState<Map<number, MALStatusUpdate>>(new Map());
-  const [scoreEvolutionPeriod, setScoreEvolutionPeriod] = useState(1);
 
   const sortedAnimes = useMemo(() => {
     const sorted = [...animes].sort((a, b) => {
@@ -350,20 +350,6 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
 
   return (
     <div className={styles.animeTableContainer}>
-      <div className={styles.toolbar}>
-        <div className={styles.evolutionSelectorContainer}>
-          <label htmlFor="evolution-period">Evolution Period:</label>
-          <select 
-            id="evolution-period"
-            value={scoreEvolutionPeriod} 
-            onChange={(e) => setScoreEvolutionPeriod(Number(e.target.value))}
-            className={styles.evolutionPeriodSelector}
-            title="Select evolution period"
-          >
-            {[1, 2, 4, 8, 12, 24, 52].map(w => <option key={w} value={w}>{w}w</option>)}
-          </select>
-        </div>
-      </div>
       <div className={styles.tableWrapper}>
         <table className={styles.animeTable}>
           <thead>

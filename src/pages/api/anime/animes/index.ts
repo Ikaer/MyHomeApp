@@ -50,9 +50,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     // Apply status filter
     if (status && typeof status === 'string') {
       const statusList = status.split(',').map(s => s.trim());
-      animeList = animeList.filter(anime =>
-        statusList.includes(anime.status || '')
-      );
+      animeList = animeList.filter(anime => {
+        const userStatus = anime.my_list_status?.status;
+        if (!userStatus) {
+          return statusList.includes('not_defined');
+        }
+        return statusList.includes(userStatus);
+      });
     }
 
     // Apply minimum score filter

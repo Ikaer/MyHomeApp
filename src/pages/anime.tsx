@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { AnimeAuth, AnimeSync, AnimeTable, AnimeViewSelector } from '@/components/anime';
-import { AnimeWithExtensions, MALAuthState, AnimeView, AnimeScoresHistoryData } from '@/models/anime';
+import { AnimeAuth, AnimeSync, AnimeTable, AnimeViewSelector, AnimeToolbar } from '@/components/anime';
+import { AnimeWithExtensions, MALAuthState, AnimeView, AnimeScoresHistoryData, UserAnimeStatus } from '@/models/anime';
+
+const ALL_STATUSES: (UserAnimeStatus | 'not_defined')[] = ["watching", "completed", "on_hold", "dropped", "plan_to_watch", "not_defined"];
 
 export default function AnimePage() {
   const [authState, setAuthState] = useState<MALAuthState>({ isAuthenticated: false });
@@ -10,11 +12,13 @@ export default function AnimePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [currentView, setCurrentView] = useState<AnimeView>('new_season');
+  const [scoreEvolutionPeriod, setScoreEvolutionPeriod] = useState(1);
+  const [statusFilters, setStatusFilters] = useState<(UserAnimeStatus | 'not_defined')[]>(ALL_STATUSES);
 
   useEffect(() => {
     loadAnimes();
     loadScoresHistory();
-  }, [currentView]);
+  }, [currentView, statusFilters]);
 
   useEffect(() => {
     // Check for auth success/error from OAuth redirect
@@ -36,7 +40,8 @@ export default function AnimePage() {
       setIsLoading(true);
       setError('');
       
-      const response = await fetch(`/api/anime/animes?view=${currentView}`);
+      const statusQuery = statusFilters.join(',');
+      const response = await fetch(`/api/anime/animes?view=${currentView}&status=${statusQuery}`);
       if (response.ok) {
         const data = await response.json();
         setAnimes(data.animes || []);
@@ -162,21 +167,30 @@ export default function AnimePage() {
           isLoading={isLoading}
         />
 
-        <div className="content-section">
-          {isLoading ? (
-              <div className="loading-state">
-                <p>Loading anime list...</p>
-              </div>
-            ) : (
-              <AnimeTable 
-                animes={animes} 
-                scoresHistory={scoresHistory}
-                currentView={currentView}
-                onUpdateMALStatus={handleUpdateMALStatus}
-                onHideToggle={handleHideToggle}
-              />
-            )}
-        </div>
+          <div className="table-container">
+            <AnimeToolbar
+              scoreEvolutionPeriod={scoreEvolutionPeriod}
+              onScoreEvolutionPeriodChange={setScoreEvolutionPeriod}
+              statusFilters={statusFilters}
+              onStatusFiltersChange={setStatusFilters}
+            />
+            <div className="content-section">
+              {isLoading ? (
+                  <div className="loading-state">
+                    <p>Loading anime list...</p>
+                  </div>
+                ) : (
+                  <AnimeTable 
+                    animes={animes} 
+                    scoresHistory={scoresHistory}
+                    currentView={currentView}
+                    scoreEvolutionPeriod={scoreEvolutionPeriod}
+                    onUpdateMALStatus={handleUpdateMALStatus}
+                    onHideToggle={handleHideToggle}
+                  />
+                )}
+            </div>
+          </div>
 
         <style jsx>{`
           .anime-page {
@@ -220,10 +234,15 @@ export default function AnimePage() {
               margin-left: 1rem;
             }
 
-            .content-section {
+            .table-container {
               background: #1f2937;
               border-radius: 8px;
               border: 1px solid #374151;
+              overflow: hidden;
+              margin-top: 1rem;
+            }
+
+            .content-section {
               overflow: hidden;
             }
 

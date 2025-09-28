@@ -78,6 +78,8 @@ export interface RelatedAnime {
   relation_type_formatted: string;
 }
 
+export type UserAnimeStatus = 'watching' | 'completed' | 'on_hold' | 'dropped' | 'plan_to_watch';
+
 export interface Studio {
   id: number;
   name: string;
