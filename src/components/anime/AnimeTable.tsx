@@ -119,7 +119,14 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortColumn(column);
-      setSortDirection('desc');
+      const isLowerBetter = ['rank', 'popularity'].includes(column);
+      const isDeltaLowerBetter = ['delta_rank', 'delta_popularity'].includes(column);
+      
+      if (isLowerBetter || isDeltaLowerBetter) {
+        setSortDirection('asc');
+      } else {
+        setSortDirection('desc');
+      }
     }
   };
 
@@ -343,6 +350,20 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
 
   return (
     <div className={styles.animeTableContainer}>
+      <div className={styles.toolbar}>
+        <div className={styles.evolutionSelectorContainer}>
+          <label htmlFor="evolution-period">Evolution Period:</label>
+          <select 
+            id="evolution-period"
+            value={scoreEvolutionPeriod} 
+            onChange={(e) => setScoreEvolutionPeriod(Number(e.target.value))}
+            className={styles.evolutionPeriodSelector}
+            title="Select evolution period"
+          >
+            {[1, 2, 4, 8, 12, 24, 52].map(w => <option key={w} value={w}>{w}w</option>)}
+          </select>
+        </div>
+      </div>
       <div className={styles.tableWrapper}>
         <table className={styles.animeTable}>
           <thead>
@@ -398,17 +419,6 @@ export default function AnimeTable({ animes, scoresHistory, currentView, onUpdat
               </th>
               <th className={styles.sortable} onClick={() => handleSort('delta_num_scoring_users')} title="Scorers Evolution">
                 ΔX {getSortIcon('delta_num_scoring_users')}
-              </th>
-              <th>
-                <select 
-                  value={scoreEvolutionPeriod} 
-                  onChange={(e) => setScoreEvolutionPeriod(Number(e.target.value))}
-                  className={styles.evolutionPeriodSelector}
-                  onClick={(e) => e.stopPropagation()}
-                  title="Select evolution period"
-                >
-                  {[1, 2, 4, 8, 12, 24, 52].map(w => <option key={w} value={w}>{w}w</option>)}
-                </select>
               </th>
             </tr>
           </thead>

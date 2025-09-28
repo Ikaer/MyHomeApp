@@ -11,6 +11,23 @@
   scroll-behavior: smooth;
 }
 
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  background: #111827;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border: 1px solid #374151;
+  border-bottom: none;
+}
+
+.evolutionSelectorContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .animeTable {
   width: 100%;
   border-collapse: collapse;
