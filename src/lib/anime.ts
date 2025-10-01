@@ -148,7 +148,7 @@ export function getAnimeWithExtensions(): AnimeWithExtensions[] {
   }));
 }
 
-export function getFilteredAnimeList(view: 'new_season' | 'next_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch' = 'new_season'): AnimeWithExtensions[] {
+export function getFilteredAnimeList(view: 'new_season' | 'new_season_strict' | 'next_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch' = 'new_season'): AnimeWithExtensions[] {
   const allAnime = getAnimeWithExtensions();
   
   if (view === 'hidden') {
@@ -205,6 +205,13 @@ export function getFilteredAnimeList(view: 'new_season' | 'next_season' | 'find_
     return visibleAnime.filter(anime => {
       if (!anime.start_season) return false;
       return anime.start_season.year === nextYear && anime.start_season.season === nextSeason;
+    });
+  }
+
+  if (view === 'new_season_strict') {
+    return visibleAnime.filter(anime => {
+      if (!anime.start_season) return false;
+      return anime.start_season.year === currentYear && anime.start_season.season === currentSeason;
     });
   }
   

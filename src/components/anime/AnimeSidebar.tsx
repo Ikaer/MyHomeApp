@@ -6,6 +6,7 @@ const ALL_STATUSES: (UserAnimeStatus | 'not_defined')[] = ["watching", "complete
 
 const ALL_VIEWS: Array<{ key: AnimeView; label: string; description: string }> = [
     { key: 'new_season', label: 'New Season', description: 'Current & previous season still airing' },
+    { key: 'new_season_strict', label: 'New Season (Strict)', description: 'Animes from the current season only' },
     { key: 'next_season', label: 'Next Season', description: 'Animes that will air in the next season' },
     { key: 'find_shows', label: 'Find Shows', description: 'Top 100 highest-rated TV shows not in your list' },
     { key: 'watching', label: 'Watching', description: 'Currently watching on MyAnimeList' },
