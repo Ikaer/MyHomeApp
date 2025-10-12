@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { filterAnimeByView } from '@/lib/anime';
+import { filterAnimeByView, getAnimeUserPreferences } from '@/lib/anime';
 import { AnimeWithExtensions, SortColumn, SortDirection, AnimeView, animeViewsHelper } from '@/models/anime';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -17,10 +17,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       minScore, 
       sortBy = 'mean', 
       sortDir = 'desc',
-      view = 'new_season_strict'
+      view
     } = req.query;
 
-    let animeView: AnimeView = animeViewsHelper.keys[0];
+    // Get user preferences for default view
+    const userPrefs = getAnimeUserPreferences();
+    
+    let animeView: AnimeView = userPrefs.currentView;
     if(typeof view === 'string' && animeViewsHelper.isValid(view)) {
       animeView = view;
     }

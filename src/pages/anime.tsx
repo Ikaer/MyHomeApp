@@ -32,6 +32,7 @@ export default function AnimePage() {
   useEffect(() => {
     checkAuthStatus();
     loadScoresHistory();
+    loadUserPreferences();
   }, []);
 
   // Reload animes when view or filters change
@@ -96,6 +97,32 @@ export default function AnimePage() {
       }
     } catch (error) {
       console.error('Error loading scores history:', error);
+    }
+  };
+
+  const loadUserPreferences = async () => {
+    try {
+      const response = await fetch('/api/anime/preferences');
+      if (response.ok) {
+        const prefs = await response.json();
+        setCurrentView(prefs.currentView);
+        setStatusFilters(prefs.statusFilters);
+        setEvolutionPeriod(prefs.evolutionPeriod);
+      }
+    } catch (error) {
+      console.error('Error loading user preferences:', error);
+    }
+  };
+
+  const saveUserPreferences = async (updates: { currentView?: AnimeView; statusFilters?: (UserAnimeStatus | 'not_defined')[]; evolutionPeriod?: string }) => {
+    try {
+      await fetch('/api/anime/preferences', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+    } catch (error) {
+      console.error('Error saving user preferences:', error);
     }
   };
 
@@ -169,6 +196,7 @@ export default function AnimePage() {
       ? [...statusFilters, status]
       : statusFilters.filter((s) => s !== status);
     setStatusFilters(newFilters);
+    saveUserPreferences({ statusFilters: newFilters });
   };
 
   const handleHideToggle = async (animeId: number, hide: boolean) => {
@@ -221,12 +249,18 @@ export default function AnimePage() {
       onSync={handleSync}
       onBigSync={handleBigSync}
       currentView={currentView}
-      onViewChange={setCurrentView}
+      onViewChange={(view) => {
+        setCurrentView(view);
+        saveUserPreferences({ currentView: view });
+      }}
       statusFilters={statusFilters}
       onStatusFilterChange={handleStatusFilterChange}
       animeCount={animes.length}
       evolutionPeriod={evolutionPeriod}
-      onEvolutionPeriodChange={setEvolutionPeriod}
+      onEvolutionPeriodChange={(period) => {
+        setEvolutionPeriod(period);
+        saveUserPreferences({ evolutionPeriod: period });
+      }}
     />
   );
 

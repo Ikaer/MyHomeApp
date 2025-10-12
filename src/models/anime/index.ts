@@ -218,3 +218,11 @@ export interface AnimeScoreHistory {
 }
 
 export type AnimeScoresHistoryData = Record<number, Record<string, AnimeScoreHistory>>;
+
+// User preferences for persistent state
+export interface AnimeUserPreferences {
+  currentView: AnimeView;
+  statusFilters: (UserAnimeStatus | 'not_defined')[];
+  evolutionPeriod: string; // e.g., '1w', '1m', '3m'
+  lastUpdated: string;
+}
