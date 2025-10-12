@@ -23,7 +23,7 @@ export default function AnimePage() {
   const [error, setError] = useState('');
 
   // UI State
-  const [currentView, setCurrentView] = useState<AnimeView>('new_season');
+  const [currentView, setCurrentView] = useState<AnimeView>('new_season_strict');
   const [evolutionPeriod, setEvolutionPeriod] = useState('1w');
   const [statusFilters, setStatusFilters] = useState<(UserAnimeStatus | 'not_defined')[]>(ALL_STATUSES);
   const [searchQuery, setSearchQuery] = useState('');

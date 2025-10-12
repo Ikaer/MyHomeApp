@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { MALAnime, AnimeExtension, AnimeWithExtensions, MALAuthData, MALUser, SyncMetadata, AnimeScoresHistoryData } from '@/models/anime';
+import { MALAnime, AnimeExtension, AnimeWithExtensions, MALAuthData, MALUser, SyncMetadata, AnimeScoresHistoryData, AnimeView } from '@/models/anime';
+import { filterCalendarView, filterFindShowsView, filterHiddenView, filterStatusView, getSeasonInfos } from './animeUtils';
 
 const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const ANIME_DATA_PATH = path.join(DATA_PATH, 'anime');
@@ -74,11 +75,11 @@ export function saveMALAnime(animeData: Record<string, MALAnime>): void {
 
 export function upsertMALAnime(newAnime: MALAnime[]): void {
   const existingAnime = getAllMALAnime();
-  
+
   newAnime.forEach(anime => {
     existingAnime[anime.id.toString()] = anime;
   });
-  
+
   saveMALAnime(existingAnime);
 }
 
@@ -140,7 +141,7 @@ export function getAnimeWithExtensions(): AnimeWithExtensions[] {
   const malAnime = getAllMALAnime();
   const extensions = getAllAnimeExtensions();
   const hiddenIds = getHiddenAnimeIds();
-  
+
   return Object.values(malAnime).map(anime => ({
     ...anime,
     extensions: extensions[anime.id.toString()],
@@ -148,91 +149,13 @@ export function getAnimeWithExtensions(): AnimeWithExtensions[] {
   }));
 }
 
-export function getFilteredAnimeList(view: 'new_season' | 'new_season_strict' | 'next_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch' = 'new_season'): AnimeWithExtensions[] {
-  const allAnime = getAnimeWithExtensions();
-  
-  if (view === 'hidden') {
-    return allAnime.filter(anime => anime.hidden);
-  }
-
-  // Always filter out hidden anime for all other views
-  const visibleAnime = allAnime.filter(anime => !anime.hidden);
-  
-  if (view === 'find_shows') {
-    // Return top 100 TV shows with no my_list_status (shows to discover)
-    return visibleAnime
-      .filter(anime => 
-        anime.media_type === 'tv' && 
-        !anime.my_list_status
-      )
-      .sort((a, b) => (b.mean || 0) - (a.mean || 0)) // Sort by MAL score descending
-      .slice(0, 100); // Limit to top 100
-  }
-  
-  if (['watching', 'completed', 'on_hold', 'dropped', 'plan_to_watch'].includes(view)) {
-    return visibleAnime.filter(anime => anime.my_list_status?.status === view);
-  }
-  
-  // Default: new_season view (current implementation)
-  const currentDate = new Date();
-  const currentYear = currentDate.getFullYear();
-  
-  // Determine current season
-  const month = currentDate.getMonth(); // 0-11
-  let currentSeason: string;
-  if (month >= 0 && month <= 2) currentSeason = 'winter';
-  else if (month >= 3 && month <= 5) currentSeason = 'spring';
-  else if (month >= 6 && month <= 8) currentSeason = 'summer';
-  else currentSeason = 'fall';
-
-  // Determine previous season
-  let prevYear = currentYear;
-  let prevSeason: string;
-  if (currentSeason === 'winter') { prevSeason = 'fall'; prevYear--; }
-  else if (currentSeason === 'spring') prevSeason = 'winter';
-  else if (currentSeason === 'summer') prevSeason = 'spring';
-  else prevSeason = 'summer';
-
-  // Determine next season
-  let nextYear = currentYear;
-  let nextSeason: string;
-  if (currentSeason === 'winter') nextSeason = 'spring';
-  else if (currentSeason === 'spring') nextSeason = 'summer';
-  else if (currentSeason === 'summer') nextSeason = 'fall';
-  else { nextSeason = 'winter'; nextYear++; }
-
-  if (view === 'next_season') {
-    return visibleAnime.filter(anime => {
-      if (!anime.start_season) return false;
-      return anime.start_season.year === nextYear && anime.start_season.season === nextSeason;
-    });
-  }
-
-  if (view === 'new_season_strict') {
-    return visibleAnime.filter(anime => {
-      if (!anime.start_season) return false;
-      return anime.start_season.year === currentYear && anime.start_season.season === currentSeason;
-    });
-  }
-  
-  return visibleAnime.filter(anime => {
-    if (!anime.start_season) return false;
-    
-    const animeYear = anime.start_season.year;
-    const animeSeason = anime.start_season.season;
-    
-    // Include all anime from current season (any status)
-    if (animeYear === currentYear && animeSeason === currentSeason) {
-      return true;
-    }
-    
-    // Include all anime from previous season (any status)
-    if (animeYear === prevYear && animeSeason === prevSeason) {
-      return true;
-    }
-    
-    return false;
-  });
+export function filterAnimeByView(view: AnimeView = 'new_season'): AnimeWithExtensions[] {
+  let animes = getAnimeWithExtensions();
+  animes = filterHiddenView(animes, view);
+  animes = filterFindShowsView(animes, view);
+  animes = filterStatusView(animes, view);
+  animes = filterCalendarView(animes, view);
+  return animes;
 }
 
 // Authentication operations
@@ -251,10 +174,10 @@ export function clearMALAuthData(): void {
 
 export function isMALTokenValid(token: MALAuthData | null): boolean {
   if (!token) return false;
-  
+
   const now = Date.now();
   const tokenExpiry = token.created_at + (token.expires_in * 1000);
-  
+
   return now < tokenExpiry;
 }
 
@@ -262,35 +185,35 @@ export function isMALTokenValid(token: MALAuthData | null): boolean {
 export function getSyncMetadata(): SyncMetadata | null {
   const malAnime = getAllMALAnime();
   const animeList = Object.values(malAnime);
-  
+
   if (animeList.length === 0) return null;
-  
+
   // Find the most recent sync by looking at updated_at timestamps
   const mostRecent = animeList.reduce((latest, anime) => {
     if (!anime.updated_at) return latest;
     if (!latest.updated_at) return anime;
     return new Date(anime.updated_at) > new Date(latest.updated_at) ? anime : latest;
   });
-  
+
   if (!mostRecent.updated_at) return null;
-  
+
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
-  
+
   let currentSeason: string;
   if (month >= 1 && month <= 3) currentSeason = 'winter';
   else if (month >= 4 && month <= 6) currentSeason = 'spring';
   else if (month >= 7 && month <= 9) currentSeason = 'summer';
   else currentSeason = 'fall';
-  
+
   let prevYear = currentYear;
   let prevSeason: string;
   if (currentSeason === 'winter') { prevSeason = 'fall'; prevYear--; }
   else if (currentSeason === 'spring') prevSeason = 'winter';
   else if (currentSeason === 'summer') prevSeason = 'spring';
   else prevSeason = 'summer';
-  
+
   return {
     lastSyncDate: mostRecent.updated_at,
     currentSeason: { year: currentYear, season: currentSeason },

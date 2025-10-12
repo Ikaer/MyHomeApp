@@ -4,7 +4,7 @@
  */
 
 // Utility function to format season display with nice labels and colors
-import { AnimeScoresHistoryData, AnimeScoreHistory } from "@/models/anime";
+import { AnimeScoresHistoryData, AnimeScoreHistory, AnimeView, CalendarAnimeView, AnimeWithExtensions } from "@/models/anime";
 
 export const formatSeason = (year: number, season: string) => {
   const seasonMap: Record<string, { label: string; color: string }> = {
@@ -13,7 +13,7 @@ export const formatSeason = (year: number, season: string) => {
     'fall': { label: 'Fall', color: '#EF4444' },     // Red
     'winter': { label: 'Winter', color: '#3B82F6' }  // Blue
   };
-  
+
   const seasonInfo = seasonMap[season] || { label: season, color: '#6B7280' };
   return {
     label: `${seasonInfo.label} ${year}`,
@@ -68,5 +68,111 @@ export const getScoreEvolution = (
 
   return result;
 };
+
+export const filterFindShowsView = (animes: AnimeWithExtensions[], view: AnimeView): AnimeWithExtensions[] => {
+  if (view === 'find_shows') {
+    return animes.filter(anime => anime.media_type === 'tv' && !anime.my_list_status);
+  }
+  return animes;
+};
+
+export const filterHiddenView= (animes: AnimeWithExtensions[], view: AnimeView): AnimeWithExtensions[] => {
+  if (view === 'hidden') {
+    return animes.filter(anime => anime.hidden);
+  }
+  else{
+    return animes.filter(anime => !anime.hidden);
+  }
+}
+
+export const filterStatusView = (animes: AnimeWithExtensions[], view: AnimeView): AnimeWithExtensions[] => {
+  if (['watching', 'completed', 'on_hold', 'dropped', 'plan_to_watch'].includes(view)) {
+    return animes.filter(anime => anime.my_list_status?.status === view);
+  }
+  return animes;
+}
+
+export const filterCalendarView = (animes: AnimeWithExtensions[], view: AnimeView): AnimeWithExtensions[] => {
+  const seasonInfos = getSeasonInfos();
+  const currentSeason = seasonInfos.current;
+  const previousSeason = seasonInfos.previous;
+  const nextSeason = seasonInfos.next;
+
+  if (view === 'next_season') {
+    return animes.filter(anime => {
+      if (!anime.start_season) return false;
+      return anime.start_season.year === nextSeason.year && anime.start_season.season === nextSeason.season;
+    });
+  }
+  else if (view === 'new_season_strict') {
+    return animes.filter(anime => {
+      if (!anime.start_season) return false;
+      return anime.start_season.year === currentSeason.year && anime.start_season.season === currentSeason.season;
+    });
+  }
+  else if (view === 'new_season') {
+    return animes.filter(anime => {
+      if (!anime.start_season) return false;
+
+      const animeYear = anime.start_season.year;
+      const animeSeason = anime.start_season.season;
+
+      // Include all anime from current season (any status)
+      if (animeYear === currentSeason.year && animeSeason === currentSeason.season) {
+        return true;
+      }
+
+      // Include all anime from previous season (any status)
+      if (animeYear === previousSeason.year && animeSeason === previousSeason.season) {
+        return true;
+      }
+
+      return false;
+    });
+  }
+  return animes;
+}
+
+type Season = 'winter' | 'spring' | 'summer' | 'fall';
+type SeasonInfo = { year: number; season: Season };
+type SeasonInfos = { current: SeasonInfo; previous: SeasonInfo; next: SeasonInfo };
+
+export function getSeasonInfos(): SeasonInfos {
+
+  // Default: new_season view (current implementation)
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+
+  // Determine current season
+  const month = currentDate.getMonth(); // 0-11
+  let currentSeason: Season;
+  if (month >= 0 && month <= 2) currentSeason = 'winter';
+  else if (month >= 3 && month <= 5) currentSeason = 'spring';
+  else if (month >= 6 && month <= 8) currentSeason = 'summer';
+  else currentSeason = 'fall';
+
+  // Determine previous season
+  let prevYear = currentYear;
+  let prevSeason: Season;
+  if (currentSeason === 'winter') { prevSeason = 'fall'; prevYear--; }
+  else if (currentSeason === 'spring') prevSeason = 'winter';
+  else if (currentSeason === 'summer') prevSeason = 'spring';
+  else prevSeason = 'summer';
+
+  // Determine next season
+  let nextYear = currentYear;
+  let nextSeason: Season;
+  if (currentSeason === 'winter') nextSeason = 'spring';
+  else if (currentSeason === 'spring') nextSeason = 'summer';
+  else if (currentSeason === 'summer') nextSeason = 'fall';
+  else { nextSeason = 'winter'; nextYear++; }
+
+  return {
+    current: { year: currentYear, season: currentSeason },
+    previous: { year: prevYear, season: prevSeason },
+    next: { year: nextYear, season: nextSeason },
+  };
+}
+
 
 // You can add other client-safe anime utility functions here

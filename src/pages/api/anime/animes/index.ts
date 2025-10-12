@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getFilteredAnimeList } from '@/lib/anime';
-import { AnimeWithExtensions, SortColumn, SortDirection, AnimeView } from '@/models/anime';
+import { filterAnimeByView } from '@/lib/anime';
+import { AnimeWithExtensions, SortColumn, SortDirection, AnimeView, animeViewsHelper } from '@/models/anime';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -17,16 +17,21 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       minScore, 
       sortBy = 'mean', 
       sortDir = 'desc',
-      view = 'new_season'
+      view = 'new_season_strict'
     } = req.query;
 
-    // Validate view parameter
-    const animeView = (['new_season', 'new_season_strict', 'next_season', 'find_shows', 'watching', 'completed', 'hidden', 'dropped', 'on_hold', 'plan_to_watch'].includes(view as string)) 
-      ? view as AnimeView 
-      : 'new_season';
+    let animeView: AnimeView = animeViewsHelper.keys[0];
+    if(typeof view === 'string' && animeViewsHelper.isValid(view)) {
+      animeView = view;
+    }
 
     // Get filtered anime list based on view
-    let animeList = getFilteredAnimeList(animeView);
+    let animeList = filterAnimeByView(animeView);
+
+
+    if(animeView == 'find_shows') {
+      animeList = animeList.slice(0, 200); 
+    }
 
     // Apply search filter
     if (search && typeof search === 'string') {

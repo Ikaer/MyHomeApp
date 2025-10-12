@@ -28,3 +28,4 @@ export interface SearchParams {
   query: string;
   filters?: Record<string, any>;
 }
+export type LiteralSubset<K, T extends K> = T;

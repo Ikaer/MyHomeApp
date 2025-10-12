@@ -3,6 +3,8 @@
  * Based on MyAnimeList API structure and user extensions
  */
 
+import { LiteralSubset } from "../shared";
+
 // Base MAL anime data (from API)
 export interface MALAnime {
   id: number;
@@ -154,6 +156,38 @@ export type SortDirection = 'asc' | 'desc';
 
 // View types
 export type AnimeView = 'new_season' | 'new_season_strict' | 'next_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch';
+
+export type CalendarAnimeView = LiteralSubset< AnimeView, 'new_season' | 'new_season_strict' | 'next_season'>;
+
+export class AnimeViewHelper {
+  private  _exhausterAll: { [key in AnimeView]: AnimeView } ={
+    new_season_strict: 'new_season_strict',
+    new_season: 'new_season',
+    next_season: 'next_season',
+    find_shows: 'find_shows',
+    watching: 'watching',
+    completed: 'completed',
+    hidden: 'hidden',
+    dropped: 'dropped',
+    on_hold: 'on_hold',
+    plan_to_watch: 'plan_to_watch'
+  }
+  private _exhausterCalendar: { [key in CalendarAnimeView]: CalendarAnimeView } ={
+    new_season_strict: 'new_season_strict',
+    new_season: 'new_season',
+    next_season: 'next_season',
+  }
+  
+  public readonly keys: AnimeView[] = Object.keys(this._exhausterAll) as AnimeView[];
+
+  public readonly calendarViews: CalendarAnimeView[] = Object.keys(this._exhausterCalendar) as CalendarAnimeView[];
+
+  public isValid(view: string): view is AnimeView {
+    return view in this._exhausterAll;
+  }
+}
+export const animeViewsHelper = new AnimeViewHelper();
+
 
 export interface AnimeFilters {
   search?: string;
