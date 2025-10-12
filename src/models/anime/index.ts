@@ -219,10 +219,41 @@ export interface AnimeScoreHistory {
 
 export type AnimeScoresHistoryData = Record<number, Record<string, AnimeScoreHistory>>;
 
+// Display options
+export type ImageSize = 1 | 2 | 3;
+
+// Stats columns that can be shown/hidden
+export type StatsColumn = 
+  | 'score' 
+  | 'scoreDelta' 
+  | 'rank' 
+  | 'rankDelta' 
+  | 'popularity' 
+  | 'popularityDelta' 
+  | 'users' 
+  | 'usersDelta' 
+  | 'scorers' 
+  | 'scorersDelta';
+
+export interface VisibleColumns {
+  score: boolean;
+  scoreDelta: boolean;
+  rank: boolean;
+  rankDelta: boolean;
+  popularity: boolean;
+  popularityDelta: boolean;
+  users: boolean;
+  usersDelta: boolean;
+  scorers: boolean;
+  scorersDelta: boolean;
+}
+
 // User preferences for persistent state
 export interface AnimeUserPreferences {
   currentView: AnimeView;
   statusFilters: (UserAnimeStatus | 'not_defined')[];
   evolutionPeriod: string; // e.g., '1w', '1m', '3m'
+  imageSize: ImageSize; // 1x, 2x, or 3x
+  visibleColumns: VisibleColumns; // Stats columns visibility
   lastUpdated: string;
 }

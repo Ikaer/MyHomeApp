@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { AnimePageLayout, AnimeSidebar, AnimeTable } from '@/components/anime';
-import { AnimeWithExtensions, MALAuthState, AnimeView, AnimeScoresHistoryData, UserAnimeStatus } from '@/models/anime';
+import { AnimeWithExtensions, MALAuthState, AnimeView, AnimeScoresHistoryData, UserAnimeStatus, ImageSize, VisibleColumns, StatsColumn } from '@/models/anime';
 
 const ALL_STATUSES: (UserAnimeStatus | 'not_defined')[] = ["watching", "completed", "on_hold", "dropped", "plan_to_watch", "not_defined"];
 
@@ -25,6 +25,19 @@ export default function AnimePage() {
   // UI State
   const [currentView, setCurrentView] = useState<AnimeView>('new_season_strict');
   const [evolutionPeriod, setEvolutionPeriod] = useState('1w');
+  const [imageSize, setImageSize] = useState<ImageSize>(1);
+  const [visibleColumns, setVisibleColumns] = useState<VisibleColumns>({
+    score: true,
+    scoreDelta: true,
+    rank: true,
+    rankDelta: true,
+    popularity: true,
+    popularityDelta: true,
+    users: true,
+    usersDelta: true,
+    scorers: true,
+    scorersDelta: true,
+  });
   const [statusFilters, setStatusFilters] = useState<(UserAnimeStatus | 'not_defined')[]>(ALL_STATUSES);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -108,13 +121,15 @@ export default function AnimePage() {
         setCurrentView(prefs.currentView);
         setStatusFilters(prefs.statusFilters);
         setEvolutionPeriod(prefs.evolutionPeriod);
+        setImageSize(prefs.imageSize);
+        setVisibleColumns(prefs.visibleColumns);
       }
     } catch (error) {
       console.error('Error loading user preferences:', error);
     }
   };
 
-  const saveUserPreferences = async (updates: { currentView?: AnimeView; statusFilters?: (UserAnimeStatus | 'not_defined')[]; evolutionPeriod?: string }) => {
+  const saveUserPreferences = async (updates: { currentView?: AnimeView; statusFilters?: (UserAnimeStatus | 'not_defined')[]; evolutionPeriod?: string; imageSize?: ImageSize; visibleColumns?: VisibleColumns }) => {
     try {
       await fetch('/api/anime/preferences', {
         method: 'PUT',
@@ -199,6 +214,12 @@ export default function AnimePage() {
     saveUserPreferences({ statusFilters: newFilters });
   };
 
+  const handleVisibleColumnsChange = (column: StatsColumn, isVisible: boolean) => {
+    const newVisibleColumns = { ...visibleColumns, [column]: isVisible };
+    setVisibleColumns(newVisibleColumns);
+    saveUserPreferences({ visibleColumns: newVisibleColumns });
+  };
+
   const handleHideToggle = async (animeId: number, hide: boolean) => {
     try {
       const response = await fetch(`/api/anime/animes/${animeId}/hide`, { method: hide ? 'POST' : 'DELETE' });
@@ -253,6 +274,11 @@ export default function AnimePage() {
         setCurrentView(view);
         saveUserPreferences({ currentView: view });
       }}
+      imageSize={imageSize}
+      onImageSizeChange={(size) => {
+        setImageSize(size);
+        saveUserPreferences({ imageSize: size });
+      }}
       statusFilters={statusFilters}
       onStatusFilterChange={handleStatusFilterChange}
       animeCount={animes.length}
@@ -261,6 +287,8 @@ export default function AnimePage() {
         setEvolutionPeriod(period);
         saveUserPreferences({ evolutionPeriod: period });
       }}
+      visibleColumns={visibleColumns}
+      onVisibleColumnsChange={handleVisibleColumnsChange}
     />
   );
 
@@ -297,6 +325,8 @@ export default function AnimePage() {
                 scoresHistory={scoresHistory}
                 currentView={currentView}
                 scoreEvolutionPeriod={parseInt(evolutionPeriod.replace('w', ''))}
+                imageSize={imageSize}
+                visibleColumns={visibleColumns}
                 onUpdateMALStatus={handleUpdateMALStatus}
                 onHideToggle={handleHideToggle}
               />

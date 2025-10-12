@@ -146,3 +146,72 @@
   border-radius: 4px;
   padding: 0.25rem 0.5rem;
 }
+
+.displayOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.displayLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.imageSizeButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.sizeButton {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.sizeButton:hover {
+  background-color: var(--bg-tertiary);
+  border-color: var(--accent-primary-hover);
+}
+
+.activeSizeButton {
+  background-color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: white;
+  font-weight: 700;
+}
+
+.columnsVisibility {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.columnsLabel {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.columnCheckboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.columnCheckboxes .checkboxLabel {
+  font-size: 0.85rem;
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './AnimeSidebar.module.css';
-import { MALAuthState, UserAnimeStatus, AnimeView } from '@/models/anime';
+import { MALAuthState, UserAnimeStatus, AnimeView, ImageSize, VisibleColumns, StatsColumn } from '@/models/anime';
 
 const ALL_STATUSES: (UserAnimeStatus | 'not_defined')[] = ["watching", "completed", "on_hold", "dropped", "plan_to_watch", "not_defined"];
 
@@ -36,6 +36,10 @@ interface AnimeSidebarProps {
   currentView: AnimeView;
   onViewChange: (view: AnimeView) => void;
 
+  // Display
+  imageSize: ImageSize;
+  onImageSizeChange: (size: ImageSize) => void;
+
   // Filters
   statusFilters: (UserAnimeStatus | 'not_defined')[];
   onStatusFilterChange: (status: UserAnimeStatus | 'not_defined', isChecked: boolean) => void;
@@ -44,14 +48,18 @@ interface AnimeSidebarProps {
   animeCount: number;
   evolutionPeriod: string;
   onEvolutionPeriodChange: (period: string) => void;
+  visibleColumns: VisibleColumns;
+  onVisibleColumnsChange: (column: StatsColumn, isVisible: boolean) => void;
 }
 
 const AnimeSidebar: React.FC<AnimeSidebarProps> = ({
   authState, isAuthLoading, authError, onConnect, onDisconnect,
   isSyncing, isBigSyncing, syncError, onSync, onBigSync,
   currentView, onViewChange,
+  imageSize, onImageSizeChange,
   statusFilters, onStatusFilterChange,
   animeCount, evolutionPeriod, onEvolutionPeriodChange,
+  visibleColumns, onVisibleColumnsChange,
 }) => {
   return (
     <div className={styles.sidebar}>
@@ -104,6 +112,33 @@ const AnimeSidebar: React.FC<AnimeSidebarProps> = ({
       </div>
 
       <div className={styles.section}>
+        <h2 className={styles.sectionTitle}>Display</h2>
+        <div className={styles.displayOptions}>
+          <label className={styles.displayLabel}>Image Size:</label>
+          <div className={styles.imageSizeButtons}>
+            <button
+              className={`${styles.sizeButton} ${imageSize === 1 ? styles.activeSizeButton : ''}`}
+              onClick={() => onImageSizeChange(1)}
+            >
+              x1
+            </button>
+            <button
+              className={`${styles.sizeButton} ${imageSize === 2 ? styles.activeSizeButton : ''}`}
+              onClick={() => onImageSizeChange(2)}
+            >
+              x2
+            </button>
+            <button
+              className={`${styles.sizeButton} ${imageSize === 3 ? styles.activeSizeButton : ''}`}
+              onClick={() => onImageSizeChange(3)}
+            >
+              x3
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.section}>
         <h2 className={styles.sectionTitle}>Filters</h2>
         <div className={styles.filterGroup}>
           {ALL_STATUSES.map((status) => (
@@ -135,6 +170,92 @@ const AnimeSidebar: React.FC<AnimeSidebarProps> = ({
               <option value="3m">3 Months</option>
               <option value="1y">1 Year</option>
             </select>
+          </div>
+          
+          <div className={styles.columnsVisibility}>
+            <label className={styles.columnsLabel}>Visible Columns:</label>
+            <div className={styles.columnCheckboxes}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns?.score ?? true}
+                  onChange={(e) => onVisibleColumnsChange('score', e.target.checked)}
+                />
+                Score
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns?.scoreDelta ?? true}
+                  onChange={(e) => onVisibleColumnsChange('scoreDelta', e.target.checked)}
+                />
+                Score Δ
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns?.rank ?? true}
+                  onChange={(e) => onVisibleColumnsChange('rank', e.target.checked)}
+                />
+                Rank
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns?.rankDelta ?? true}
+                  onChange={(e) => onVisibleColumnsChange('rankDelta', e.target.checked)}
+                />
+                Rank Δ
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns?.popularity ?? true}
+                  onChange={(e) => onVisibleColumnsChange('popularity', e.target.checked)}
+                />
+                Popularity
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns?.popularityDelta ?? true}
+                  onChange={(e) => onVisibleColumnsChange('popularityDelta', e.target.checked)}
+                />
+                Popularity Δ
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns?.users ?? true}
+                  onChange={(e) => onVisibleColumnsChange('users', e.target.checked)}
+                />
+                Users
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns?.usersDelta ?? true}
+                  onChange={(e) => onVisibleColumnsChange('usersDelta', e.target.checked)}
+                />
+                Users Δ
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns?.scorers ?? true}
+                  onChange={(e) => onVisibleColumnsChange('scorers', e.target.checked)}
+                />
+                Scorers
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={visibleColumns?.scorersDelta ?? true}
+                  onChange={(e) => onVisibleColumnsChange('scorersDelta', e.target.checked)}
+                />
+                Scorers Δ
+              </label>
+            </div>
           </div>
         </div>
       </div>

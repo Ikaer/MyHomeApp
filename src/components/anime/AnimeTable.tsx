@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { AnimeWithExtensions, SortColumn, SortDirection, AnimeScoresHistoryData,AnimeView } from '@/models/anime';
+import { AnimeWithExtensions, SortColumn, SortDirection, AnimeScoresHistoryData, AnimeView, ImageSize, VisibleColumns } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
 import { formatSeason, getScoreEvolution } from '@/lib/animeUtils';
 import styles from './AnimeTable.module.css';
@@ -26,11 +26,13 @@ interface AnimeTableProps {
   scoresHistory: AnimeScoresHistoryData;
   currentView: AnimeView;
   scoreEvolutionPeriod: number;
+  imageSize: ImageSize;
+  visibleColumns: VisibleColumns;
   onUpdateMALStatus?: (animeId: number, updates: MALStatusUpdate) => void;
   onHideToggle?: (animeId: number, hide: boolean) => void;
 }
 
-export default function AnimeTable({ animes, scoresHistory, currentView, scoreEvolutionPeriod, onUpdateMALStatus, onHideToggle }: AnimeTableProps) {
+export default function AnimeTable({ animes, scoresHistory, currentView, scoreEvolutionPeriod, imageSize, visibleColumns, onUpdateMALStatus, onHideToggle }: AnimeTableProps) {
   const [sortColumn, setSortColumn] = useState<SortColumn>('mean');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [pendingUpdates, setPendingUpdates] = useState<Map<number, MALStatusUpdate>>(new Map());
@@ -376,36 +378,56 @@ export default function AnimeTable({ animes, scoresHistory, currentView, scoreEv
               <th>Starting Season</th>
               <th>Me</th>
               <th>Links</th>
-              <th className={styles.sortable} onClick={() => handleSort('mean')} title="Score">
-                S {getSortIcon('mean')}
-              </th>
-              <th className={styles.sortable} onClick={() => handleSort('delta_mean')} title="Score Evolution">
-                ΔS {getSortIcon('delta_mean')}
-              </th>
-              <th className={styles.sortable} onClick={() => handleSort('rank')} title="Rank">
-                R {getSortIcon('rank')}
-              </th>
-              <th className={styles.sortable} onClick={() => handleSort('delta_rank')} title="Rank Evolution">
-                ΔR {getSortIcon('delta_rank')}
-              </th>
-              <th className={styles.sortable} onClick={() => handleSort('popularity')} title="Popularity">
-                P {getSortIcon('popularity')}
-              </th>
-              <th className={styles.sortable} onClick={() => handleSort('delta_popularity')} title="Popularity Evolution">
-                ΔP {getSortIcon('delta_popularity')}
-              </th>
-              <th className={styles.sortable} onClick={() => handleSort('num_list_users')} title="Users">
-                U {getSortIcon('num_list_users')}
-              </th>
-              <th className={styles.sortable} onClick={() => handleSort('delta_num_list_users')} title="Users Evolution">
-                ΔU {getSortIcon('delta_num_list_users')}
-              </th>
-              <th className={styles.sortable} onClick={() => handleSort('num_scoring_users')} title="Scorers">
-                X {getSortIcon('num_scoring_users')}
-              </th>
-              <th className={styles.sortable} onClick={() => handleSort('delta_num_scoring_users')} title="Scorers Evolution">
-                ΔX {getSortIcon('delta_num_scoring_users')}
-              </th>
+              {(visibleColumns?.score ?? true) && (
+                <th className={styles.sortable} onClick={() => handleSort('mean')} title="Score">
+                  S {getSortIcon('mean')}
+                </th>
+              )}
+              {(visibleColumns?.scoreDelta ?? true) && (
+                <th className={styles.sortable} onClick={() => handleSort('delta_mean')} title="Score Evolution">
+                  ΔS {getSortIcon('delta_mean')}
+                </th>
+              )}
+              {(visibleColumns?.rank ?? true) && (
+                <th className={styles.sortable} onClick={() => handleSort('rank')} title="Rank">
+                  R {getSortIcon('rank')}
+                </th>
+              )}
+              {(visibleColumns?.rankDelta ?? true) && (
+                <th className={styles.sortable} onClick={() => handleSort('delta_rank')} title="Rank Evolution">
+                  ΔR {getSortIcon('delta_rank')}
+                </th>
+              )}
+              {(visibleColumns?.popularity ?? true) && (
+                <th className={styles.sortable} onClick={() => handleSort('popularity')} title="Popularity">
+                  P {getSortIcon('popularity')}
+                </th>
+              )}
+              {(visibleColumns?.popularityDelta ?? true) && (
+                <th className={styles.sortable} onClick={() => handleSort('delta_popularity')} title="Popularity Evolution">
+                  ΔP {getSortIcon('delta_popularity')}
+                </th>
+              )}
+              {(visibleColumns?.users ?? true) && (
+                <th className={styles.sortable} onClick={() => handleSort('num_list_users')} title="Users">
+                  U {getSortIcon('num_list_users')}
+                </th>
+              )}
+              {(visibleColumns?.usersDelta ?? true) && (
+                <th className={styles.sortable} onClick={() => handleSort('delta_num_list_users')} title="Users Evolution">
+                  ΔU {getSortIcon('delta_num_list_users')}
+                </th>
+              )}
+              {(visibleColumns?.scorers ?? true) && (
+                <th className={styles.sortable} onClick={() => handleSort('num_scoring_users')} title="Scorers">
+                  X {getSortIcon('num_scoring_users')}
+                </th>
+              )}
+              {(visibleColumns?.scorersDelta ?? true) && (
+                <th className={styles.sortable} onClick={() => handleSort('delta_num_scoring_users')} title="Scorers Evolution">
+                  ΔX {getSortIcon('delta_num_scoring_users')}
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -416,10 +438,10 @@ export default function AnimeTable({ animes, scoresHistory, currentView, scoreEv
                     <img 
                       src={anime.main_picture.medium} 
                       alt={anime.title}
-                      className={styles.animeImage}
+                      className={`${styles.animeImage} ${styles[`imageSize${imageSize}`]}`}
                     />
                   ) : (
-                    <div className={styles.noImage}>No Image</div>
+                    <div className={`${styles.noImage} ${styles[`imageSize${imageSize}`]}`}>No Image</div>
                   )}
                 </td>
                 <td className={styles.titleCell}>
@@ -548,36 +570,56 @@ export default function AnimeTable({ animes, scoresHistory, currentView, scoreEv
                     )}
                   </div>
                 </td>
-                <td className={styles.scoreCell}>
-                  {renderMetric(anime, 'mean')}
-                </td>
-                <td>
-                  {renderDelta(anime, 'mean', true)}
-                </td>
-                <td className={styles.scoreCell}>
-                  {renderMetric(anime, 'rank')}
-                </td>
-                <td>
-                  {renderDelta(anime, 'rank', false)}
-                </td>
-                <td className={styles.scoreCell}>
-                  {renderMetric(anime, 'popularity')}
-                </td>
-                <td>
-                  {renderDelta(anime, 'popularity', false)}
-                </td>
-                <td className={styles.scoreCell}>
-                  {renderMetric(anime, 'num_list_users')}
-                </td>
-                <td>
-                  {renderDelta(anime, 'num_list_users', true)}
-                </td>
-                <td className={styles.scoreCell}>
-                  {renderMetric(anime, 'num_scoring_users')}
-                </td>
-                <td>
-                  {renderDelta(anime, 'num_scoring_users', true)}
-                </td>
+                {(visibleColumns?.score ?? true) && (
+                  <td className={styles.scoreCell}>
+                    {renderMetric(anime, 'mean')}
+                  </td>
+                )}
+                {(visibleColumns?.scoreDelta ?? true) && (
+                  <td>
+                    {renderDelta(anime, 'mean', true)}
+                  </td>
+                )}
+                {(visibleColumns?.rank ?? true) && (
+                  <td className={styles.scoreCell}>
+                    {renderMetric(anime, 'rank')}
+                  </td>
+                )}
+                {(visibleColumns?.rankDelta ?? true) && (
+                  <td>
+                    {renderDelta(anime, 'rank', false)}
+                  </td>
+                )}
+                {(visibleColumns?.popularity ?? true) && (
+                  <td className={styles.scoreCell}>
+                    {renderMetric(anime, 'popularity')}
+                  </td>
+                )}
+                {(visibleColumns?.popularityDelta ?? true) && (
+                  <td>
+                    {renderDelta(anime, 'popularity', false)}
+                  </td>
+                )}
+                {(visibleColumns?.users ?? true) && (
+                  <td className={styles.scoreCell}>
+                    {renderMetric(anime, 'num_list_users')}
+                  </td>
+                )}
+                {(visibleColumns?.usersDelta ?? true) && (
+                  <td>
+                    {renderDelta(anime, 'num_list_users', true)}
+                  </td>
+                )}
+                {(visibleColumns?.scorers ?? true) && (
+                  <td className={styles.scoreCell}>
+                    {renderMetric(anime, 'num_scoring_users')}
+                  </td>
+                )}
+                {(visibleColumns?.scorersDelta ?? true) && (
+                  <td>
+                    {renderDelta(anime, 'num_scoring_users', true)}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

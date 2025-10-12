@@ -229,6 +229,19 @@ export function getAnimeUserPreferences(): AnimeUserPreferences {
     currentView: 'new_season_strict',
     statusFilters: ['watching', 'completed', 'on_hold', 'dropped', 'plan_to_watch', 'not_defined'],
     evolutionPeriod: '1w',
+    imageSize: 1,
+    visibleColumns: {
+      score: true,
+      scoreDelta: true,
+      rank: true,
+      rankDelta: true,
+      popularity: true,
+      popularityDelta: true,
+      users: true,
+      usersDelta: true,
+      scorers: true,
+      scorersDelta: true,
+    },
     lastUpdated: new Date().toISOString()
   };
 
