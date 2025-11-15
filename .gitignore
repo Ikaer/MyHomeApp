@@ -40,3 +40,5 @@ python_anime_app/
 sandbox/
 
 *.http
+
+/data/*.json

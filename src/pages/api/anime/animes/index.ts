@@ -28,22 +28,17 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       animeView = view;
     }
 
-    // Get filtered anime list based on view
+    // Get filtered anime list based on view (no hard limit yet)
     let animeList = filterAnimeByView(animeView);
-
-
-    if(animeView == 'find_shows') {
-      animeList = animeList.slice(0, 200); 
-    }
 
     // Apply search filter
     if (search && typeof search === 'string') {
       const searchTerm = search.toLowerCase();
       animeList = animeList.filter(anime => 
-        anime.title.toLowerCase().includes(searchTerm) ||
-        (anime.alternative_titles?.en && anime.alternative_titles.en.toLowerCase().includes(searchTerm)) ||
-        (anime.synopsis && anime.synopsis.toLowerCase().includes(searchTerm)) ||
-        anime.genres.some(genre => genre.name.toLowerCase().includes(searchTerm))
+        (anime.title || '').toLowerCase().includes(searchTerm) ||
+        (anime.alternative_titles?.en || '').toLowerCase().includes(searchTerm)
+        // Synopsis search commented out - too noisy without relevance ranking
+        // || (anime.synopsis || '').toLowerCase().includes(searchTerm)
       );
     }
 
@@ -51,7 +46,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     if (genres && typeof genres === 'string') {
       const genreList = genres.split(',').map(g => g.trim().toLowerCase());
       animeList = animeList.filter(anime =>
-        anime.genres.some(genre => genreList.includes(genre.name.toLowerCase()))
+        (anime.genres || []).some(genre => genreList.includes((genre.name || '').toLowerCase()))
       );
     }
 
@@ -120,7 +115,12 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       return 0;
     });
 
-    // Return the filtered and sorted list
+    // Apply final limit for find_shows AFTER all filters and sorting
+    if (animeView === 'find_shows') {
+      animeList = animeList.slice(0, 200);
+    }
+
+    // Return the filtered and sorted (and limited) list
     res.json({
       animes: animeList,
       total: animeList.length,

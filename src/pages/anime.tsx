@@ -48,10 +48,10 @@ export default function AnimePage() {
     loadUserPreferences();
   }, []);
 
-  // Reload animes when view or filters change
+  // Reload animes when view, filters, or search query change
   useEffect(() => {
     loadAnimes();
-  }, [currentView, statusFilters]);
+  }, [currentView, statusFilters, searchQuery]);
 
   // Handle OAuth redirect
   useEffect(() => {
@@ -85,7 +85,7 @@ export default function AnimePage() {
       setIsLoading(true);
       setError('');
       const statusQuery = statusFilters.join(',');
-      const response = await fetch(`/api/anime/animes?view=${currentView}&status=${statusQuery}`);
+      const response = await fetch(`/api/anime/animes?view=${currentView}&status=${statusQuery}&search=${encodeURIComponent(searchQuery)}`);
       if (response.ok) {
         const data = await response.json();
         setAnimes(data.animes || []);
@@ -251,11 +251,8 @@ export default function AnimePage() {
     }
   };
 
-  const filteredAnimes = animes.filter(anime =>
-    anime.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (anime.alternative_titles?.en || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (anime.alternative_titles?.ja || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Server-side search is applied via the API; use the list as-is
+  const filteredAnimes = animes;
 
   const sidebar = (
     <AnimeSidebar
