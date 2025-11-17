@@ -1,0 +1,49 @@
+.dataSyncSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  background: var(--accent-primary);
+  color: white;
+}
+
+.button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.bigSyncButton {
+  background: #dc3545;
+}
+
+.bigSyncButton:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.error {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  padding: 8px;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}

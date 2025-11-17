@@ -154,6 +154,11 @@ export interface SyncMetadata {
 export type SortColumn = 'title' | 'mean' | 'start_date' | 'status' | 'num_episodes' | 'rank' | 'popularity' | 'num_list_users' | 'num_scoring_users' | 'delta_mean' | 'delta_rank' | 'delta_popularity' | 'delta_num_list_users' | 'delta_num_scoring_users';
 export type SortDirection = 'asc' | 'desc';
 
+// Seasons & media types (shared across API and UI)
+export type SeasonName = 'winter' | 'spring' | 'summer' | 'fall';
+export interface SeasonInfo { year: number; season: SeasonName }
+export type MediaType = 'tv' | 'movie' | 'ona' | 'ova' | 'special' | 'music';
+
 // View types
 export type AnimeView = 'new_season' | 'new_season_strict' | 'next_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch';
 
@@ -192,8 +197,12 @@ export const animeViewsHelper = new AnimeViewHelper();
 export interface AnimeFilters {
   search?: string;
   genres?: string[];
-  status?: string[];
+  status?: (UserAnimeStatus | 'not_defined')[];
   minScore?: number;
+  maxScore?: number;
+  season?: SeasonInfo[];
+  mediaType?: MediaType[];
+  hidden?: boolean;
 }
 
 export interface AnimeSortOptions {
@@ -250,10 +259,49 @@ export interface VisibleColumns {
 
 // User preferences for persistent state
 export interface AnimeUserPreferences {
-  currentView: AnimeView;
+  // Legacy: currentView now deprecated (fire-and-forget presets)
+  currentView?: AnimeView;
+  
+  // Sort preferences
+  sortBy: SortColumn;
+  sortDir: SortDirection;
+  
+  // Filter preferences
   statusFilters: (UserAnimeStatus | 'not_defined')[];
+  searchQuery: string;
+  seasons: Array<{ year: number; season: 'winter' | 'spring' | 'summer' | 'fall' }>;
+  mediaTypes: string[];
+  hiddenOnly: boolean;
+  minScore: number | null;
+  maxScore: number | null;
+  
+  // Display preferences
   evolutionPeriod: string; // e.g., '1w', '1m', '3m'
   imageSize: ImageSize; // 1x, 2x, or 3x
   visibleColumns: VisibleColumns; // Stats columns visibility
+  
+  // UI state (optional - sidebar collapse is localStorage only)
+  sidebarExpanded?: Record<string, boolean>;
+  
   lastUpdated: string;
+}
+
+// API response model for anime list endpoint
+export interface AnimeListResponse {
+  animes: AnimeWithExtensions[];
+  total: number;
+  // Filters echoed back as strings as they appear in query for traceability
+  filters: {
+    search: string | null;
+    season: string | null;
+    mediaType: string | null;
+    hidden: string | null;
+    genres: string | null;
+    status: string | null;
+    minScore: string | null;
+    maxScore: string | null;
+  };
+  sort: { column: SortColumn; direction: SortDirection };
+  page: { limit: number | 'all'; offset: number; count: number };
+  mode: 'full' | 'compact';
 }

@@ -4,7 +4,7 @@
  */
 
 // Utility function to format season display with nice labels and colors
-import { AnimeScoresHistoryData, AnimeScoreHistory, AnimeView, CalendarAnimeView, AnimeWithExtensions } from "@/models/anime";
+import { AnimeScoresHistoryData, AnimeScoreHistory, AnimeView, CalendarAnimeView, AnimeWithExtensions, UserAnimeStatus, SortColumn, SortDirection } from "@/models/anime";
 
 export const formatSeason = (year: number, season: string) => {
   const seasonMap: Record<string, { label: string; color: string }> = {
@@ -69,69 +69,6 @@ export const getScoreEvolution = (
   return result;
 };
 
-export const filterFindShowsView = (animes: AnimeWithExtensions[], view: AnimeView): AnimeWithExtensions[] => {
-  if (view === 'find_shows') {
-    return animes.filter(anime => anime.media_type === 'tv' && !anime.my_list_status);
-  }
-  return animes;
-};
-
-export const filterHiddenView= (animes: AnimeWithExtensions[], view: AnimeView): AnimeWithExtensions[] => {
-  if (view === 'hidden') {
-    return animes.filter(anime => anime.hidden);
-  }
-  else{
-    return animes.filter(anime => !anime.hidden);
-  }
-}
-
-export const filterStatusView = (animes: AnimeWithExtensions[], view: AnimeView): AnimeWithExtensions[] => {
-  if (['watching', 'completed', 'on_hold', 'dropped', 'plan_to_watch'].includes(view)) {
-    return animes.filter(anime => anime.my_list_status?.status === view);
-  }
-  return animes;
-}
-
-export const filterCalendarView = (animes: AnimeWithExtensions[], view: AnimeView): AnimeWithExtensions[] => {
-  const seasonInfos = getSeasonInfos();
-  const currentSeason = seasonInfos.current;
-  const previousSeason = seasonInfos.previous;
-  const nextSeason = seasonInfos.next;
-
-  if (view === 'next_season') {
-    return animes.filter(anime => {
-      if (!anime.start_season) return false;
-      return anime.start_season.year === nextSeason.year && anime.start_season.season === nextSeason.season;
-    });
-  }
-  else if (view === 'new_season_strict') {
-    return animes.filter(anime => {
-      if (!anime.start_season) return false;
-      return anime.start_season.year === currentSeason.year && anime.start_season.season === currentSeason.season;
-    });
-  }
-  else if (view === 'new_season') {
-    return animes.filter(anime => {
-      if (!anime.start_season) return false;
-
-      const animeYear = anime.start_season.year;
-      const animeSeason = anime.start_season.season;
-
-      // Include all anime from current season (any status)
-      if (animeYear === currentSeason.year && animeSeason === currentSeason.season) {
-        return true;
-      }
-
-      // Include all anime from previous season (any status)
-      if (animeYear === previousSeason.year && animeSeason === previousSeason.season) {
-        return true;
-      }
-
-      return false;
-    });
-  }
-  return animes;
-}
 
 type Season = 'winter' | 'spring' | 'summer' | 'fall';
 type SeasonInfo = { year: number; season: Season };
@@ -175,4 +112,85 @@ export function getSeasonInfos(): SeasonInfos {
 }
 
 
+// Map old view system to new filter parameters
+// View preset definition
+export interface ViewPreset {
+  key: AnimeView;
+  label: string;
+  description: string;
+  seasonStrategy?: 'current' | 'current_previous' | 'next' | null; // dynamic seasons
+  staticFilters?: {
+    mediaType?: string[];
+    hidden?: boolean;
+    status?: UserAnimeStatus | 'not_defined';
+    sortBy?: SortColumn;
+    sortDir?: SortDirection;
+  };
+}
+
+export const VIEW_PRESETS: ViewPreset[] = [
+  {
+    key: 'new_season_strict',
+    label: 'New Season (Strict)',
+    description: 'Animes from the current season only',
+    seasonStrategy: 'current',
+    staticFilters: { hidden: false }
+  },
+  {
+    key: 'new_season',
+    label: 'New Season',
+    description: 'Current & previous season',
+    seasonStrategy: 'current_previous',
+    staticFilters: { hidden: false }
+  },
+  {
+    key: 'next_season',
+    label: 'Next Season',
+    description: 'Animes that will air in the next season',
+    seasonStrategy: 'next',
+    staticFilters: { hidden: false }
+  },
+  {
+    key: 'find_shows',
+    label: 'Find Shows',
+    description: 'Highest rated TV shows not in your list',
+    seasonStrategy: null,
+    staticFilters: { mediaType: ['tv'], hidden: false, sortBy: 'mean', sortDir: 'desc' }
+  },
+  { key: 'watching', label: 'Watching', description: 'Currently watching', seasonStrategy: null, staticFilters: { status: 'watching', hidden: false } },
+  { key: 'completed', label: 'Completed', description: 'Completed shows', seasonStrategy: null, staticFilters: { status: 'completed', hidden: false } },
+  { key: 'on_hold', label: 'On Hold', description: 'Shows on hold', seasonStrategy: null, staticFilters: { status: 'on_hold', hidden: false } },
+  { key: 'dropped', label: 'Dropped', description: 'Shows you dropped', seasonStrategy: null, staticFilters: { status: 'dropped', hidden: false } },
+  { key: 'plan_to_watch', label: 'Plan to Watch', description: 'Planned shows', seasonStrategy: null, staticFilters: { status: 'plan_to_watch', hidden: false } },
+  { key: 'hidden', label: 'Hidden', description: 'Hidden shows only', seasonStrategy: null, staticFilters: { hidden: true } },
+];
+
+// Map a view to filter query parameter strings (CSV tokens)
+export function mapViewToFilters(view: AnimeView): Record<string, any> {
+  const preset = VIEW_PRESETS.find(p => p.key === view);
+  if (!preset) return {};
+
+  const filters: Record<string, string> = {};
+  const seasonInfos = getSeasonInfos();
+  if (preset.seasonStrategy) {
+    if (preset.seasonStrategy === 'current') {
+      filters.season = `${seasonInfos.current.year}-${seasonInfos.current.season}`;
+    } else if (preset.seasonStrategy === 'current_previous') {
+      filters.season = `${seasonInfos.current.year}-${seasonInfos.current.season},${seasonInfos.previous.year}-${seasonInfos.previous.season}`;
+    } else if (preset.seasonStrategy === 'next') {
+      filters.season = `${seasonInfos.next.year}-${seasonInfos.next.season}`;
+    }
+  }
+  if (preset.staticFilters) {
+    const sf = preset.staticFilters;
+    if (sf.mediaType && sf.mediaType.length > 0) filters.mediaType = sf.mediaType.join(',');
+    if (sf.hidden !== undefined) filters.hidden = sf.hidden ? 'true' : 'false';
+    if (sf.status) filters.status = sf.status;
+    if (sf.sortBy) filters.sortBy = sf.sortBy;
+    if (sf.sortDir) filters.sortDir = sf.sortDir;
+  }
+  return filters;
+}
+
 // You can add other client-safe anime utility functions here
+

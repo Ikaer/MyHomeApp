@@ -15,16 +15,52 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       const updates: Partial<AnimeUserPreferences> = req.body;
 
       // Validate the updates (basic validation)
-      if (updates.currentView && typeof updates.currentView !== 'string') {
+      if (updates.currentView !== undefined && typeof updates.currentView !== 'string') {
         return res.status(400).json({ error: 'Invalid currentView' });
       }
 
-      if (updates.statusFilters && !Array.isArray(updates.statusFilters)) {
+      if (updates.statusFilters !== undefined && !Array.isArray(updates.statusFilters)) {
         return res.status(400).json({ error: 'Invalid statusFilters' });
       }
 
-      if (updates.evolutionPeriod && typeof updates.evolutionPeriod !== 'string') {
+      if (updates.evolutionPeriod !== undefined && typeof updates.evolutionPeriod !== 'string') {
         return res.status(400).json({ error: 'Invalid evolutionPeriod' });
+      }
+
+      if (updates.sortBy !== undefined && typeof updates.sortBy !== 'string') {
+        return res.status(400).json({ error: 'Invalid sortBy' });
+      }
+
+      if (updates.sortDir !== undefined && (updates.sortDir !== 'asc' && updates.sortDir !== 'desc')) {
+        return res.status(400).json({ error: 'Invalid sortDir' });
+      }
+
+      if (updates.searchQuery !== undefined && typeof updates.searchQuery !== 'string') {
+        return res.status(400).json({ error: 'Invalid searchQuery' });
+      }
+
+      if (updates.seasons !== undefined && !Array.isArray(updates.seasons)) {
+        return res.status(400).json({ error: 'Invalid seasons' });
+      }
+
+      if (updates.mediaTypes !== undefined && !Array.isArray(updates.mediaTypes)) {
+        return res.status(400).json({ error: 'Invalid mediaTypes' });
+      }
+
+      if (updates.hiddenOnly !== undefined && typeof updates.hiddenOnly !== 'boolean') {
+        return res.status(400).json({ error: 'Invalid hiddenOnly' });
+      }
+
+      if (updates.minScore !== undefined && updates.minScore !== null && typeof updates.minScore !== 'number') {
+        return res.status(400).json({ error: 'Invalid minScore' });
+      }
+
+      if (updates.maxScore !== undefined && updates.maxScore !== null && typeof updates.maxScore !== 'number') {
+        return res.status(400).json({ error: 'Invalid maxScore' });
+      }
+
+      if (updates.sidebarExpanded !== undefined && (typeof updates.sidebarExpanded !== 'object' || updates.sidebarExpanded === null)) {
+        return res.status(400).json({ error: 'Invalid sidebarExpanded' });
       }
 
       // Save the preferences

@@ -7,6 +7,26 @@
   overflow-y: auto;
 }
 
+.searchInput {
+  padding: 10px 12px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid #444;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.searchInput::placeholder {
+  color: #888;
+}
+
 .section {
   display: flex;
   flex-direction: column;
@@ -214,4 +234,30 @@
 
 .columnCheckboxes .checkboxLabel {
   font-size: 0.85rem;
+}
+
+.scoreRangeInputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.scoreInput {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.scoreInput:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.rangeSeparator {
+  color: var(--text-secondary);
+  font-weight: 500;
 }

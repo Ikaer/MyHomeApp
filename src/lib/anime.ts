@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { MALAnime, AnimeExtension, AnimeWithExtensions, MALAuthData, MALUser, SyncMetadata, AnimeScoresHistoryData, AnimeView, AnimeUserPreferences, UserAnimeStatus } from '@/models/anime';
-import { filterCalendarView, filterFindShowsView, filterHiddenView, filterStatusView, getSeasonInfos } from './animeUtils';
+// Legacy view-specific filter utilities removed (fire-and-forget presets now handled client-side)
 
 const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const ANIME_DATA_PATH = path.join(DATA_PATH, 'anime');
@@ -138,26 +138,28 @@ export function deleteAnimeExtension(malId: string): void {
 }
 
 // Combined data operations
+let cachedAnime: AnimeWithExtensions[] | null = null;
+let lastCacheTime = 0;
+const CACHE_TTL_MS = 60_000; // 60s
+
 export function getAnimeWithExtensions(): AnimeWithExtensions[] {
+  const now = Date.now();
+  if (cachedAnime && (now - lastCacheTime) < CACHE_TTL_MS) {
+    return cachedAnime;
+  }
   const malAnime = getAllMALAnime();
   const extensions = getAllAnimeExtensions();
   const hiddenIds = getHiddenAnimeIds();
-
-  return Object.values(malAnime).map(anime => ({
+  cachedAnime = Object.values(malAnime).map(anime => ({
     ...anime,
     extensions: extensions[anime.id.toString()],
     hidden: hiddenIds.includes(anime.id)
   }));
+  lastCacheTime = now;
+  return cachedAnime;
 }
 
-export function filterAnimeByView(view: AnimeView = 'new_season'): AnimeWithExtensions[] {
-  let animes = getAnimeWithExtensions();
-  animes = filterHiddenView(animes, view);
-  animes = filterFindShowsView(animes, view);
-  animes = filterStatusView(animes, view);
-  animes = filterCalendarView(animes, view);
-  return animes;
-}
+// Deprecated: server-side view filtering removed. `view` parameter now only maps to explicit filters in API handler.
 
 // Authentication operations
 export function getMALAuthData(): { user: MALUser | null; token: MALAuthData | null } {
@@ -226,8 +228,20 @@ export function getSyncMetadata(): SyncMetadata | null {
 // User preferences operations
 export function getAnimeUserPreferences(): AnimeUserPreferences {
   const defaultPreferences: AnimeUserPreferences = {
-    currentView: 'new_season_strict',
+    // Sort defaults
+    sortBy: 'mean',
+    sortDir: 'desc',
+    
+    // Filter defaults
     statusFilters: ['watching', 'completed', 'on_hold', 'dropped', 'plan_to_watch', 'not_defined'],
+    searchQuery: '',
+    seasons: [],
+    mediaTypes: [],
+    hiddenOnly: false,
+    minScore: null,
+    maxScore: null,
+    
+    // Display defaults
     evolutionPeriod: '1w',
     imageSize: 1,
     visibleColumns: {
@@ -242,6 +256,18 @@ export function getAnimeUserPreferences(): AnimeUserPreferences {
       scorers: true,
       scorersDelta: true,
     },
+    
+    // UI state defaults (sidebar sections)
+    sidebarExpanded: {
+      account: true,
+      sync: true,
+      views: true,
+      display: true,
+      filters: true,
+      sort: true,
+      stats: true,
+    },
+    
     lastUpdated: new Date().toISOString()
   };
 
