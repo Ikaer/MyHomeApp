@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { filterAnimeByView, getAnimeUserPreferences } from '@/lib/anime';
-import { AnimeWithExtensions, SortColumn, SortDirection, AnimeView, animeViewsHelper } from '@/models/anime';
+import { getAnimeWithExtensions, getAnimeUserPreferences } from '@/lib/anime';
+import { mapViewToFilters } from '@/lib/animeUtils';
+import { AnimeWithExtensions, SortColumn, SortDirection, AnimeView, animeViewsHelper, AnimeListResponse } from '@/models/anime';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -10,26 +11,106 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     // Get query parameters
-    const { 
+    let { 
       search, 
       genres, 
       status, 
-      minScore, 
+      minScore,
+      maxScore,
+      season,
+  mediaType,
+      hidden,
       sortBy = 'mean', 
       sortDir = 'desc',
-      view
+      view,
+      limit,
+      offset,
+      full
     } = req.query;
 
-    // Get user preferences for default view
-    const userPrefs = getAnimeUserPreferences();
-    
-    let animeView: AnimeView = userPrefs.currentView;
-    if(typeof view === 'string' && animeViewsHelper.isValid(view)) {
-      animeView = view;
+    // If view parameter is provided, map it to filters (backward compatibility)
+    if (view && typeof view === 'string' && animeViewsHelper.isValid(view)) {
+      const viewFilters = mapViewToFilters(view as AnimeView);
+      // Apply view filters, but don't override explicitly provided parameters
+      season = season || viewFilters.season;
+      mediaType = mediaType || viewFilters.mediaType;
+      hidden = hidden || viewFilters.hidden;
+      status = status || viewFilters.status;
+      sortBy = (sortBy === 'mean' && viewFilters.sortBy) ? viewFilters.sortBy : sortBy;
+      sortDir = (sortDir === 'desc' && viewFilters.sortDir) ? viewFilters.sortDir : sortDir;
     }
 
-    // Get filtered anime list based on view (no hard limit yet)
-    let animeList = filterAnimeByView(animeView);
+    // Backward compat: view parameter now only maps to filters via mapViewToFilters
+    // No server-side view filtering or tracking
+
+    // Start from full dataset (no legacy view filtering)
+    let animeList = getAnimeWithExtensions();
+
+    // Pagination settings
+    let pageLimit: number | 'all' = 200;
+    if (typeof limit === 'string') {
+      if (limit === 'all') pageLimit = 'all';
+      else {
+        const parsed = parseInt(limit, 10);
+        if (!isNaN(parsed) && parsed > 0) pageLimit = Math.min(parsed, 1000); // safety cap
+      }
+    }
+    let pageOffset = 0;
+    if (typeof offset === 'string') {
+      const parsedOffset = parseInt(offset, 10);
+      if (!isNaN(parsedOffset) && parsedOffset >= 0) pageOffset = parsedOffset;
+    }
+
+    // Apply season filter (CSV tokens: YYYY-season)
+    if (season && typeof season === 'string') {
+      const tokens = season.split(',').map(s => s.trim()).filter(Boolean);
+      if (tokens.length > 0) {
+        const seasonMap: Record<string, 'winter'|'spring'|'summer'|'fall'> = {
+          winter: 'winter', spring: 'spring', summer: 'summer', fall: 'fall', autumn: 'fall'
+        };
+        const parsed: Array<{ year: number; season: 'winter'|'spring'|'summer'|'fall' }> = [];
+        for (const t of tokens) {
+          const [y, s] = t.split('-');
+          const year = Number(y);
+          const norm = seasonMap[(s || '').toLowerCase()];
+          if (!year || !Number.isInteger(year) || year < 1900 || year > 3000 || !norm) {
+            return res.status(400).json({ error: `Invalid season token: '${t}'. Expected 'YYYY-season' (e.g., 2025-spring).` });
+          }
+          parsed.push({ year, season: norm });
+        }
+        // Deduplicate
+        const seen = new Set(parsed.map(p => `${p.year}-${p.season}`));
+        const seasonFilters = Array.from(seen).map(k => {
+          const [yy, ss] = k.split('-');
+          return { year: Number(yy), season: ss as 'winter'|'spring'|'summer'|'fall' };
+        });
+        animeList = animeList.filter(anime => {
+          if (!anime.start_season) return false;
+          return seasonFilters.some(s =>
+            anime.start_season!.year === s.year &&
+            anime.start_season!.season === s.season
+          );
+        });
+      }
+    }
+
+    // Apply media type filter (NEW)
+    if (mediaType && typeof mediaType === 'string') {
+      const typeList = mediaType.split(',').map(t => t.trim().toLowerCase());
+      animeList = animeList.filter(anime =>
+        typeList.includes((anime.media_type || '').toLowerCase())
+      );
+    }
+
+
+    // Apply hidden filter (NEW)
+    if (hidden !== undefined && typeof hidden === 'string') {
+      const showHidden = hidden.toLowerCase() === 'true';
+      animeList = animeList.filter(anime => {
+        const isHidden = anime.hidden === true;
+        return showHidden ? isHidden : !isHidden;
+      });
+    }
 
     // Apply search filter
     if (search && typeof search === 'string') {
@@ -68,6 +149,16 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       if (!isNaN(minScoreNum)) {
         animeList = animeList.filter(anime =>
           anime.mean && anime.mean >= minScoreNum
+        );
+      }
+    }
+
+    // Apply maximum score filter (NEW)
+    if (maxScore && typeof maxScore === 'string') {
+      const maxScoreNum = parseFloat(maxScore);
+      if (!isNaN(maxScoreNum)) {
+        animeList = animeList.filter(anime =>
+          anime.mean && anime.mean <= maxScoreNum
         );
       }
     }
@@ -115,27 +206,43 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       return 0;
     });
 
-    // Apply final limit for find_shows AFTER all filters and sorting
-    if (animeView === 'find_shows') {
-      animeList = animeList.slice(0, 200);
+    // Pagination already defaulted to 200; no view-specific overrides
+
+    const totalBeforePaging = animeList.length;
+    if (pageLimit !== 'all') {
+      animeList = animeList.slice(pageOffset, pageOffset + pageLimit);
+    } else if (pageOffset > 0) {
+      animeList = animeList.slice(pageOffset);
+    }
+
+    // Compact mode: remove heavy fields unless full=true
+    const useFull = typeof full === 'string' && full.toLowerCase() === 'true';
+    if (!useFull) {
+      animeList = animeList.map(anime => {
+        const { synopsis, alternative_titles, genres, studios, source, rating, background, related_anime, related_manga, recommendations, ...rest } = anime as any;
+        return rest as AnimeWithExtensions;
+      });
     }
 
     // Return the filtered and sorted (and limited) list
-    res.json({
+    const response: AnimeListResponse = {
       animes: animeList,
-      total: animeList.length,
-      view: animeView,
+      total: totalBeforePaging,
       filters: {
-        search: search || null,
-        genres: genres || null,
-        status: status || null,
-        minScore: minScore || null
+        search: (typeof search === 'string' ? search : null),
+        season: (typeof season === 'string' ? season : null),
+        mediaType: (typeof mediaType === 'string' ? mediaType : null),
+        hidden: (typeof hidden === 'string' ? hidden : null),
+        genres: (typeof genres === 'string' ? genres : null),
+        status: (typeof status === 'string' ? status : null),
+        minScore: (typeof minScore === 'string' ? minScore : null),
+        maxScore: (typeof maxScore === 'string' ? maxScore : null)
       },
-      sort: {
-        column: sortColumn,
-        direction: sortDirection
-      }
-    });
+      sort: { column: sortColumn, direction: sortDirection },
+      page: { limit: pageLimit, offset: pageOffset, count: animeList.length },
+      mode: useFull ? 'full' : 'compact'
+    };
+    res.json(response);
 
   } catch (error) {
     console.error('Get anime list error:', error);

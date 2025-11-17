@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { AnimeWithExtensions, SortColumn, SortDirection, AnimeScoresHistoryData, AnimeView, ImageSize, VisibleColumns } from '@/models/anime';
+import React, { useMemo, useState } from 'react';
+import { AnimeWithExtensions, SortColumn, SortDirection, AnimeScoresHistoryData, ImageSize, VisibleColumns } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
 import { formatSeason, getScoreEvolution } from '@/lib/animeUtils';
 import styles from './AnimeTable.module.css';
@@ -24,17 +24,16 @@ interface MALStatusUpdate {
 interface AnimeTableProps {
   animes: AnimeWithExtensions[];
   scoresHistory: AnimeScoresHistoryData;
-  currentView: AnimeView;
   scoreEvolutionPeriod: number;
   imageSize: ImageSize;
   visibleColumns: VisibleColumns;
+  sortColumn: SortColumn;
+  sortDirection: SortDirection;
   onUpdateMALStatus?: (animeId: number, updates: MALStatusUpdate) => void;
   onHideToggle?: (animeId: number, hide: boolean) => void;
 }
 
-export default function AnimeTable({ animes, scoresHistory, currentView, scoreEvolutionPeriod, imageSize, visibleColumns, onUpdateMALStatus, onHideToggle }: AnimeTableProps) {
-  const [sortColumn, setSortColumn] = useState<SortColumn>('mean');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod, imageSize, visibleColumns, sortColumn, sortDirection, onUpdateMALStatus, onHideToggle }: AnimeTableProps) {
   const [pendingUpdates, setPendingUpdates] = useState<Map<number, MALStatusUpdate>>(new Map());
 
   const sortedAnimes = useMemo(() => {
@@ -116,21 +115,7 @@ export default function AnimeTable({ animes, scoresHistory, currentView, scoreEv
     return sorted;
   }, [animes, sortColumn, sortDirection, scoresHistory, scoreEvolutionPeriod]);
 
-  const handleSort = (column: SortColumn) => {
-    if (sortColumn === column) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortColumn(column);
-      const isLowerBetter = ['rank', 'popularity'].includes(column);
-      const isDeltaLowerBetter = ['delta_rank', 'delta_popularity'].includes(column);
-      
-      if (isLowerBetter || isDeltaLowerBetter) {
-        setSortDirection('asc');
-      } else {
-        setSortDirection('desc');
-      }
-    }
-  };
+  // Sorting is controlled by parent via props; no header click sorting here.
 
   const handleManualSearch = (anime: AnimeWithExtensions) => {
     const searchTitle = anime.alternative_titles?.en || anime.title;
@@ -217,7 +202,7 @@ export default function AnimeTable({ animes, scoresHistory, currentView, scoreEv
   };
 
   const getSortIcon = (column: SortColumn) => {
-    if (sortColumn !== column) return '↕️';
+    if (sortColumn !== column) return '';
     return sortDirection === 'asc' ? '↑' : '↓';
   };
 
@@ -357,76 +342,41 @@ export default function AnimeTable({ animes, scoresHistory, currentView, scoreEv
           <thead>
             <tr>
               <th>Image</th>
-              <th 
-                className={styles.sortable}
-                onClick={() => handleSort('title')}
-              >
-                Title {getSortIcon('title')}
-              </th>
-              <th 
-                className={styles.sortable}
-                onClick={() => handleSort('status')}
-              >
-                Status {getSortIcon('status')}
-              </th>
-              <th 
-                className={styles.sortable}
-                onClick={() => handleSort('num_episodes')}
-              >
-                Episodes {getSortIcon('num_episodes')}
-              </th>
+              <th>Title {getSortIcon('title')}</th>
+              <th>Status {getSortIcon('status')}</th>
+              <th>Episodes {getSortIcon('num_episodes')}</th>
               <th>Starting Season</th>
               <th>Me</th>
               <th>Links</th>
               {(visibleColumns?.score ?? true) && (
-                <th className={styles.sortable} onClick={() => handleSort('mean')} title="Score">
-                  S {getSortIcon('mean')}
-                </th>
+                <th title="Score">S {getSortIcon('mean')}</th>
               )}
               {(visibleColumns?.scoreDelta ?? true) && (
-                <th className={styles.sortable} onClick={() => handleSort('delta_mean')} title="Score Evolution">
-                  ΔS {getSortIcon('delta_mean')}
-                </th>
+                <th title="Score Evolution">ΔS {getSortIcon('delta_mean')}</th>
               )}
               {(visibleColumns?.rank ?? true) && (
-                <th className={styles.sortable} onClick={() => handleSort('rank')} title="Rank">
-                  R {getSortIcon('rank')}
-                </th>
+                <th title="Rank">R {getSortIcon('rank')}</th>
               )}
               {(visibleColumns?.rankDelta ?? true) && (
-                <th className={styles.sortable} onClick={() => handleSort('delta_rank')} title="Rank Evolution">
-                  ΔR {getSortIcon('delta_rank')}
-                </th>
+                <th title="Rank Evolution">ΔR {getSortIcon('delta_rank')}</th>
               )}
               {(visibleColumns?.popularity ?? true) && (
-                <th className={styles.sortable} onClick={() => handleSort('popularity')} title="Popularity">
-                  P {getSortIcon('popularity')}
-                </th>
+                <th title="Popularity">P {getSortIcon('popularity')}</th>
               )}
               {(visibleColumns?.popularityDelta ?? true) && (
-                <th className={styles.sortable} onClick={() => handleSort('delta_popularity')} title="Popularity Evolution">
-                  ΔP {getSortIcon('delta_popularity')}
-                </th>
+                <th title="Popularity Evolution">ΔP {getSortIcon('delta_popularity')}</th>
               )}
               {(visibleColumns?.users ?? true) && (
-                <th className={styles.sortable} onClick={() => handleSort('num_list_users')} title="Users">
-                  U {getSortIcon('num_list_users')}
-                </th>
+                <th title="Users">U {getSortIcon('num_list_users')}</th>
               )}
               {(visibleColumns?.usersDelta ?? true) && (
-                <th className={styles.sortable} onClick={() => handleSort('delta_num_list_users')} title="Users Evolution">
-                  ΔU {getSortIcon('delta_num_list_users')}
-                </th>
+                <th title="Users Evolution">ΔU {getSortIcon('delta_num_list_users')}</th>
               )}
               {(visibleColumns?.scorers ?? true) && (
-                <th className={styles.sortable} onClick={() => handleSort('num_scoring_users')} title="Scorers">
-                  X {getSortIcon('num_scoring_users')}
-                </th>
+                <th title="Scorers">X {getSortIcon('num_scoring_users')}</th>
               )}
               {(visibleColumns?.scorersDelta ?? true) && (
-                <th className={styles.sortable} onClick={() => handleSort('delta_num_scoring_users')} title="Scorers Evolution">
-                  ΔX {getSortIcon('delta_num_scoring_users')}
-                </th>
+                <th title="Scorers Evolution">ΔX {getSortIcon('delta_num_scoring_users')}</th>
               )}
             </tr>
           </thead>

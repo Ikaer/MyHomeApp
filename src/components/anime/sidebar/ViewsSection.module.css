@@ -1,0 +1,22 @@
+.viewsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.viewButton {
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  text-align: left;
+  transition: all 0.2s;
+}
+
+.viewButton:hover {
+  background: #3a3a3a;
+  border-color: var(--accent-primary);
+}
