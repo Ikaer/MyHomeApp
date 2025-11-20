@@ -219,7 +219,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const useFull = typeof full === 'string' && full.toLowerCase() === 'true';
     if (!useFull) {
       animeList = animeList.map(anime => {
-        const { synopsis, alternative_titles, genres, studios, source, rating, background, related_anime, related_manga, recommendations, ...rest } = anime as any;
+        // Keep genres and alternative_titles (english alt title needed for listing)
+        const { synopsis, studios, source, rating, background, related_anime, related_manga, recommendations, ...rest } = anime as any;
         return rest as AnimeWithExtensions;
       });
     }

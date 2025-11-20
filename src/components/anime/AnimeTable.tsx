@@ -226,8 +226,8 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
 
   const formatGenres = (genres: Array<{ name: string }> = []) => {
     if (!genres || genres.length === 0) return 'No genres';
-    return genres.slice(0, 3).map(g => g.name).join(', ') + 
-           (genres.length > 3 ? ` +${genres.length - 3}` : '');
+    // Show full genre list without suffix abbreviation
+    return genres.map(g => g.name).join(', ');
   };
 
   const formatProviders = (anime: AnimeWithExtensions) => {
@@ -396,9 +396,9 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
                 </td>
                 <td className={styles.titleCell}>
                   <div className="title-content">
-                    <div className={styles.primaryTitle}>{getEnglishTitle(anime)}</div>
+                    <div className={styles.primaryTitle}>{anime.title}</div>
                     {anime.alternative_titles?.en && anime.alternative_titles.en !== anime.title && (
-                      <div className={styles.japaneseTitle}>{anime.title}</div>
+                      <div className={styles.altTitle}>{anime.alternative_titles.en}</div>
                     )}
                   </div>
                   <div className={styles.genresInTitle}>{formatGenres(anime.genres || [])}</div>

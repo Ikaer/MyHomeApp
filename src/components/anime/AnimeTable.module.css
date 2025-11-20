@@ -114,6 +114,13 @@
   color: #f9fafb;
 }
 
+.altTitle {
+  font-size: 0.85rem;
+  color: #d1d5db; /* Between primary title and genres */
+  margin-top: 0.15rem;
+  font-weight: 400;
+}
+
 .japaneseTitle {
   font-size: 0.875rem;
   color: #9ca3af;
