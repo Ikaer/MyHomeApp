@@ -192,14 +192,16 @@ export default function AnimePage() {
   const filteredAnimes = animes;
 
   const applyPreset = (preset: AnimeView, persist: boolean = true) => {
-    // Full reset of all filter-related state before applying new preset
-    setSearchQuery('');
-    setSeasons([]);
-    setMediaTypes([]);
-    setHiddenOnly(false);
-    setMinScore(null);
-    setMaxScore(null);
-    setStatusFilters(ALL_STATUSES); // baseline: all statuses selected
+    // Build next state values first, then set state and persist
+    let nextSearchQuery = '';
+    let nextSeasons: Array<{year:number; season:'winter'|'spring'|'summer'|'fall'}> = [];
+    let nextMediaTypes: string[] = [];
+    let nextHiddenOnly = false;
+    let nextMinScore: number | null = null;
+    let nextMaxScore: number | null = null;
+    let nextStatusFilters: (UserAnimeStatus | 'not_defined')[] = ALL_STATUSES;
+    let nextSortBy: SortColumn = sortBy;
+    let nextSortDir: SortDirection = sortDir;
 
     const filters = mapViewToFilters(preset);
 
@@ -214,31 +216,55 @@ export default function AnimePage() {
         const norm = seasonMap[(s || '').toLowerCase()];
         if (year && Number.isInteger(year) && norm) parsed.push({ year, season: norm });
       }
-      setSeasons(parsed);
+      nextSeasons = parsed;
     }
 
     // Status logic (override baseline for certain presets)
     if (preset === 'hidden') {
-      // Hidden preset: only hidden filter, no status filter sent
-      setStatusFilters([]);
+      nextStatusFilters = [];
     } else if (filters.status) {
-      setStatusFilters([filters.status as UserAnimeStatus]);
+      nextStatusFilters = [filters.status as UserAnimeStatus];
     } else if (preset === 'find_shows') {
-      // Discovery preset: show only items not in list by selecting 'not_defined'
-      setStatusFilters(['not_defined']);
+      nextStatusFilters = ['not_defined'];
     }
 
     // Media types
     if (filters.mediaType) {
-      setMediaTypes(filters.mediaType.split(','));
+      nextMediaTypes = filters.mediaType.split(',');
     }
 
     // Hidden toggle
-  if (filters.hidden === 'true') setHiddenOnly(true);
+    if (filters.hidden === 'true') nextHiddenOnly = true;
 
     // Sort overrides from preset (fallback keep existing if not provided)
-    if (filters.sortBy) setSortBy(filters.sortBy as SortColumn);
-    if (filters.sortDir === 'asc' || filters.sortDir === 'desc') setSortDir(filters.sortDir as SortDirection);
+    if (filters.sortBy) nextSortBy = filters.sortBy as SortColumn;
+    if (filters.sortDir === 'asc' || filters.sortDir === 'desc') nextSortDir = filters.sortDir as SortDirection;
+
+    // Apply state updates
+    setSearchQuery(nextSearchQuery);
+    setSeasons(nextSeasons);
+    setMediaTypes(nextMediaTypes);
+    setHiddenOnly(nextHiddenOnly);
+    setMinScore(nextMinScore);
+    setMaxScore(nextMaxScore);
+    setStatusFilters(nextStatusFilters);
+    setSortBy(nextSortBy);
+    setSortDir(nextSortDir);
+
+    if (persist) {
+      saveUserPreferences({
+        currentView: preset,
+        statusFilters: nextStatusFilters,
+        searchQuery: nextSearchQuery,
+        seasons: nextSeasons,
+        mediaTypes: nextMediaTypes,
+        hiddenOnly: nextHiddenOnly,
+        minScore: nextMinScore,
+        maxScore: nextMaxScore,
+        sortBy: nextSortBy,
+        sortDir: nextSortDir,
+      });
+    }
   };
 
   const sidebar = (
