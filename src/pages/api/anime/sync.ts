@@ -1,5 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getMALAuthData, isMALTokenValid, upsertMALAnime, getSyncMetadata } from '@/lib/anime';
+import { 
+  getMALAuthData, 
+  isMALTokenValid, 
+  upsertMALAnime, 
+  getSyncMetadata,
+  updatePersonalStatusBatch 
+} from '@/lib/anime';
 import { AnimeSeasonResponse, MALAnime } from '@/models/anime';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -10,9 +16,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     // Check authentication
-    const { token } = getMALAuthData();
+    const authData = getMALAuthData();
+    const { token, user } = authData;
     if (!token || !isMALTokenValid(token)) {
       return res.status(401).json({ error: 'Not authenticated with MAL' });
+    }
+
+    if (!user?.name) {
+      return res.status(401).json({ error: 'User information not available' });
     }
 
     // Determine current and previous seasons
@@ -62,15 +73,39 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Upsert all anime data
     upsertMALAnime(allAnime);
 
-    console.log(`Successfully synced ${allAnime.length} anime`);
+    console.log(`Successfully synced ${allAnime.length} seasonal anime`);
+
+    // Personal status sync
+    console.log(`Syncing personal anime list for user: ${user.name}`);
+    const personalAnimeList = await fetchUserAnimelist(token.access_token, user.name);
+    console.log(`Fetched ${personalAnimeList.length} anime from personal list`);
+
+    const personalStatusUpdates = personalAnimeList.map(item => ({
+      animeId: item.animeId,
+      listStatus: item.listStatus
+    }));
+
+    const personalSyncStats = updatePersonalStatusBatch(personalStatusUpdates);
+    console.log(
+      `Personal status sync: ${personalSyncStats.updated} updated, ${personalSyncStats.skipped} skipped, ${personalSyncStats.failed} failed`
+    );
 
     // Return sync results
     const syncMetadata = getSyncMetadata();
     res.json({
       success: true,
-      syncedCount: allAnime.length,
-      currentSeason: { year: currentYear, season: currentSeason },
-      previousSeason: { year: prevYear, season: prevSeason },
+      seasonalSync: {
+        syncedCount: allAnime.length,
+        currentSeason: { year: currentYear, season: currentSeason },
+        previousSeason: { year: prevYear, season: prevSeason }
+      },
+      personalStatusSync: {
+        processed: personalSyncStats.totalProcessed,
+        updated: personalSyncStats.updated,
+        skipped: personalSyncStats.skipped,
+        failed: personalSyncStats.failed,
+        changes: personalSyncStats.updates
+      },
       metadata: syncMetadata
     });
 
@@ -144,5 +179,104 @@ async function fetchSeasonalAnime(accessToken: string, year: number, season: str
   }
 
   console.log(`Finished fetching ${year} ${season}: ${allAnime.length} anime`);
+  return allAnime;
+}
+
+interface UserAnimeListItem {
+  animeId: number;
+  listStatus: {
+    status: string;
+    score: number;
+    num_episodes_watched: number;
+    is_rewatching: boolean;
+    updated_at: string;
+  };
+}
+
+/**
+ * Fetch user's personal anime list from MAL.
+ * Paginates through all entries and returns anime IDs with their personal status.
+ */
+async function fetchUserAnimelist(
+  accessToken: string,
+  username: string
+): Promise<UserAnimeListItem[]> {
+  const allAnime: UserAnimeListItem[] = [];
+  let offset = 0;
+  const limit = 100; // MAL API limit
+
+  // Minimal fields needed for personal status sync
+  const fields = 'id,title,my_list_status';
+
+  while (true) {
+    const url = `https://api.myanimelist.net/v2/users/${username}/animelist`;
+    const params = new URLSearchParams({
+      offset: offset.toString(),
+      limit: limit.toString(),
+      fields,
+    });
+
+    console.log(`Fetching user animelist, offset: ${offset}`);
+
+    const response = await fetch(`${url}?${params}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        `MAL API request failed: ${response.status} ${response.statusText}`
+      );
+    }
+
+    interface UserAnimeListResponse {
+      data: Array<{
+        node: {
+          id: number;
+          title: string;
+          my_list_status: {
+            status: string;
+            score: number;
+            num_episodes_watched: number;
+            is_rewatching: boolean;
+            updated_at: string;
+          };
+        };
+      }>;
+      paging?: {
+        next?: string;
+      };
+    }
+
+    const data: UserAnimeListResponse = await response.json();
+
+    if (!data.data || data.data.length === 0) {
+      break; // No more data
+    }
+
+    // Extract anime from response
+    const userAnime = data.data.map(item => ({
+      animeId: item.node.id,
+      listStatus: item.node.my_list_status,
+    }));
+    allAnime.push(...userAnime);
+
+    console.log(
+      `Fetched ${userAnime.length} anime from user list (total: ${allAnime.length})`
+    );
+
+    // Check if there's more data
+    if (!data.paging?.next || data.data.length < limit) {
+      break;
+    }
+
+    offset += limit;
+
+    // Add a small delay to be respectful to the API
+    await new Promise(resolve => setTimeout(resolve, 200));
+  }
+
+  console.log(`Finished fetching user animelist: ${allAnime.length} anime`);
   return allAnime;
 }

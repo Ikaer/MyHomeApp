@@ -283,3 +283,127 @@ export function saveAnimeUserPreferences(prefs: Partial<AnimeUserPreferences>): 
   };
   writeJsonFile(ANIME_USER_PREFS_FILE, updatedPrefs);
 }
+
+// Personal status sync operations
+interface MALListStatus {
+  status: string;
+  score: number;
+  num_episodes_watched: number;
+  is_rewatching: boolean;
+  updated_at: string;
+}
+
+interface PersonalStatusUpdateResult {
+  updated: boolean;
+  changes: string[];
+}
+
+/**
+ * Update personal status for a single anime if it exists and differs from current state.
+ * Does NOT insert new anime - only updates existing ones.
+ */
+export function updatePersonalStatus(
+  animeId: number,
+  newListStatus: MALListStatus
+): PersonalStatusUpdateResult {
+  const existingAnime = getAllMALAnime();
+  const animeKey = animeId.toString();
+
+  // Anime doesn't exist locally - don't insert it
+  if (!existingAnime[animeKey]) {
+    return { updated: false, changes: [] };
+  }
+
+  const anime = existingAnime[animeKey];
+  const changes: string[] = [];
+
+  // If anime doesn't have personal status yet, initialize it
+  if (!anime.my_list_status) {
+    anime.my_list_status = {
+      status: newListStatus.status,
+      score: newListStatus.score,
+      num_episodes_watched: newListStatus.num_episodes_watched,
+      is_rewatching: newListStatus.is_rewatching,
+      updated_at: newListStatus.updated_at,
+    };
+    changes.push('initialized');
+  } else {
+    // Compare each field and track changes
+    if (anime.my_list_status.status !== newListStatus.status) {
+      changes.push(`status: ${anime.my_list_status.status} -> ${newListStatus.status}`);
+      anime.my_list_status.status = newListStatus.status;
+    }
+
+    if (anime.my_list_status.score !== newListStatus.score) {
+      changes.push(`score: ${anime.my_list_status.score} -> ${newListStatus.score}`);
+      anime.my_list_status.score = newListStatus.score;
+    }
+
+    if (anime.my_list_status.num_episodes_watched !== newListStatus.num_episodes_watched) {
+      changes.push(
+        `episodes: ${anime.my_list_status.num_episodes_watched} -> ${newListStatus.num_episodes_watched}`
+      );
+      anime.my_list_status.num_episodes_watched = newListStatus.num_episodes_watched;
+    }
+
+    if (anime.my_list_status.is_rewatching !== newListStatus.is_rewatching) {
+      changes.push(`rewatching: ${anime.my_list_status.is_rewatching} -> ${newListStatus.is_rewatching}`);
+      anime.my_list_status.is_rewatching = newListStatus.is_rewatching;
+    }
+
+    // Always update updated_at timestamp
+    anime.my_list_status.updated_at = newListStatus.updated_at;
+  }
+
+  // If changes were made, save
+  if (changes.length > 0) {
+    existingAnime[animeKey] = anime;
+    saveMALAnime(existingAnime);
+    return { updated: true, changes };
+  }
+
+  return { updated: false, changes: [] };
+}
+
+interface BatchUpdateStats {
+  totalProcessed: number;
+  updated: number;
+  skipped: number;
+  failed: number;
+  updates: Array<{ animeId: number; changes: string[] }>;
+}
+
+/**
+ * Apply personal status updates to multiple anime.
+ * Only updates existing anime, never inserts new ones.
+ */
+export function updatePersonalStatusBatch(
+  updates: Array<{ animeId: number; listStatus: MALListStatus }>
+): BatchUpdateStats {
+  const stats: BatchUpdateStats = {
+    totalProcessed: 0,
+    updated: 0,
+    skipped: 0,
+    failed: 0,
+    updates: [],
+  };
+
+  for (const update of updates) {
+    try {
+      const result = updatePersonalStatus(update.animeId, update.listStatus);
+      stats.totalProcessed++;
+
+      if (result.updated) {
+        stats.updated++;
+        stats.updates.push({ animeId: update.animeId, changes: result.changes });
+      } else {
+        stats.skipped++;
+      }
+    } catch (error) {
+      stats.failed++;
+      console.error(`Failed to update personal status for anime ${update.animeId}:`, error);
+    }
+  }
+
+  return stats;
+}
