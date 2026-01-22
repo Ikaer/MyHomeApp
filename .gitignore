@@ -42,3 +42,4 @@ sandbox/
 *.http
 
 /data/*.json
+/data/anime/*.json

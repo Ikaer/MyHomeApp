@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { MALAnime, AnimeExtension, AnimeWithExtensions, MALAuthData, MALUser, SyncMetadata, AnimeScoresHistoryData, AnimeView, AnimeUserPreferences, UserAnimeStatus } from '@/models/anime';
+import { MALAnime, AnimeExtension, AnimeWithExtensions, MALAuthData, MALUser, SyncMetadata, AnimeScoresHistoryData, UserAnimeStatus } from '@/models/anime';
 // Legacy view-specific filter utilities removed (fire-and-forget presets now handled client-side)
+// User preferences removed - all state now controlled via URL
 
 const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const ANIME_DATA_PATH = path.join(DATA_PATH, 'anime');
@@ -11,7 +12,6 @@ const ANIME_MAL_FILE = path.join(ANIME_DATA_PATH, 'animes_MAL.json');
 const ANIME_EXTENSIONS_FILE = path.join(ANIME_DATA_PATH, 'animes_extensions.json');
 const ANIME_SCORES_HISTORY_FILE = path.join(ANIME_DATA_PATH, 'anime_scores_history.json');
 const ANIME_HIDDEN_FILE = path.join(ANIME_DATA_PATH, 'animes_hidden.json');
-const ANIME_USER_PREFS_FILE = path.join(ANIME_DATA_PATH, 'user_preferences.json');
 const MAL_AUTH_FILE = path.join(ANIME_DATA_PATH, 'mal_auth.json');
 
 // Utility function to ensure anime data directory exists
@@ -223,65 +223,6 @@ export function getSyncMetadata(): SyncMetadata | null {
     previousSeason: { year: prevYear, season: prevSeason },
     totalAnimeCount: animeList.length
   };
-}
-
-// User preferences operations
-export function getAnimeUserPreferences(): AnimeUserPreferences {
-  const defaultPreferences: AnimeUserPreferences = {
-    // Sort defaults
-    sortBy: 'mean',
-    sortDir: 'desc',
-    
-    // Filter defaults
-    statusFilters: ['watching', 'completed', 'on_hold', 'dropped', 'plan_to_watch', 'not_defined'],
-    searchQuery: '',
-    seasons: [],
-    mediaTypes: [],
-    hiddenOnly: false,
-    minScore: null,
-    maxScore: null,
-    
-    // Display defaults
-    evolutionPeriod: '1w',
-    imageSize: 1,
-    visibleColumns: {
-      score: true,
-      scoreDelta: true,
-      rank: true,
-      rankDelta: true,
-      popularity: true,
-      popularityDelta: true,
-      users: true,
-      usersDelta: true,
-      scorers: true,
-      scorersDelta: true,
-    },
-    
-    // UI state defaults (sidebar sections)
-    sidebarExpanded: {
-      account: true,
-      sync: true,
-      views: true,
-      display: true,
-      filters: true,
-      sort: true,
-      stats: true,
-    },
-    
-    lastUpdated: new Date().toISOString()
-  };
-
-  return readJsonFile<AnimeUserPreferences>(ANIME_USER_PREFS_FILE, defaultPreferences);
-}
-
-export function saveAnimeUserPreferences(prefs: Partial<AnimeUserPreferences>): void {
-  const currentPrefs = getAnimeUserPreferences();
-  const updatedPrefs: AnimeUserPreferences = {
-    ...currentPrefs,
-    ...prefs,
-    lastUpdated: new Date().toISOString()
-  };
-  writeJsonFile(ANIME_USER_PREFS_FILE, updatedPrefs);
 }
 
 // Personal status sync operations

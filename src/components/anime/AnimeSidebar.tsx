@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './AnimeSidebar.module.css';
-import { MALAuthState, UserAnimeStatus, AnimeView, ImageSize, VisibleColumns, StatsColumn, SortColumn, SortDirection } from '@/models/anime';
+import { MALAuthState, UserAnimeStatus, ImageSize, VisibleColumns, StatsColumn, SortColumn, SortDirection } from '@/models/anime';
 import { SeasonInfo } from './SeasonSelector';
 import { CollapsibleSection } from '@/components/shared';
 import { 
@@ -27,9 +27,6 @@ interface AnimeSidebarProps {
   syncError: string;
   onSync: () => void;
   onBigSync: () => void;
-
-  // View (fire and forget presets)
-  onViewChange: (view: AnimeView) => void;
 
   // Display
   imageSize: ImageSize;
@@ -72,13 +69,11 @@ interface AnimeSidebarProps {
 const AnimeSidebar: React.FC<AnimeSidebarProps> = ({
   authState, isAuthLoading, authError, onConnect, onDisconnect,
   isSyncing, isBigSyncing, syncError, onSync, onBigSync,
-  onViewChange,
   imageSize, onImageSizeChange,
   statusFilters, onStatusFilterChange,
   searchQuery, onSearchChange,
   seasons, onSeasonsChange,
   mediaTypes, onMediaTypesChange,
-  // removed notInMalOnly (discovery now via selecting only 'No Status')
   hiddenOnly, onHiddenOnlyChange,
   minScore, onMinScoreChange,
   maxScore, onMaxScoreChange,
@@ -87,7 +82,7 @@ const AnimeSidebar: React.FC<AnimeSidebarProps> = ({
   sidebarExpanded, onSidebarExpandedChange,
   sortBy, sortDir, onSortByChange, onSortDirChange,
 }) => {
-  // Section toggle now uses server-side preferences
+  // Section toggle now uses URL state
   const toggle = (key: string) => {
     onSidebarExpandedChange(key, !sidebarExpanded[key]);
   };
@@ -136,7 +131,7 @@ const AnimeSidebar: React.FC<AnimeSidebarProps> = ({
         isExpanded={sidebarExpanded.views}
         onToggle={() => toggle('views')}
       >
-        <ViewsSection onViewChange={onViewChange} />
+        <ViewsSection />
       </CollapsibleSection>
 
       <CollapsibleSection

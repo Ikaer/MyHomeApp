@@ -1,20 +1,22 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import styles from './ViewsSection.module.css';
-import { AnimeView } from '@/models/anime';
-import { VIEW_PRESETS } from '@/lib/animeUtils';
+import { VIEW_PRESET_URLS } from '@/lib/animeUrlParams';
 
-interface ViewsSectionProps {
-  onViewChange: (view: AnimeView) => void;
-}
+const ViewsSection: React.FC = () => {
+  const router = useRouter();
 
-const ViewsSection: React.FC<ViewsSectionProps> = ({ onViewChange }) => {
+  const handlePresetClick = (getUrl: () => string) => {
+    router.push(getUrl());
+  };
+
   return (
     <div className={styles.viewsSection}>
-      {VIEW_PRESETS.map(preset => (
+      {VIEW_PRESET_URLS.map(preset => (
         <button
           key={preset.key}
           className={styles.viewButton}
-          onClick={() => onViewChange(preset.key)}
+          onClick={() => handlePresetClick(preset.getUrl)}
           title={preset.description}
         >
           {preset.label}

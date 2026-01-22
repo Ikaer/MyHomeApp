@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getAnimeWithExtensions, getAnimeUserPreferences } from '@/lib/anime';
-import { mapViewToFilters } from '@/lib/animeUtils';
-import { AnimeWithExtensions, SortColumn, SortDirection, AnimeView, animeViewsHelper, AnimeListResponse } from '@/models/anime';
+import { getAnimeWithExtensions } from '@/lib/anime';
+import { AnimeWithExtensions, SortColumn, SortDirection, AnimeListResponse } from '@/models/anime';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -11,39 +10,23 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     // Get query parameters
-    let { 
+    const { 
       search, 
       genres, 
       status, 
       minScore,
       maxScore,
       season,
-  mediaType,
+      mediaType,
       hidden,
       sortBy = 'mean', 
       sortDir = 'desc',
-      view,
       limit,
       offset,
       full
     } = req.query;
 
-    // If view parameter is provided, map it to filters (backward compatibility)
-    if (view && typeof view === 'string' && animeViewsHelper.isValid(view)) {
-      const viewFilters = mapViewToFilters(view as AnimeView);
-      // Apply view filters, but don't override explicitly provided parameters
-      season = season || viewFilters.season;
-      mediaType = mediaType || viewFilters.mediaType;
-      hidden = hidden || viewFilters.hidden;
-      status = status || viewFilters.status;
-      sortBy = (sortBy === 'mean' && viewFilters.sortBy) ? viewFilters.sortBy : sortBy;
-      sortDir = (sortDir === 'desc' && viewFilters.sortDir) ? viewFilters.sortDir : sortDir;
-    }
-
-    // Backward compat: view parameter now only maps to filters via mapViewToFilters
-    // No server-side view filtering or tracking
-
-    // Start from full dataset (no legacy view filtering)
+    // Start from full dataset
     let animeList = getAnimeWithExtensions();
 
     // Pagination settings
