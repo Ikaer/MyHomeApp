@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { AnimeWithExtensions, SortColumn, SortDirection, AnimeScoresHistoryData, ImageSize, VisibleColumns } from '@/models/anime';
+import { AnimeWithExtensions, SortColumn, SortDirection, ImageSize, VisibleColumns } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
-import { formatSeason, getScoreEvolution } from '@/lib/animeUtils';
+import { formatSeason } from '@/lib/animeUtils';
 import styles from './AnimeTable.module.css';
 
 const formatNumber = (num?: number) => {
@@ -23,8 +23,6 @@ interface MALStatusUpdate {
 
 interface AnimeTableProps {
   animes: AnimeWithExtensions[];
-  scoresHistory: AnimeScoresHistoryData;
-  scoreEvolutionPeriod: number;
   imageSize: ImageSize;
   visibleColumns: VisibleColumns;
   sortColumn: SortColumn;
@@ -33,7 +31,7 @@ interface AnimeTableProps {
   onHideToggle?: (animeId: number, hide: boolean) => void;
 }
 
-export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod, imageSize, visibleColumns, sortColumn, sortDirection, onUpdateMALStatus, onHideToggle }: AnimeTableProps) {
+export default function AnimeTable({ animes, imageSize, visibleColumns, sortColumn, sortDirection, onUpdateMALStatus, onHideToggle }: AnimeTableProps) {
   const [pendingUpdates, setPendingUpdates] = useState<Map<number, MALStatusUpdate>>(new Map());
 
   const sortedAnimes = useMemo(() => {
@@ -78,26 +76,6 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
           aValue = a.num_scoring_users || 0;
           bValue = b.num_scoring_users || 0;
           break;
-        case 'delta_mean':
-          aValue = getScoreEvolution(a.id, scoresHistory, scoreEvolutionPeriod).deltas.mean || 0;
-          bValue = getScoreEvolution(b.id, scoresHistory, scoreEvolutionPeriod).deltas.mean || 0;
-          break;
-        case 'delta_rank':
-          aValue = getScoreEvolution(a.id, scoresHistory, scoreEvolutionPeriod).deltas.rank || 0;
-          bValue = getScoreEvolution(b.id, scoresHistory, scoreEvolutionPeriod).deltas.rank || 0;
-          break;
-        case 'delta_popularity':
-          aValue = getScoreEvolution(a.id, scoresHistory, scoreEvolutionPeriod).deltas.popularity || 0;
-          bValue = getScoreEvolution(b.id, scoresHistory, scoreEvolutionPeriod).deltas.popularity || 0;
-          break;
-        case 'delta_num_list_users':
-          aValue = getScoreEvolution(a.id, scoresHistory, scoreEvolutionPeriod).deltas.num_list_users || 0;
-          bValue = getScoreEvolution(b.id, scoresHistory, scoreEvolutionPeriod).deltas.num_list_users || 0;
-          break;
-        case 'delta_num_scoring_users':
-          aValue = getScoreEvolution(a.id, scoresHistory, scoreEvolutionPeriod).deltas.num_scoring_users || 0;
-          bValue = getScoreEvolution(b.id, scoresHistory, scoreEvolutionPeriod).deltas.num_scoring_users || 0;
-          break;
         default:
           aValue = a.mean || 0;
           bValue = b.mean || 0;
@@ -113,7 +91,7 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
     });
 
     return sorted;
-  }, [animes, sortColumn, sortDirection, scoresHistory, scoreEvolutionPeriod]);
+  }, [animes, sortColumn, sortDirection]);
 
   // Sorting is controlled by parent via props; no header click sorting here.
 
@@ -132,7 +110,7 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
   const updateMALStatus = (animeId: number, field: keyof MALStatusUpdate, value: any) => {
     const currentUpdates = pendingUpdates.get(animeId) || {};
     const newUpdates = { ...currentUpdates, [field]: value };
-    
+
     const newPendingUpdates = new Map(pendingUpdates);
     newPendingUpdates.set(animeId, newUpdates);
     setPendingUpdates(newPendingUpdates);
@@ -240,7 +218,7 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
         {anime.extensions.providers.map((provider, index) => {
           const detectedProvider = detectProviderFromUrl(provider.url);
           return detectedProvider ? (
-            <a 
+            <a
               key={index}
               href={provider.url}
               target="_blank"
@@ -248,14 +226,14 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
               className={styles.providerLink}
               title={`Watch on ${detectedProvider.name}`}
             >
-              <img 
-                src={getProviderLogoPath(detectedProvider)} 
+              <img
+                src={getProviderLogoPath(detectedProvider)}
                 alt={detectedProvider.name}
                 className={styles.providerLogo}
               />
             </a>
           ) : (
-            <a 
+            <a
               key={index}
               href={provider.url}
               target="_blank"
@@ -275,54 +253,26 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
     anime: AnimeWithExtensions,
     metric: 'rank' | 'popularity' | 'num_list_users' | 'num_scoring_users' | 'mean'
   ) => {
-    const evolution = getScoreEvolution(anime.id, scoresHistory, scoreEvolutionPeriod);
-    const latestValue = evolution.latestData?.[metric as keyof typeof evolution.latestData];
+    let latestValue: number | undefined;
+    switch (metric) {
+      case 'rank': latestValue = anime.rank; break;
+      case 'popularity': latestValue = anime.popularity; break;
+      case 'num_list_users': latestValue = anime.num_list_users; break;
+      case 'num_scoring_users': latestValue = anime.num_scoring_users; break;
+      case 'mean': latestValue = anime.mean; break;
+    }
 
     let formattedValue;
     if (latestValue === undefined) {
       formattedValue = 'N/A';
     } else if (metric === 'mean') {
-      formattedValue = formatScore(latestValue as number);
+      formattedValue = formatScore(latestValue);
     } else if (metric === 'rank' || metric === 'popularity') {
-        formattedValue = `#${formatNumber(latestValue as number)}`;
+      formattedValue = `#${formatNumber(latestValue)}`;
     } else {
-        formattedValue = formatNumber(latestValue as number);
+      formattedValue = formatNumber(latestValue);
     }
     return <span>{formattedValue}</span>;
-  }
-
-  const renderDelta = (
-    anime: AnimeWithExtensions,
-    metric: 'rank' | 'popularity' | 'num_list_users' | 'num_scoring_users' | 'mean',
-    higherIsBetter: boolean
-  ) => {
-    const evolution = getScoreEvolution(anime.id, scoresHistory, scoreEvolutionPeriod);
-    const delta = evolution.deltas[metric as keyof typeof evolution.deltas];
-
-    if (delta === undefined || Math.abs(delta) < 0.001) {
-      return null;
-    }
-
-    const isImprovement = higherIsBetter ? delta > 0 : delta < 0;
-    const color = isImprovement ? styles.increase : styles.decrease;
-    const arrow = isImprovement ? '▲' : '▼';
-    
-    const displayDelta = (metric === 'rank' || metric === 'popularity') ? -delta : delta;
-
-    const formattedDelta = (deltaToFormat: number) => {
-      const sign = deltaToFormat > 0 ? '+' : '';
-      if (Math.abs(deltaToFormat) >= 10000) {
-        return `(${sign}${Math.round(deltaToFormat / 1000)}k)`;
-      }
-      if (!Number.isInteger(deltaToFormat)) {
-        return `(${sign}${deltaToFormat.toFixed(metric === 'mean' ? 2 : 0)})`;
-      }
-      return `(${sign}${deltaToFormat})`;
-    };
-
-    return (
-      <span className={`${styles.change} ${color}`}>{arrow} {formattedDelta(displayDelta)}</span>
-    );
   }
 
 
@@ -351,32 +301,17 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
               {(visibleColumns?.score ?? true) && (
                 <th title="Score">S {getSortIcon('mean')}</th>
               )}
-              {(visibleColumns?.scoreDelta ?? true) && (
-                <th title="Score Evolution">ΔS {getSortIcon('delta_mean')}</th>
-              )}
               {(visibleColumns?.rank ?? true) && (
                 <th title="Rank">R {getSortIcon('rank')}</th>
-              )}
-              {(visibleColumns?.rankDelta ?? true) && (
-                <th title="Rank Evolution">ΔR {getSortIcon('delta_rank')}</th>
               )}
               {(visibleColumns?.popularity ?? true) && (
                 <th title="Popularity">P {getSortIcon('popularity')}</th>
               )}
-              {(visibleColumns?.popularityDelta ?? true) && (
-                <th title="Popularity Evolution">ΔP {getSortIcon('delta_popularity')}</th>
-              )}
               {(visibleColumns?.users ?? true) && (
                 <th title="Users">U {getSortIcon('num_list_users')}</th>
               )}
-              {(visibleColumns?.usersDelta ?? true) && (
-                <th title="Users Evolution">ΔU {getSortIcon('delta_num_list_users')}</th>
-              )}
               {(visibleColumns?.scorers ?? true) && (
                 <th title="Scorers">X {getSortIcon('num_scoring_users')}</th>
-              )}
-              {(visibleColumns?.scorersDelta ?? true) && (
-                <th title="Scorers Evolution">ΔX {getSortIcon('delta_num_scoring_users')}</th>
               )}
             </tr>
           </thead>
@@ -385,8 +320,8 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
               <tr key={anime.id}>
                 <td className={styles.imageCell}>
                   {anime.main_picture?.medium ? (
-                    <img 
-                      src={anime.main_picture.medium} 
+                    <img
+                      src={anime.main_picture.medium}
                       alt={anime.title}
                       className={`${styles.animeImage} ${styles[`imageSize${imageSize}`]}`}
                     />
@@ -413,8 +348,8 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
                 </td>
                 <td className={styles.seasonCell}>
                   {anime.start_season ? (
-                    <span 
-                      style={{ 
+                    <span
+                      style={{
                         color: formatSeason(anime.start_season.year, anime.start_season.season).color,
                         fontWeight: 'bold'
                       }}
@@ -447,7 +382,7 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
                       className={`${styles.malScore} ${styles.editable}`}
                     >
                       <option value={0}>No Score</option>
-                      {[1,2,3,4,5,6,7,8,9,10].map(score => (
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(score => (
                         <option key={score} value={score}>{score}</option>
                       ))}
                     </select>
@@ -476,7 +411,7 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
                 </td>
                 <td className={styles.linksCell}>
                   <div className={styles.actionsButtonGroup}>
-                    <a 
+                    <a
                       href={`https://myanimelist.net/anime/${anime.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -484,21 +419,21 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
                     >
                       MAL
                     </a>
-                    <button 
+                    <button
                       onClick={() => handleManualSearch(anime)}
                       className={styles.searchButton}
                       title="Search providers manually on Google"
                     >
                       🔍
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleJustWatchSearch(anime)}
                       className={styles.justWatchButton}
                       title="Search on JustWatch"
                     >
-                      <img 
-                        src="/justwatch.png" 
-                        alt="JustWatch" 
+                      <img
+                        src="/justwatch.png"
+                        alt="JustWatch"
                         className={styles.justWatchIcon}
                       />
                     </button>
@@ -510,7 +445,7 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
                       {anime.hidden ? 'Unhide' : 'Hide'}
                     </button>
                     {hasPendingUpdates(anime.id) && (
-                      <button 
+                      <button
                         onClick={() => handleUpdateMAL(anime.id)}
                         className={styles.updateButton}
                         title="Update MAL status"
@@ -525,19 +460,9 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
                     {renderMetric(anime, 'mean')}
                   </td>
                 )}
-                {(visibleColumns?.scoreDelta ?? true) && (
-                  <td>
-                    {renderDelta(anime, 'mean', true)}
-                  </td>
-                )}
                 {(visibleColumns?.rank ?? true) && (
                   <td className={styles.scoreCell}>
                     {renderMetric(anime, 'rank')}
-                  </td>
-                )}
-                {(visibleColumns?.rankDelta ?? true) && (
-                  <td>
-                    {renderDelta(anime, 'rank', false)}
                   </td>
                 )}
                 {(visibleColumns?.popularity ?? true) && (
@@ -545,29 +470,14 @@ export default function AnimeTable({ animes, scoresHistory, scoreEvolutionPeriod
                     {renderMetric(anime, 'popularity')}
                   </td>
                 )}
-                {(visibleColumns?.popularityDelta ?? true) && (
-                  <td>
-                    {renderDelta(anime, 'popularity', false)}
-                  </td>
-                )}
                 {(visibleColumns?.users ?? true) && (
                   <td className={styles.scoreCell}>
                     {renderMetric(anime, 'num_list_users')}
                   </td>
                 )}
-                {(visibleColumns?.usersDelta ?? true) && (
-                  <td>
-                    {renderDelta(anime, 'num_list_users', true)}
-                  </td>
-                )}
                 {(visibleColumns?.scorers ?? true) && (
                   <td className={styles.scoreCell}>
                     {renderMetric(anime, 'num_scoring_users')}
-                  </td>
-                )}
-                {(visibleColumns?.scorersDelta ?? true) && (
-                  <td>
-                    {renderDelta(anime, 'num_scoring_users', true)}
                   </td>
                 )}
               </tr>

@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getMALAuthData, isMALTokenValid, upsertMALAnime, getSyncMetadata, updateAnimeScoresHistory } from '@/lib/anime';
+import { getMALAuthData, isMALTokenValid, upsertMALAnime, getSyncMetadata } from '@/lib/anime';
 import { AnimeSeasonResponse, MALAnime } from '@/models/anime';
 
 // Store ongoing big sync processes
-const syncProcesses = new Map<string, { 
-  isRunning: boolean; 
-  progress: any[]; 
+const syncProcesses = new Map<string, {
+  isRunning: boolean;
+  progress: any[];
   latestProgressIndex: number;
 }>();
 
@@ -30,21 +30,21 @@ async function handleStartBigSync(req: NextApiRequest, res: NextApiResponse) {
 
     // Generate a unique sync ID
     const syncId = `sync_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     // Initialize sync process
     syncProcesses.set(syncId, { isRunning: true, progress: [], latestProgressIndex: -1 });
 
     // Start the sync process asynchronously
     performBigSyncAsync(token.access_token, syncId);
 
-    return res.status(200).json({ 
+    return res.status(200).json({
       message: 'Big sync started',
       syncId
     });
 
   } catch (error) {
     console.error('Error starting big sync:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to start big sync',
       details: error instanceof Error ? error.message : 'Unknown error'
     });
@@ -53,7 +53,7 @@ async function handleStartBigSync(req: NextApiRequest, res: NextApiResponse) {
 
 async function handleEventStream(req: NextApiRequest, res: NextApiResponse) {
   const { syncId } = req.query;
-  
+
   if (!syncId || typeof syncId !== 'string') {
     return res.status(400).json({ error: 'syncId is required' });
   }
@@ -95,7 +95,7 @@ async function handleEventStream(req: NextApiRequest, res: NextApiResponse) {
     for (let i = lastSentIndex + 1; i < currentProcess.progress.length; i++) {
       res.write(`data: ${JSON.stringify(currentProcess.progress[i])}\n\n`);
       lastSentIndex = i;
-      
+
       // Check if this is the final update
       const progress = currentProcess.progress[i];
       if (progress.type === 'complete' || progress.type === 'error') {
@@ -136,9 +136,9 @@ async function performBigSyncAsync(accessToken: string, syncId: string) {
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const seasons = ['winter', 'spring', 'summer', 'fall'];
-    
+
     const seasonsToSync: Array<{ year: number; season: string }> = [];
-    
+
     // Generate list of seasons from 8 years ago to 2 years in the future
     for (let year = currentYear + 2; year >= currentYear - 8; year--) {
       for (const season of seasons) {
@@ -147,7 +147,7 @@ async function performBigSyncAsync(accessToken: string, syncId: string) {
     }
 
     console.log(`Big sync ${syncId}: Processing ${seasonsToSync.length} seasons from ${currentYear - 8} to ${currentYear + 2}`);
-    
+
     addProgress({
       type: 'start',
       message: `Starting big sync for ${seasonsToSync.length} seasons and upcoming ranking`,
@@ -237,7 +237,6 @@ async function performBigSyncAsync(accessToken: string, syncId: string) {
     // Upsert all anime data
     if (allAnime.length > 0) {
       upsertMALAnime(allAnime);
-      updateAnimeScoresHistory(allAnime);
     }
 
     console.log(`Big sync ${syncId} completed: ${allAnime.length} anime from ${processedSeasons} seasons`);
@@ -255,7 +254,7 @@ async function performBigSyncAsync(accessToken: string, syncId: string) {
 
   } catch (error) {
     console.error(`Big sync ${syncId} error:`, error);
-    
+
     addProgress({
       type: 'error',
       error: 'Failed to perform big sync',
@@ -307,7 +306,7 @@ async function fetchUpcomingAnime(
   }
 
   const data: AnimeSeasonResponse = await response.json();
-  
+
   if (data.data && data.data.length > 0) {
     const upcomingAnime = data.data.map(item => item.node);
     allAnime.push(...upcomingAnime);
@@ -329,8 +328,8 @@ async function fetchUpcomingAnime(
 }
 
 async function fetchSeasonalAnime(
-  accessToken: string, 
-  year: number, 
+  accessToken: string,
+  year: number,
   season: string,
   addProgress?: (progress: any) => void
 ): Promise<MALAnime[]> {
@@ -371,7 +370,7 @@ async function fetchSeasonalAnime(
     }
 
     const data: AnimeSeasonResponse = await response.json();
-    
+
     if (!data.data || data.data.length === 0) {
       break; // No more data
     }

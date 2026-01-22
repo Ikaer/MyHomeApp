@@ -5,11 +5,11 @@
  * Short param keys and values are used for compact, shareable URLs.
  */
 
-import { 
-  UserAnimeStatus, 
-  SortColumn, 
-  SortDirection, 
-  ImageSize, 
+import {
+  UserAnimeStatus,
+  SortColumn,
+  SortDirection,
+  ImageSize,
   VisibleColumns,
   SeasonName
 } from '@/models/anime';
@@ -39,11 +39,10 @@ export interface AnimeFiltersState {
 export interface AnimeDisplayState {
   imageSize: ImageSize;
   visibleColumns: VisibleColumns;
-  evolutionPeriod: string;
   sidebarExpanded: Record<string, boolean>;
 }
 
-export interface AnimeUrlState extends AnimeFiltersState, AnimeDisplayState {}
+export interface AnimeUrlState extends AnimeFiltersState, AnimeDisplayState { }
 
 // ============================================================================
 // Short Code Mappings
@@ -92,32 +91,21 @@ const SORT_TO_CODE: Record<SortColumn, string> = {
   popularity: 'p',
   num_list_users: 'lu',
   num_scoring_users: 'su',
-  delta_mean: 'dm',
-  delta_rank: 'dr',
-  delta_popularity: 'dp',
-  delta_num_list_users: 'dlu',
-  delta_num_scoring_users: 'dsu',
 };
+
 const CODE_TO_SORT: Record<string, SortColumn> = Object.fromEntries(
   Object.entries(SORT_TO_CODE).map(([k, v]) => [v, k as SortColumn])
 );
-
-// Direction codes: a=asc, d=desc
 const DIR_TO_CODE: Record<SortDirection, string> = { asc: 'a', desc: 'd' };
 const CODE_TO_DIR: Record<string, SortDirection> = { a: 'asc', d: 'desc' };
 
 // Visible columns codes
 const COLUMN_TO_CODE: Record<keyof VisibleColumns, string> = {
   score: 'sc',
-  scoreDelta: 'scd',
   rank: 'r',
-  rankDelta: 'rd',
   popularity: 'p',
-  popularityDelta: 'pd',
   users: 'u',
-  usersDelta: 'ud',
   scorers: 'sr',
-  scorersDelta: 'srd',
 };
 const CODE_TO_COLUMN: Record<string, keyof VisibleColumns> = Object.fromEntries(
   Object.entries(COLUMN_TO_CODE).map(([k, v]) => [v, k as keyof VisibleColumns])
@@ -147,15 +135,10 @@ const ALL_STATUSES: (UserAnimeStatus | 'not_defined')[] = [
 
 const DEFAULT_VISIBLE_COLUMNS: VisibleColumns = {
   score: true,
-  scoreDelta: false,
   rank: false,
-  rankDelta: false,
   popularity: false,
-  popularityDelta: false,
   users: false,
-  usersDelta: false,
   scorers: false,
-  scorersDelta: false,
 };
 
 const DEFAULT_SIDEBAR_EXPANDED: Record<string, boolean> = {
@@ -183,7 +166,6 @@ export const DEFAULT_FILTERS: AnimeFiltersState = {
 export const DEFAULT_DISPLAY: AnimeDisplayState = {
   imageSize: 1,
   visibleColumns: DEFAULT_VISIBLE_COLUMNS,
-  evolutionPeriod: '1w',
   sidebarExpanded: DEFAULT_SIDEBAR_EXPANDED,
 };
 
@@ -215,7 +197,6 @@ const PARAM_KEYS = {
   // Display
   imageSize: 'img',
   columns: 'cols',
-  evolution: 'ev',
   sidebar: 'sb',
 } as const;
 
@@ -225,8 +206,8 @@ const PARAM_KEYS = {
 
 function encodeStatuses(statuses: (UserAnimeStatus | 'not_defined')[]): string | null {
   // If all statuses selected, omit from URL
-  if (statuses.length === ALL_STATUSES.length && 
-      ALL_STATUSES.every(s => statuses.includes(s))) {
+  if (statuses.length === ALL_STATUSES.length &&
+    ALL_STATUSES.every(s => statuses.includes(s))) {
     return null;
   }
   if (statuses.length === 0) return '';
@@ -248,7 +229,7 @@ function encodeVisibleColumns(cols: VisibleColumns): string | null {
   const visibleCodes = Object.entries(cols)
     .filter(([, v]) => v)
     .map(([k]) => COLUMN_TO_CODE[k as keyof VisibleColumns]);
-  
+
   if (visibleCodes.length === Object.keys(DEFAULT_VISIBLE_COLUMNS).length) {
     return null; // All visible = default
   }
@@ -260,7 +241,7 @@ function encodeSidebarExpanded(expanded: Record<string, boolean>): string | null
   const expandedCodes = Object.entries(expanded)
     .filter(([, v]) => v)
     .map(([k]) => SIDEBAR_TO_CODE[k] || k);
-  
+
   if (expandedCodes.length === Object.keys(DEFAULT_SIDEBAR_EXPANDED).length) {
     return null; // All expanded = default
   }
@@ -269,86 +250,82 @@ function encodeSidebarExpanded(expanded: Record<string, boolean>): string | null
 
 export function encodeFiltersToParams(filters: Partial<AnimeFiltersState>): URLSearchParams {
   const params = new URLSearchParams();
-  
+
   if (filters.statusFilters !== undefined) {
     const encoded = encodeStatuses(filters.statusFilters);
     if (encoded !== null) params.set(PARAM_KEYS.status, encoded);
   }
-  
+
   if (filters.searchQuery) {
     params.set(PARAM_KEYS.search, filters.searchQuery);
   }
-  
+
   if (filters.seasons !== undefined) {
     const encoded = encodeSeasons(filters.seasons);
     if (encoded) params.set(PARAM_KEYS.seasons, encoded);
   }
-  
+
   if (filters.mediaTypes !== undefined) {
     const encoded = encodeMediaTypes(filters.mediaTypes);
     if (encoded) params.set(PARAM_KEYS.mediaType, encoded);
   }
-  
+
   if (filters.hiddenOnly) {
     params.set(PARAM_KEYS.hidden, '1');
   }
-  
+
   if (filters.minScore !== null && filters.minScore !== undefined) {
     params.set(PARAM_KEYS.minScore, filters.minScore.toString());
   }
-  
+
   if (filters.maxScore !== null && filters.maxScore !== undefined) {
     params.set(PARAM_KEYS.maxScore, filters.maxScore.toString());
   }
-  
+
   if (filters.sortBy) {
     params.set(PARAM_KEYS.sort, SORT_TO_CODE[filters.sortBy]);
   }
-  
+
   if (filters.sortDir) {
     params.set(PARAM_KEYS.direction, DIR_TO_CODE[filters.sortDir]);
   }
-  
+
   return params;
 }
 
 export function encodeDisplayToParams(display: Partial<AnimeDisplayState>): URLSearchParams {
   const params = new URLSearchParams();
-  
+
   if (display.imageSize !== undefined && display.imageSize !== DEFAULT_DISPLAY.imageSize) {
     params.set(PARAM_KEYS.imageSize, display.imageSize.toString());
   }
-  
+
   if (display.visibleColumns !== undefined) {
     const encoded = encodeVisibleColumns(display.visibleColumns);
     if (encoded !== null) params.set(PARAM_KEYS.columns, encoded);
   }
-  
-  if (display.evolutionPeriod && display.evolutionPeriod !== DEFAULT_DISPLAY.evolutionPeriod) {
-    params.set(PARAM_KEYS.evolution, display.evolutionPeriod);
-  }
-  
+
   if (display.sidebarExpanded !== undefined) {
     const encoded = encodeSidebarExpanded(display.sidebarExpanded);
     if (encoded !== null) params.set(PARAM_KEYS.sidebar, encoded);
   }
-  
+
   return params;
 }
 
 export function encodeStateToUrl(state: Partial<AnimeUrlState>): string {
   const filterParams = encodeFiltersToParams(state);
   const displayParams = encodeDisplayToParams(state);
-  
+
   // Merge params
   displayParams.forEach((value, key) => {
     filterParams.set(key, value);
   });
-  
+
   const queryString = filterParams.toString()
     // Decode safe characters for readability
     .replace(/%2C/g, ',');
-  
+
   return queryString ? `/anime?${queryString}` : '/anime';
 }
 
@@ -367,7 +344,7 @@ function decodeStatuses(value: string | null): (UserAnimeStatus | 'not_defined')
 function decodeSeasons(value: string | null): SeasonInfo[] {
   if (!value) return [];
   const result: SeasonInfo[] = [];
-  
+
   for (const token of value.split(',')) {
     // Parse format: YYYYx where x is w/sp/su/f
     const match = token.match(/^(\d{4})(w|sp|su|f)$/);
@@ -379,7 +356,7 @@ function decodeSeasons(value: string | null): SeasonInfo[] {
       }
     }
   }
-  
+
   return result;
 }
 
@@ -390,34 +367,29 @@ function decodeMediaTypes(value: string | null): string[] {
 
 function decodeVisibleColumns(value: string | null): VisibleColumns {
   if (!value) return { ...DEFAULT_VISIBLE_COLUMNS };
-  
+
   // Start with all false, then enable specified columns
   const result: VisibleColumns = {
     score: false,
-    scoreDelta: false,
     rank: false,
-    rankDelta: false,
     popularity: false,
-    popularityDelta: false,
     users: false,
-    usersDelta: false,
     scorers: false,
-    scorersDelta: false,
   };
-  
+
   for (const code of value.split(',')) {
     const column = CODE_TO_COLUMN[code];
     if (column) {
       result[column] = true;
     }
   }
-  
+
   return result;
 }
 
 function decodeSidebarExpanded(value: string | null): Record<string, boolean> {
   if (!value) return { ...DEFAULT_SIDEBAR_EXPANDED };
-  
+
   // Start with all false, then enable specified sections
   const result: Record<string, boolean> = {
     account: false,
@@ -428,14 +400,14 @@ function decodeSidebarExpanded(value: string | null): Record<string, boolean> {
     sort: false,
     stats: false,
   };
-  
+
   for (const code of value.split(',')) {
     const section = CODE_TO_SIDEBAR[code];
     if (section) {
       result[section] = true;
     }
   }
-  
+
   return result;
 }
 
@@ -455,13 +427,12 @@ export function decodeUrlToFilters(params: URLSearchParams): AnimeFiltersState {
 
 export function decodeUrlToDisplay(params: URLSearchParams): AnimeDisplayState {
   const imgSize = params.get(PARAM_KEYS.imageSize);
-  
+
   return {
     imageSize: imgSize ? (parseInt(imgSize, 10) as ImageSize) : DEFAULT_DISPLAY.imageSize,
-    visibleColumns: params.has(PARAM_KEYS.columns) 
+    visibleColumns: params.has(PARAM_KEYS.columns)
       ? decodeVisibleColumns(params.get(PARAM_KEYS.columns))
       : { ...DEFAULT_VISIBLE_COLUMNS },
-    evolutionPeriod: params.get(PARAM_KEYS.evolution) || DEFAULT_DISPLAY.evolutionPeriod,
     sidebarExpanded: params.has(PARAM_KEYS.sidebar)
       ? decodeSidebarExpanded(params.get(PARAM_KEYS.sidebar))
       : { ...DEFAULT_SIDEBAR_EXPANDED },

@@ -54,7 +54,7 @@ export function useAnimeUrlState(): UseAnimeUrlStateReturn {
     if (!router.isReady) {
       return { ...DEFAULT_FILTERS, ...DEFAULT_DISPLAY };
     }
-    
+
     const params = new URLSearchParams(queryString);
     return decodeUrlToState(params);
   }, [router.isReady, queryString]);
@@ -128,7 +128,6 @@ export function useAnimeUrlState(): UseAnimeUrlStateReturn {
   const display: AnimeDisplayState = useMemo(() => ({
     imageSize: currentState.imageSize,
     visibleColumns: currentState.visibleColumns,
-    evolutionPeriod: currentState.evolutionPeriod,
     sidebarExpanded: currentState.sidebarExpanded,
   }), [currentState]);
 

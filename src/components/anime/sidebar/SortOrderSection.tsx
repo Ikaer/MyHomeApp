@@ -12,11 +12,6 @@ const SORT_OPTIONS: Array<{ key: SortColumn; label: string }> = [
   { key: 'popularity', label: 'Popularity' },
   { key: 'num_list_users', label: 'Users' },
   { key: 'num_scoring_users', label: 'Scorers' },
-  { key: 'delta_mean', label: 'Δ Score' },
-  { key: 'delta_rank', label: 'Δ Rank' },
-  { key: 'delta_popularity', label: 'Δ Popularity' },
-  { key: 'delta_num_list_users', label: 'Δ Users' },
-  { key: 'delta_num_scoring_users', label: 'Δ Scorers' },
 ];
 
 interface SortOrderSectionProps {
@@ -35,9 +30,9 @@ const SortOrderSection: React.FC<SortOrderSectionProps> = ({
   return (
     <div className={styles.sortOrderSection}>
       <label className={styles.label}>Sort by:</label>
-      <select 
-        value={sortBy} 
-        onChange={(e) => onSortByChange(e.target.value as SortColumn)} 
+      <select
+        value={sortBy}
+        onChange={(e) => onSortByChange(e.target.value as SortColumn)}
         className={styles.select}
       >
         {SORT_OPTIONS.map(opt => (
@@ -46,19 +41,19 @@ const SortOrderSection: React.FC<SortOrderSectionProps> = ({
       </select>
       <div className={styles.directionButtons}>
         <label className={styles.radioLabel}>
-          <input 
-            type="radio" 
-            name="sortDir" 
-            checked={sortDir === 'asc'} 
-            onChange={() => onSortDirChange('asc')} 
+          <input
+            type="radio"
+            name="sortDir"
+            checked={sortDir === 'asc'}
+            onChange={() => onSortDirChange('asc')}
           /> Asc
         </label>
         <label className={styles.radioLabel}>
-          <input 
-            type="radio" 
-            name="sortDir" 
-            checked={sortDir === 'desc'} 
-            onChange={() => onSortDirChange('desc')} 
+          <input
+            type="radio"
+            name="sortDir"
+            checked={sortDir === 'desc'}
+            onChange={() => onSortDirChange('desc')}
           /> Desc
         </label>
       </div>

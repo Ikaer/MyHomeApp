@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { MALAnime, AnimeExtension, AnimeWithExtensions, MALAuthData, MALUser, SyncMetadata, AnimeScoresHistoryData, UserAnimeStatus } from '@/models/anime';
+import { MALAnime, AnimeExtension, AnimeWithExtensions, MALAuthData, MALUser, SyncMetadata, UserAnimeStatus } from '@/models/anime';
 // Legacy view-specific filter utilities removed (fire-and-forget presets now handled client-side)
 // User preferences removed - all state now controlled via URL
 
@@ -10,7 +10,6 @@ const ANIME_DATA_PATH = path.join(DATA_PATH, 'anime');
 // File paths
 const ANIME_MAL_FILE = path.join(ANIME_DATA_PATH, 'animes_MAL.json');
 const ANIME_EXTENSIONS_FILE = path.join(ANIME_DATA_PATH, 'animes_extensions.json');
-const ANIME_SCORES_HISTORY_FILE = path.join(ANIME_DATA_PATH, 'anime_scores_history.json');
 const ANIME_HIDDEN_FILE = path.join(ANIME_DATA_PATH, 'animes_hidden.json');
 const MAL_AUTH_FILE = path.join(ANIME_DATA_PATH, 'mal_auth.json');
 
@@ -82,33 +81,6 @@ export function upsertMALAnime(newAnime: MALAnime[]): void {
   });
 
   saveMALAnime(existingAnime);
-}
-
-// Anime scores history operations
-export function getAnimeScoresHistory(): AnimeScoresHistoryData {
-  return readJsonFile(ANIME_SCORES_HISTORY_FILE, {});
-}
-
-export function updateAnimeScoresHistory(newScores: MALAnime[]): void {
-  const history = getAnimeScoresHistory();
-  const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-
-  newScores.forEach(anime => {
-    if (!history[anime.id]) {
-      history[anime.id] = {};
-    }
-
-    history[anime.id][today] = {
-      mean: anime.mean,
-      rank: anime.rank,
-      popularity: anime.popularity,
-      num_list_users: anime.num_list_users,
-      num_scoring_users: anime.num_scoring_users,
-      my_list_status: anime.my_list_status,
-    };
-  });
-
-  writeJsonFile(ANIME_SCORES_HISTORY_FILE, history);
 }
 
 // Extension data operations

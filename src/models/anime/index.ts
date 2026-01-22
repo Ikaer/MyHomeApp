@@ -151,7 +151,7 @@ export interface SyncMetadata {
 }
 
 // Filter and sort options
-export type SortColumn = 'title' | 'mean' | 'start_date' | 'status' | 'num_episodes' | 'rank' | 'popularity' | 'num_list_users' | 'num_scoring_users' | 'delta_mean' | 'delta_rank' | 'delta_popularity' | 'delta_num_list_users' | 'delta_num_scoring_users';
+export type SortColumn = 'title' | 'mean' | 'start_date' | 'status' | 'num_episodes' | 'rank' | 'popularity' | 'num_list_users' | 'num_scoring_users';
 export type SortDirection = 'asc' | 'desc';
 
 // Seasons & media types (shared across API and UI)
@@ -162,10 +162,10 @@ export type MediaType = 'tv' | 'movie' | 'ona' | 'ova' | 'special' | 'music';
 // View types
 export type AnimeView = 'new_season' | 'new_season_strict' | 'next_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch';
 
-export type CalendarAnimeView = LiteralSubset< AnimeView, 'new_season' | 'new_season_strict' | 'next_season'>;
+export type CalendarAnimeView = LiteralSubset<AnimeView, 'new_season' | 'new_season_strict' | 'next_season'>;
 
 export class AnimeViewHelper {
-  private  _exhausterAll: { [key in AnimeView]: AnimeView } ={
+  private _exhausterAll: { [key in AnimeView]: AnimeView } = {
     new_season_strict: 'new_season_strict',
     new_season: 'new_season',
     next_season: 'next_season',
@@ -177,12 +177,12 @@ export class AnimeViewHelper {
     on_hold: 'on_hold',
     plan_to_watch: 'plan_to_watch'
   }
-  private _exhausterCalendar: { [key in CalendarAnimeView]: CalendarAnimeView } ={
+  private _exhausterCalendar: { [key in CalendarAnimeView]: CalendarAnimeView } = {
     new_season_strict: 'new_season_strict',
     new_season: 'new_season',
     next_season: 'next_season',
   }
-  
+
   public readonly keys: AnimeView[] = Object.keys(this._exhausterAll) as AnimeView[];
 
   public readonly calendarViews: CalendarAnimeView[] = Object.keys(this._exhausterCalendar) as CalendarAnimeView[];
@@ -210,62 +210,34 @@ export interface AnimeSortOptions {
   direction: SortDirection;
 }
 
-// Score history tracking
-export interface AnimeScoreHistory {
-  mean?: number;
-  rank?: number;
-  popularity?: number;
-  num_list_users?: number;
-  num_scoring_users?: number;
-  my_list_status?: {
-    status: string;
-    score: number;
-    num_episodes_watched: number;
-    is_rewatching: boolean;
-    updated_at: string;
-  };
-}
-
-export type AnimeScoresHistoryData = Record<number, Record<string, AnimeScoreHistory>>;
-
 // Display options
 export type ImageSize = 1 | 2 | 3;
 
 // Stats columns that can be shown/hidden
-export type StatsColumn = 
-  | 'score' 
-  | 'scoreDelta' 
-  | 'rank' 
-  | 'rankDelta' 
-  | 'popularity' 
-  | 'popularityDelta' 
-  | 'users' 
-  | 'usersDelta' 
-  | 'scorers' 
-  | 'scorersDelta';
+export type StatsColumn =
+  | 'score'
+  | 'rank'
+  | 'popularity'
+  | 'users'
+  | 'scorers';
 
 export interface VisibleColumns {
   score: boolean;
-  scoreDelta: boolean;
   rank: boolean;
-  rankDelta: boolean;
   popularity: boolean;
-  popularityDelta: boolean;
   users: boolean;
-  usersDelta: boolean;
   scorers: boolean;
-  scorersDelta: boolean;
 }
 
 // User preferences for persistent state
 export interface AnimeUserPreferences {
   // Legacy: currentView now deprecated (fire-and-forget presets)
   currentView?: AnimeView;
-  
+
   // Sort preferences
   sortBy: SortColumn;
   sortDir: SortDirection;
-  
+
   // Filter preferences
   statusFilters: (UserAnimeStatus | 'not_defined')[];
   searchQuery: string;
@@ -274,15 +246,14 @@ export interface AnimeUserPreferences {
   hiddenOnly: boolean;
   minScore: number | null;
   maxScore: number | null;
-  
+
   // Display preferences
-  evolutionPeriod: string; // e.g., '1w', '1m', '3m'
   imageSize: ImageSize; // 1x, 2x, or 3x
   visibleColumns: VisibleColumns; // Stats columns visibility
-  
+
   // UI state (optional - sidebar collapse is localStorage only)
   sidebarExpanded?: Record<string, boolean>;
-  
+
   lastUpdated: string;
 }
 

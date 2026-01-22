@@ -2,39 +2,37 @@ import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { AnimePageLayout, AnimeSidebar, AnimeTable } from '@/components/anime';
-import { AnimeWithExtensions, MALAuthState, AnimeScoresHistoryData, UserAnimeStatus, StatsColumn } from '@/models/anime';
+import { AnimeWithExtensions, MALAuthState, UserAnimeStatus, StatsColumn } from '@/models/anime';
 import { useAnimeUrlState } from '@/hooks';
 
 export default function AnimePage() {
   const router = useRouter();
   const { filters, display, updateFilters, updateDisplay, isReady } = useAnimeUrlState();
-  
+
   // Auth state (not URL-controlled)
   const [authState, setAuthState] = useState<MALAuthState>({ isAuthenticated: false });
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [authError, setAuthError] = useState('');
-  
+
   // Sync state (not URL-controlled)
   const [isSyncing, setIsSyncing] = useState(false);
   const [isBigSyncing, setIsBigSyncing] = useState(false);
   const [syncError, setSyncError] = useState('');
-  
+
   // Data state
   const [animes, setAnimes] = useState<AnimeWithExtensions[]>([]);
-  const [scoresHistory, setScoresHistory] = useState<AnimeScoresHistoryData>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   // Check auth status on mount
   useEffect(() => {
     checkAuthStatus();
-    loadScoresHistory();
   }, []);
 
   // Handle OAuth callback
   useEffect(() => {
     if (!router.isReady) return;
-    
+
     const authParam = router.query.auth;
     if (authParam) {
       if (authParam === 'success') {
@@ -72,38 +70,38 @@ export default function AnimePage() {
     try {
       setIsLoading(true);
       setError('');
-      
+
       const params = new URLSearchParams();
-      
+
       // Status filter
       const statusQuery = filters.statusFilters.join(',');
       if (statusQuery) params.set('status', statusQuery);
-      
+
       // Search
       if (filters.searchQuery) params.set('search', filters.searchQuery);
-      
+
       // Seasons
       if (filters.seasons.length > 0) {
         const seasonParam = filters.seasons.map(s => `${s.year}-${s.season}`).join(',');
         params.set('season', seasonParam);
       }
-      
+
       // Media types
       if (filters.mediaTypes.length > 0) {
         params.set('mediaType', filters.mediaTypes.join(','));
       }
-      
+
       // Hidden
       params.set('hidden', filters.hiddenOnly ? 'true' : 'false');
-      
+
       // Score range
       if (filters.minScore !== null) params.set('minScore', filters.minScore.toString());
       if (filters.maxScore !== null) params.set('maxScore', filters.maxScore.toString());
-      
+
       // Sort
       params.set('sortBy', filters.sortBy);
       params.set('sortDir', filters.sortDir);
-      
+
       const response = await fetch(`/api/anime/animes?${params.toString()}`);
       if (response.ok) {
         const data = await response.json();
@@ -119,18 +117,6 @@ export default function AnimePage() {
       setIsLoading(false);
     }
   }, [filters]);
-
-  const loadScoresHistory = async () => {
-    try {
-      const response = await fetch('/api/anime/scores-history');
-      if (response.ok) {
-        const data = await response.json();
-        setScoresHistory(data.history || {});
-      }
-    } catch (error) {
-      console.error('Error loading scores history:', error);
-    }
-  };
 
   // Auth handlers
   const handleConnect = async () => {
@@ -174,7 +160,6 @@ export default function AnimePage() {
       const response = await fetch('/api/anime/sync', { method: 'POST' });
       if (!response.ok) throw new Error('Sync failed');
       loadAnimes();
-      loadScoresHistory();
     } catch (error) {
       setSyncError('Failed to sync data.');
     } finally {
@@ -190,7 +175,6 @@ export default function AnimePage() {
       const response = await fetch('/api/anime/big-sync', { method: 'POST' });
       if (!response.ok) throw new Error('Big sync failed');
       loadAnimes();
-      loadScoresHistory();
     } catch (error) {
       setSyncError('Failed to start big sync.');
     } finally {
@@ -200,8 +184,8 @@ export default function AnimePage() {
 
   // Filter handlers - update URL
   const handleStatusFilterChange = (status: UserAnimeStatus | 'not_defined', isChecked: boolean) => {
-    const newFilters = isChecked 
-      ? [...filters.statusFilters, status] 
+    const newFilters = isChecked
+      ? [...filters.statusFilters, status]
       : filters.statusFilters.filter(s => s !== status);
     updateFilters({ statusFilters: newFilters });
   };
@@ -243,10 +227,6 @@ export default function AnimePage() {
     updateDisplay({ imageSize });
   };
 
-  const handleEvolutionPeriodChange = (evolutionPeriod: string) => {
-    updateDisplay({ evolutionPeriod });
-  };
-
   const handleVisibleColumnsChange = (column: StatsColumn, isVisible: boolean) => {
     const newVisibleColumns = { ...display.visibleColumns, [column]: isVisible };
     updateDisplay({ visibleColumns: newVisibleColumns });
@@ -260,8 +240,8 @@ export default function AnimePage() {
   // Anime action handlers
   const handleHideToggle = async (animeId: number, hide: boolean) => {
     try {
-      const response = await fetch(`/api/anime/animes/${animeId}/hide`, { 
-        method: hide ? 'POST' : 'DELETE' 
+      const response = await fetch(`/api/anime/animes/${animeId}/hide`, {
+        method: hide ? 'POST' : 'DELETE'
       });
       if (response.ok) {
         setAnimes(prev => prev.filter(a => a.id !== animeId));
@@ -281,9 +261,9 @@ export default function AnimePage() {
         body: JSON.stringify(updates),
       });
       if (response.ok) {
-        setAnimes(prev => prev.map(a => 
-          a.id === animeId 
-            ? { ...a, my_list_status: { ...a.my_list_status, ...updates } } 
+        setAnimes(prev => prev.map(a =>
+          a.id === animeId
+            ? { ...a, my_list_status: { ...a.my_list_status, ...updates } }
             : a
         ));
       } else {
@@ -326,8 +306,6 @@ export default function AnimePage() {
       searchQuery={filters.searchQuery}
       onSearchChange={handleSearchChange}
       animeCount={animes.length}
-      evolutionPeriod={display.evolutionPeriod}
-      onEvolutionPeriodChange={handleEvolutionPeriodChange}
       visibleColumns={display.visibleColumns}
       onVisibleColumnsChange={handleVisibleColumnsChange}
       sidebarExpanded={display.sidebarExpanded}
@@ -358,8 +336,6 @@ export default function AnimePage() {
             ) : (
               <AnimeTable
                 animes={animes}
-                scoresHistory={scoresHistory}
-                scoreEvolutionPeriod={parseInt(display.evolutionPeriod.replace('w', ''))}
                 imageSize={display.imageSize}
                 visibleColumns={display.visibleColumns}
                 sortColumn={filters.sortBy}

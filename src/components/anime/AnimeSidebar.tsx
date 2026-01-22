@@ -3,7 +3,7 @@ import styles from './AnimeSidebar.module.css';
 import { MALAuthState, UserAnimeStatus, ImageSize, VisibleColumns, StatsColumn, SortColumn, SortDirection } from '@/models/anime';
 import { SeasonInfo } from './SeasonSelector';
 import { CollapsibleSection } from '@/components/shared';
-import { 
+import {
   SortOrderSection,
   AccountSection,
   DataSyncSection,
@@ -50,8 +50,6 @@ interface AnimeSidebarProps {
 
   // Stats
   animeCount: number;
-  evolutionPeriod: string;
-  onEvolutionPeriodChange: (period: string) => void;
   visibleColumns: VisibleColumns;
   onVisibleColumnsChange: (column: StatsColumn, isVisible: boolean) => void;
 
@@ -77,7 +75,7 @@ const AnimeSidebar: React.FC<AnimeSidebarProps> = ({
   hiddenOnly, onHiddenOnlyChange,
   minScore, onMinScoreChange,
   maxScore, onMaxScoreChange,
-  animeCount, evolutionPeriod, onEvolutionPeriodChange,
+  animeCount,
   visibleColumns, onVisibleColumnsChange,
   sidebarExpanded, onSidebarExpandedChange,
   sortBy, sortDir, onSortByChange, onSortDirChange,
@@ -186,8 +184,6 @@ const AnimeSidebar: React.FC<AnimeSidebarProps> = ({
       >
         <StatsSection
           animeCount={animeCount}
-          evolutionPeriod={evolutionPeriod}
-          onEvolutionPeriodChange={onEvolutionPeriodChange}
           visibleColumns={visibleColumns}
           onVisibleColumnsChange={onVisibleColumnsChange}
         />
