@@ -152,26 +152,65 @@
 .score {
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
-  font-weight: 500;
+  font-weight: 600;
+  display: inline-block;
+  min-width: 2.5rem;
+  text-align: center;
 }
 
-.score.high {
-  background: #047857;
-  color: #d1fae5;
+.score10 {
+  background: #059669;
+  color: #ffffff;
 }
 
-.score.medium {
-  background: #d97706;
-  color: #fef3c7;
+.score9 {
+  background: #10b981;
+  color: #ffffff;
 }
 
-.score.low {
+.score8 {
+  background: #34d399;
+  color: #064e3b;
+}
+
+.score7 {
+  background: #84cc16;
+  color: #1a2e05;
+}
+
+.score6 {
+  background: #eab308;
+  color: #422006;
+}
+
+.score5 {
+  background: #f59e0b;
+  color: #451a03;
+}
+
+.score4 {
+  background: #f97316;
+  color: #431407;
+}
+
+.score3 {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.score2 {
   background: #dc2626;
-  color: #fee2e2;
+  color: #ffffff;
 }
 
-.score.none {
-  color: #9ca3af;
+.score1 {
+  background: #991b1b;
+  color: #ffffff;
+}
+
+.scoreNA {
+  background: #4b5563;
+  color: #ffffff;
 }
 
 .statusCell {

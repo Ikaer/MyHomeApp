@@ -184,6 +184,21 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
     return sortDirection === 'asc' ? '↑' : '↓';
   };
 
+  const getScoreClass = (score?: number) => {
+    if (score === undefined || score === 0) return styles.scoreNA;
+    const s = Math.floor(score);
+    if (s >= 10) return styles.score10;
+    if (s >= 9) return styles.score9;
+    if (s >= 8) return styles.score8;
+    if (s >= 7) return styles.score7;
+    if (s >= 6) return styles.score6;
+    if (s >= 5) return styles.score5;
+    if (s >= 4) return styles.score4;
+    if (s >= 3) return styles.score3;
+    if (s >= 2) return styles.score2;
+    return styles.score1;
+  };
+
   const formatScore = (score?: number) => {
     return score ? score.toFixed(2) : 'N/A';
   };
@@ -272,6 +287,15 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
     } else {
       formattedValue = formatNumber(latestValue);
     }
+
+    if (metric === 'mean') {
+      return (
+        <span className={`${styles.score} ${getScoreClass(latestValue)}`}>
+          {formattedValue}
+        </span>
+      );
+    }
+
     return <span>{formattedValue}</span>;
   }
 
