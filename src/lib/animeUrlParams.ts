@@ -164,7 +164,7 @@ export const DEFAULT_FILTERS: AnimeFiltersState = {
 };
 
 export const DEFAULT_DISPLAY: AnimeDisplayState = {
-  imageSize: 1,
+  imageSize: 3,
   visibleColumns: DEFAULT_VISIBLE_COLUMNS,
   sidebarExpanded: DEFAULT_SIDEBAR_EXPANDED,
 };
@@ -467,77 +467,132 @@ export interface PresetConfig {
   key: string;
   label: string;
   description: string;
-  getUrl: () => string;
+  getState: () => Partial<AnimeUrlState>;
 }
 
-export const VIEW_PRESET_URLS: PresetConfig[] = [
+export const PERSISTENT_UI_KEYS: (keyof AnimeUrlState)[] = [
+  'imageSize',
+  'minScore',
+  'maxScore',
+  'visibleColumns',
+  'sidebarExpanded'
+];
+
+export const VIEW_PRESETS: PresetConfig[] = [
   {
     key: 'new_season_strict',
     label: 'New Season (Strict)',
     description: 'Current season only',
-    getUrl: () => {
+    getState: () => {
       const { current } = getSeasonInfos();
-      return `/anime?sn=${current.year}${SEASON_TO_CODE[current.season]}&mt=tv&so=m&d=d`;
+      return {
+        seasons: [{ year: current.year, season: current.season as SeasonName }],
+        mediaTypes: ['tv'],
+        sortBy: 'mean',
+        sortDir: 'desc',
+      };
     },
   },
   {
     key: 'new_season',
     label: 'New Season',
     description: 'Current & previous season',
-    getUrl: () => {
+    getState: () => {
       const { current, previous } = getSeasonInfos();
-      return `/anime?sn=${current.year}${SEASON_TO_CODE[current.season]},${previous.year}${SEASON_TO_CODE[previous.season]}&mt=tv&so=m&d=d`;
+      return {
+        seasons: [
+          { year: current.year, season: current.season as SeasonName },
+          { year: previous.year, season: previous.season as SeasonName }
+        ],
+        mediaTypes: ['tv'],
+        sortBy: 'mean',
+        sortDir: 'desc',
+      };
     },
   },
   {
     key: 'next_season',
     label: 'Next Season',
     description: 'Upcoming season',
-    getUrl: () => {
+    getState: () => {
       const { next } = getSeasonInfos();
-      return `/anime?sn=${next.year}${SEASON_TO_CODE[next.season]}&mt=tv&so=m&d=d`;
+      return {
+        seasons: [{ year: next.year, season: next.season as SeasonName }],
+        mediaTypes: ['tv'],
+        sortBy: 'mean',
+        sortDir: 'desc',
+      };
     },
   },
   {
     key: 'find_shows',
     label: 'Find Shows',
     description: 'TV shows not in your list',
-    getUrl: () => `/anime?s=n&mt=tv&so=m&d=d`,
+    getState: () => ({
+      statusFilters: ['not_defined'],
+      mediaTypes: ['tv'],
+      sortBy: 'mean',
+      sortDir: 'desc',
+    }),
   },
   {
     key: 'watching',
     label: 'Watching',
     description: 'Currently watching',
-    getUrl: () => `/anime?s=w&so=t&d=a`,
+    getState: () => ({
+      statusFilters: ['watching'],
+      sortBy: 'title',
+      sortDir: 'asc',
+    }),
   },
   {
     key: 'completed',
     label: 'Completed',
     description: 'Completed shows',
-    getUrl: () => `/anime?s=c&so=t&d=a`,
+    getState: () => ({
+      statusFilters: ['completed'],
+      sortBy: 'title',
+      sortDir: 'asc',
+    }),
   },
   {
     key: 'on_hold',
     label: 'On Hold',
     description: 'Shows on hold',
-    getUrl: () => `/anime?s=h&so=t&d=a`,
+    getState: () => ({
+      statusFilters: ['on_hold'],
+      sortBy: 'title',
+      sortDir: 'asc',
+    }),
   },
   {
     key: 'dropped',
     label: 'Dropped',
     description: 'Dropped shows',
-    getUrl: () => `/anime?s=d&so=t&d=a`,
+    getState: () => ({
+      statusFilters: ['dropped'],
+      sortBy: 'title',
+      sortDir: 'asc',
+    }),
   },
   {
     key: 'plan_to_watch',
     label: 'Plan to Watch',
     description: 'Planned shows',
-    getUrl: () => `/anime?s=p&so=t&d=a`,
+    getState: () => ({
+      statusFilters: ['plan_to_watch'],
+      sortBy: 'title',
+      sortDir: 'asc',
+    }),
   },
   {
     key: 'hidden',
     label: 'Hidden',
     description: 'Hidden shows only',
-    getUrl: () => `/anime?h=1&so=t&d=a`,
+    getState: () => ({
+      hiddenOnly: true,
+      sortBy: 'title',
+      sortDir: 'asc',
+    }),
   },
 ];

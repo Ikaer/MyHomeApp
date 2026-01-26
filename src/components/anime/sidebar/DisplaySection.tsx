@@ -16,6 +16,12 @@ const DisplaySection: React.FC<DisplaySectionProps> = ({
       <label className={styles.label}>Image Size:</label>
       <div className={styles.sizeButtons}>
         <button
+          className={`${styles.sizeButton} ${imageSize === 0 ? styles.activeSizeButton : ''}`}
+          onClick={() => onImageSizeChange(0)}
+        >
+          Original
+        </button>
+        <button
           className={`${styles.sizeButton} ${imageSize === 1 ? styles.activeSizeButton : ''}`}
           onClick={() => onImageSizeChange(1)}
         >

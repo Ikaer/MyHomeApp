@@ -19,6 +19,7 @@ import {
   getDefaultPresetUrl,
   DEFAULT_FILTERS,
   DEFAULT_DISPLAY,
+  PERSISTENT_UI_KEYS,
 } from '@/lib/animeUrlParams';
 
 export interface UseAnimeUrlStateReturn {
@@ -27,6 +28,7 @@ export interface UseAnimeUrlStateReturn {
   updateFilters: (updates: Partial<AnimeFiltersState>) => void;
   updateDisplay: (updates: Partial<AnimeDisplayState>) => void;
   updateState: (updates: Partial<AnimeUrlState>) => void;
+  applyPreset: (presetState: Partial<AnimeUrlState>) => void;
   isReady: boolean;
 }
 
@@ -111,6 +113,28 @@ export function useAnimeUrlState(): UseAnimeUrlStateReturn {
     router.push(url, undefined, { shallow: true });
   }, [currentState, router]);
 
+  // Apply a preset while preserving UI preferences
+  const applyPreset = useCallback((presetState: Partial<AnimeUrlState>) => {
+    // 1. Capture current persistent values
+    const currentPersistentState: Partial<AnimeUrlState> = {};
+    PERSISTENT_UI_KEYS.forEach(key => {
+      if (currentState[key] !== undefined) {
+        (currentPersistentState as any)[key] = currentState[key];
+      }
+    });
+
+    // 2. Build new state: Baseline -> Persistent -> Preset
+    const newState: AnimeUrlState = {
+      ...DEFAULT_FILTERS,
+      ...DEFAULT_DISPLAY,
+      ...currentPersistentState,
+      ...presetState,
+    };
+
+    const url = encodeStateToUrl(newState);
+    router.push(url, undefined, { shallow: true });
+  }, [currentState, router]);
+
   // Memoize filters to prevent unnecessary re-renders
   const filters: AnimeFiltersState = useMemo(() => ({
     statusFilters: currentState.statusFilters,
@@ -137,6 +161,7 @@ export function useAnimeUrlState(): UseAnimeUrlStateReturn {
     updateFilters,
     updateDisplay,
     updateState,
+    applyPreset,
     isReady,
   };
 }

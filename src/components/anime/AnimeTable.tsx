@@ -318,10 +318,10 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
           <tbody>
             {sortedAnimes.map((anime) => (
               <tr key={anime.id}>
-                <td className={styles.imageCell}>
-                  {anime.main_picture?.medium ? (
+                <td className={`${styles.imageCell} ${imageSize === 0 ? styles.imageCellOriginal : ''}`}>
+                  {anime.main_picture?.large || anime.main_picture?.medium ? (
                     <img
-                      src={anime.main_picture.medium}
+                      src={anime.main_picture?.large || anime.main_picture?.medium}
                       alt={anime.title}
                       className={`${styles.animeImage} ${styles[`imageSize${imageSize}`]}`}
                     />

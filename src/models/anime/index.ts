@@ -211,7 +211,7 @@ export interface AnimeSortOptions {
 }
 
 // Display options
-export type ImageSize = 1 | 2 | 3;
+export type ImageSize = 0 | 1 | 2 | 3;
 
 // Stats columns that can be shown/hidden
 export type StatsColumn =
