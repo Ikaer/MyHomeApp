@@ -7,15 +7,56 @@
   overflow-y: auto;
 }
 
+.topRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
 .searchInput {
+  width: 100%;
   padding: 10px 12px;
   background: var(--bg-primary);
   color: var(--text-primary);
   border: 1px solid #444;
   border-radius: 6px;
   font-size: 0.95rem;
-  width: 100%;
   box-sizing: border-box;
+}
+
+.layoutSelector {
+  display: flex;
+  background: var(--bg-primary);
+  border: 1px solid #444;
+  border-radius: 6px;
+  overflow: hidden;
+  padding: 2px;
+  align-self: flex-start;
+}
+
+.layoutBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.layoutBtn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.layoutBtn.active {
+  background: var(--accent-primary);
+  color: white;
 }
 
 .searchInput:focus {
@@ -44,7 +85,8 @@
   letter-spacing: 0.05em;
 }
 
-.button, .viewButton {
+.button,
+.viewButton {
   padding: 0.6rem 1rem;
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -96,13 +138,13 @@
 }
 
 .buttonGroup {
-    display: flex;
-    gap: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
 }
 
 .buttonGroup .button {
-    flex: 1;
-    text-align: center;
+  flex: 1;
+  text-align: center;
 }
 
 .error {

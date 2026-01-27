@@ -11,6 +11,19 @@
   --border-hover: #555555;
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+
+  /* Score Colors (Emerald Scale for high scores, Red for low) */
+  --score-10: #059669;
+  --score-9: #10b981;
+  --score-8: #34d399;
+  --score-7: #84cc16;
+  --score-6: #eab308;
+  --score-5: #f59e0b;
+  --score-4: #f97316;
+  --score-3: #ef4444;
+  --score-2: #dc2626;
+  --score-1: #991b1b;
+  --score-na: #4b5563;
 }
 
 * {
@@ -232,11 +245,11 @@ a:hover {
   .container {
     padding: 0 1rem;
   }
-  
+
   .card-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .nav {
     gap: 1rem;
   }
@@ -247,19 +260,19 @@ a:hover {
   .container {
     max-width: 2560px;
   }
-  
+
   .page-title {
     font-size: 3rem;
   }
-  
+
   .card {
     padding: 2rem;
   }
-  
+
   .card-icon {
     font-size: 2.5rem;
   }
-  
+
   .card-title {
     font-size: 1.5rem;
   }

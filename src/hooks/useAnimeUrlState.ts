@@ -153,6 +153,7 @@ export function useAnimeUrlState(): UseAnimeUrlStateReturn {
     imageSize: currentState.imageSize,
     visibleColumns: currentState.visibleColumns,
     sidebarExpanded: currentState.sidebarExpanded,
+    layout: currentState.layout,
   }), [currentState]);
 
   return {

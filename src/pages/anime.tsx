@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { AnimePageLayout, AnimeSidebar, AnimeTable } from '@/components/anime';
+import { AnimePageLayout, AnimeSidebar, AnimeTable, AnimeCardView } from '@/components/anime';
 import { AnimeWithExtensions, MALAuthState, UserAnimeStatus, StatsColumn } from '@/models/anime';
 import { useAnimeUrlState } from '@/hooks';
 
@@ -222,6 +222,10 @@ export default function AnimePage() {
     updateFilters({ sortDir });
   };
 
+  const handleLayoutChange = (layout: typeof display.layout) => {
+    updateDisplay({ layout });
+  };
+
   // Display handlers - update URL
   const handleImageSizeChange = (imageSize: typeof display.imageSize) => {
     updateDisplay({ imageSize });
@@ -314,6 +318,8 @@ export default function AnimePage() {
       sortDir={filters.sortDir}
       onSortByChange={handleSortByChange}
       onSortDirChange={handleSortDirChange}
+      layout={display.layout}
+      onLayoutChange={handleLayoutChange}
     />
   );
 
@@ -333,6 +339,14 @@ export default function AnimePage() {
           <div className="table-container">
             {!isReady || isLoading ? (
               <div className="loading-state">Loading...</div>
+            ) : display.layout === 'card' ? (
+              <AnimeCardView
+                animes={animes}
+                imageSize={display.imageSize}
+                visibleColumns={display.visibleColumns}
+                onUpdateMALStatus={handleUpdateMALStatus}
+                onHideToggle={handleHideToggle}
+              />
             ) : (
               <AnimeTable
                 animes={animes}

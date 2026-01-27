@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { AnimeWithExtensions, SortColumn, SortDirection, ImageSize, VisibleColumns } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
-import { formatSeason } from '@/lib/animeUtils';
+import { formatSeason, formatUserStatus } from '@/lib/animeUtils';
 import styles from './AnimeTable.module.css';
 
 const formatNumber = (num?: number) => {
@@ -213,8 +213,7 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
   };
 
   const formatStatus = (status?: string) => {
-    if (!status) return 'Unknown';
-    return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    return formatUserStatus(status);
   };
 
   const formatGenres = (genres: Array<{ name: string }> = []) => {

@@ -159,57 +159,57 @@
 }
 
 .score10 {
-  background: #059669;
+  background: var(--score-10);
   color: #ffffff;
 }
 
 .score9 {
-  background: #10b981;
+  background: var(--score-9);
   color: #ffffff;
 }
 
 .score8 {
-  background: #34d399;
+  background: var(--score-8);
   color: #064e3b;
 }
 
 .score7 {
-  background: #84cc16;
+  background: var(--score-7);
   color: #1a2e05;
 }
 
 .score6 {
-  background: #eab308;
+  background: var(--score-6);
   color: #422006;
 }
 
 .score5 {
-  background: #f59e0b;
+  background: var(--score-5);
   color: #451a03;
 }
 
 .score4 {
-  background: #f97316;
+  background: var(--score-4);
   color: #431407;
 }
 
 .score3 {
-  background: #ef4444;
+  background: var(--score-3);
   color: #ffffff;
 }
 
 .score2 {
-  background: #dc2626;
+  background: var(--score-2);
   color: #ffffff;
 }
 
 .score1 {
-  background: #991b1b;
+  background: var(--score-1);
   color: #ffffff;
 }
 
 .scoreNA {
-  background: #4b5563;
+  background: var(--score-na);
   color: #ffffff;
 }
 

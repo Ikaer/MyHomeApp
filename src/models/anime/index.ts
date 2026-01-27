@@ -160,6 +160,7 @@ export interface SeasonInfo { year: number; season: SeasonName }
 export type MediaType = 'tv' | 'movie' | 'ona' | 'ova' | 'special' | 'music';
 
 // View types
+export type AnimeLayoutType = 'table' | 'card';
 export type AnimeView = 'new_season' | 'new_season_strict' | 'next_season' | 'find_shows' | 'watching' | 'completed' | 'hidden' | 'dropped' | 'on_hold' | 'plan_to_watch';
 
 export type CalendarAnimeView = LiteralSubset<AnimeView, 'new_season' | 'new_season_strict' | 'next_season'>;
@@ -229,6 +230,13 @@ export interface VisibleColumns {
   scorers: boolean;
 }
 
+export interface AnimeDisplayState {
+  imageSize: ImageSize;
+  visibleColumns: VisibleColumns;
+  sidebarExpanded: Record<string, boolean>;
+  layout: AnimeLayoutType;
+}
+
 // User preferences for persistent state
 export interface AnimeUserPreferences {
   // Legacy: currentView now deprecated (fire-and-forget presets)
@@ -250,6 +258,7 @@ export interface AnimeUserPreferences {
   // Display preferences
   imageSize: ImageSize; // 1x, 2x, or 3x
   visibleColumns: VisibleColumns; // Stats columns visibility
+  layout: AnimeLayoutType;
 
   // UI state (optional - sidebar collapse is localStorage only)
   sidebarExpanded?: Record<string, boolean>;

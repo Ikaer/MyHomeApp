@@ -112,31 +112,24 @@ export const VIEW_PRESETS: ViewPreset[] = [
   { key: 'hidden', label: 'Hidden', description: 'Hidden shows only', seasonStrategy: null, staticFilters: { hidden: true } },
 ];
 
-// Map a view to filter query parameter strings (CSV tokens)
-export function mapViewToFilters(view: AnimeView): Record<string, any> {
-  const preset = VIEW_PRESETS.find(p => p.key === view);
-  if (!preset) return {};
 
-  const filters: Record<string, string> = {};
-  const seasonInfos = getSeasonInfos();
-  if (preset.seasonStrategy) {
-    if (preset.seasonStrategy === 'current') {
-      filters.season = `${seasonInfos.current.year}-${seasonInfos.current.season}`;
-    } else if (preset.seasonStrategy === 'current_previous') {
-      filters.season = `${seasonInfos.current.year}-${seasonInfos.current.season},${seasonInfos.previous.year}-${seasonInfos.previous.season}`;
-    } else if (preset.seasonStrategy === 'next') {
-      filters.season = `${seasonInfos.next.year}-${seasonInfos.next.season}`;
-    }
-  }
-  if (preset.staticFilters) {
-    const sf = preset.staticFilters;
-    if (sf.mediaType && sf.mediaType.length > 0) filters.mediaType = sf.mediaType.join(',');
-    if (sf.hidden !== undefined) filters.hidden = sf.hidden ? 'true' : 'false';
-    if (sf.status) filters.status = sf.status;
-    if (sf.sortBy) filters.sortBy = sf.sortBy;
-    if (sf.sortDir) filters.sortDir = sf.sortDir;
-  }
-  return filters;
+// Map old view system to new filter parameters
+// View preset definition
+export interface ViewPreset {
+  key: AnimeView;
+  label: string;
+  description: string;
+  seasonStrategy?: 'current' | 'current_previous' | 'next' | null; // dynamic seasons
+  staticFilters?: {
+    mediaType?: string[];
+    hidden?: boolean;
+    status?: UserAnimeStatus | 'not_defined';
+    sortBy?: SortColumn;
+    sortDir?: SortDirection;
+  };
 }
 
-// You can add other client-safe anime utility functions here
+export function formatUserStatus(status?: string) {
+  if (!status) return 'Unknown';
+  return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}

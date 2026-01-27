@@ -40,6 +40,7 @@ export interface AnimeDisplayState {
   imageSize: ImageSize;
   visibleColumns: VisibleColumns;
   sidebarExpanded: Record<string, boolean>;
+  layout: 'table' | 'card';
 }
 
 export interface AnimeUrlState extends AnimeFiltersState, AnimeDisplayState { }
@@ -167,6 +168,7 @@ export const DEFAULT_DISPLAY: AnimeDisplayState = {
   imageSize: 3,
   visibleColumns: DEFAULT_VISIBLE_COLUMNS,
   sidebarExpanded: DEFAULT_SIDEBAR_EXPANDED,
+  layout: 'card',
 };
 
 // ============================================================================
@@ -198,6 +200,7 @@ const PARAM_KEYS = {
   imageSize: 'img',
   columns: 'cols',
   sidebar: 'sb',
+  layout: 'lt',
 } as const;
 
 // ============================================================================
@@ -308,6 +311,10 @@ export function encodeDisplayToParams(display: Partial<AnimeDisplayState>): URLS
   if (display.sidebarExpanded !== undefined) {
     const encoded = encodeSidebarExpanded(display.sidebarExpanded);
     if (encoded !== null) params.set(PARAM_KEYS.sidebar, encoded);
+  }
+
+  if (display.layout !== undefined && display.layout !== DEFAULT_DISPLAY.layout) {
+    params.set(PARAM_KEYS.layout, display.layout);
   }
 
   return params;
@@ -436,6 +443,7 @@ export function decodeUrlToDisplay(params: URLSearchParams): AnimeDisplayState {
     sidebarExpanded: params.has(PARAM_KEYS.sidebar)
       ? decodeSidebarExpanded(params.get(PARAM_KEYS.sidebar))
       : { ...DEFAULT_SIDEBAR_EXPANDED },
+    layout: (params.get(PARAM_KEYS.layout) as any) || DEFAULT_DISPLAY.layout,
   };
 }
 
