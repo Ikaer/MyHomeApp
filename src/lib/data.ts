@@ -11,15 +11,15 @@ function logToFile(level: 'INFO' | 'ERROR' | 'WARN', message: string, error?: an
   try {
     const timestamp = new Date().toISOString();
     const logEntry = `[${timestamp}] ${level}: ${message}${error ? ` - ${error.message || error}` : ''}\n`;
-    
+
     // Ensure logs directory exists
     if (!fs.existsSync(LOGS_PATH)) {
       fs.mkdirSync(LOGS_PATH, { recursive: true, mode: 0o755 });
     }
-    
+
     const logFile = path.join(LOGS_PATH, 'app.log');
     fs.appendFileSync(logFile, logEntry);
-    
+
     // Also log to console
     console.log(`${level}: ${message}`, error || '');
   } catch (logError) {
@@ -45,17 +45,18 @@ export function ensureDirectoryExists(dirPath: string): void {
 export function initializeDataDirectories(): void {
   try {
     logToFile('INFO', 'Initializing data directories...');
-    
+
     // Create main directories first
     ensureDirectoryExists(DATA_PATH);
     ensureDirectoryExists(CONFIG_PATH);
     ensureDirectoryExists(LOGS_PATH);
-    
+
     // Create sub-app directories
     ensureDirectoryExists(path.join(DATA_PATH, 'bookmarks'));
     ensureDirectoryExists(path.join(DATA_PATH, 'anime'));
     ensureDirectoryExists(path.join(DATA_PATH, 'services'));
-    
+    ensureDirectoryExists(path.join(DATA_PATH, 'savings'));
+
     logToFile('INFO', 'Data directories initialized successfully');
   } catch (error) {
     logToFile('ERROR', 'Failed to initialize data directories', error);
@@ -139,12 +140,12 @@ export function getAppConfig(): AppConfig {
     };
 
     const config = readJsonFile(configPath, defaultConfig);
-    
+
     // Write default config if it doesn't exist
     if (!fs.existsSync(configPath)) {
       writeJsonFile(configPath, defaultConfig);
     }
-    
+
     return config;
   } catch (error) {
     logToFile('ERROR', 'Failed to get app config', error);
@@ -187,9 +188,17 @@ export function getSubApps(): SubApp[] {
         icon: '📁',
         route: '/files',
         enabled: true // Will be enabled in Phase 3
+      },
+      {
+        id: 'savings',
+        name: 'Savings',
+        description: 'Manage your financial investments',
+        icon: '💰',
+        route: '/savings',
+        enabled: true
       }
     ];
-    
+
     logToFile('INFO', `Retrieved ${subApps.length} sub-applications`);
     return subApps;
   } catch (error) {
