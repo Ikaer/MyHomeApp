@@ -7,8 +7,8 @@ async function testXIRR() {
 
     // Sample data from the user document
     const transactions: Transaction[] = [
-        { id: '1', date: '2025-06-06', type: 'Achat', assetName: 'A', isin: '1', ticker: 'A', quantity: 100, unitPrice: 5.50, fees: 0, ttf: 0, totalAmount: 550 },
-        { id: '2', date: '2025-07-07', type: 'Achat', assetName: 'A', isin: '1', ticker: 'A', quantity: 100, unitPrice: 5.53, fees: 0, ttf: 0, totalAmount: 553 },
+        { id: '1', date: '2025-06-06', type: 'Buy', assetName: 'A', isin: '1', ticker: 'A', quantity: 100, unitPrice: 5.50, fees: 0, ttf: 0, totalAmount: 550 },
+        { id: '2', date: '2025-07-07', type: 'Buy', assetName: 'A', isin: '1', ticker: 'A', quantity: 100, unitPrice: 5.53, fees: 0, ttf: 0, totalAmount: 553 },
     ];
 
     const currentValue = 1200; // Mock current value
