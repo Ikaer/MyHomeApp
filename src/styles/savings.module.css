@@ -48,6 +48,35 @@
     margin-bottom: 1.5rem;
 }
 
+.defaultToggle {
+    background: rgba(31, 41, 55, 0.6);
+    border: 1px solid rgba(75, 85, 99, 0.4);
+    color: #9ca3af;
+    font-size: 1.5rem;
+    line-height: 1;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.defaultToggle:hover {
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.5);
+    background: rgba(31, 41, 55, 0.8);
+    transform: scale(1.05);
+}
+
+.defaultActive {
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.6);
+    background: rgba(251, 191, 36, 0.1);
+}
+
 .accountName {
     font-size: 1.5rem;
     font-weight: 600;
@@ -134,11 +163,54 @@
     letter-spacing: 0.05em;
 }
 
+.sortableHeader {
+    padding: 0.5rem 1rem;
+}
+
+.sortButton {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font: inherit;
+    text-transform: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+    padding: 0.5rem 0;
+}
+
+.sortButton:hover {
+    color: #e5e7eb;
+}
+
+.sortActive {
+    color: #f3f4f6;
+}
+
+.sortIndicator {
+    font-size: 0.7rem;
+    color: #60a5fa;
+    min-width: 1rem;
+    text-align: right;
+}
+
 .table td {
     padding: 1rem;
     border-top: 1px solid rgba(75, 85, 99, 0.1);
     color: #d1d5db;
     font-size: 0.875rem;
+}
+
+.table td.positive {
+    color: #10b981;
+}
+
+.table td.negative {
+    color: #ef4444;
 }
 
 .ticker {
@@ -183,6 +255,7 @@
 .secondaryButton:hover {
     background: rgba(75, 85, 99, 0.7);
 }
+
 
 .modalOverlay {
     position: fixed;

@@ -3,12 +3,10 @@ import Head from 'next/head';
 import Link from 'next/link';
 import styles from '@/styles/savings.module.css';
 import { SavingsAccount, AccountSummary, AssetPosition } from '@/models/savings';
-import PEAOverview from '@/components/savings/PEAOverview';
 
 export default function SavingsPage() {
     const [accounts, setAccounts] = useState<SavingsAccount[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchAccounts();
@@ -28,21 +26,21 @@ export default function SavingsPage() {
         }
     };
 
-    const selectedAccount = accounts.find(a => a.id === selectedAccountId);
-
-    if (selectedAccount) {
-        return (
-            <div className={styles.savingsContainer}>
-                <Head>
-                    <title>MyHomeApp - {selectedAccount.name}</title>
-                </Head>
-                <PEAOverview
-                    account={selectedAccount}
-                    onBack={() => setSelectedAccountId(null)}
-                />
-            </div>
-        );
-    }
+    const setDefaultAccount = async (accountId: string) => {
+        try {
+            const res = await fetch('/api/savings/accounts', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ accountId })
+            });
+            if (res.ok) {
+                const updated = await res.json();
+                setAccounts(updated);
+            }
+        } catch (error) {
+            console.error('Failed to set default account:', error);
+        }
+    };
 
     return (
         <div className={styles.savingsContainer}>
@@ -52,9 +50,6 @@ export default function SavingsPage() {
 
             <div className={styles.header}>
                 <div>
-                    <Link href="/" className={styles.secondaryButton} style={{ marginBottom: '1rem', display: 'inline-block' }}>
-                        ← Back to Dashboard
-                    </Link>
                     <h1 className={styles.title}>Savings Management</h1>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
@@ -79,7 +74,7 @@ export default function SavingsPage() {
                         <AccountCard
                             key={account.id}
                             account={account}
-                            onView={() => setSelectedAccountId(account.id)}
+                            onSetDefault={() => setDefaultAccount(account.id)}
                         />
                     ))}
                 </div>
@@ -92,7 +87,8 @@ export default function SavingsPage() {
             id: 'pea-main',
             name: 'Main PEA',
             type: 'PEA',
-            currency: 'EUR'
+            currency: 'EUR',
+            isDefault: true
         };
 
         try {
@@ -108,7 +104,13 @@ export default function SavingsPage() {
     }
 }
 
-function AccountCard({ account, onView }: { account: SavingsAccount, onView: () => void }) {
+function AccountCard({
+    account,
+    onSetDefault
+}: {
+    account: SavingsAccount;
+    onSetDefault: () => void;
+}) {
     const [data, setData] = useState<{ summary: AccountSummary; positions: AssetPosition[] } | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -146,8 +148,18 @@ function AccountCard({ account, onView }: { account: SavingsAccount, onView: () 
     return (
         <div className={styles.accountCard}>
             <div className={styles.accountHeader}>
-                <h2 className={styles.accountName}>{account.name}</h2>
-                <span className={styles.accountType}>{account.type}</span>
+                <div>
+                    <h2 className={styles.accountName}>{account.name}</h2>
+                    <span className={styles.accountType}>{account.type}</span>
+                </div>
+                <button
+                    className={`${styles.defaultToggle} ${account.isDefault ? styles.defaultActive : ''}`}
+                    onClick={onSetDefault}
+                    title={account.isDefault ? 'Default account' : 'Set as default'}
+                    aria-label={account.isDefault ? 'Default account' : 'Set as default'}
+                >
+                    {account.isDefault ? '★' : '☆'}
+                </button>
             </div>
 
             <div className={styles.statsGrid}>
@@ -203,7 +215,9 @@ function AccountCard({ account, onView }: { account: SavingsAccount, onView: () 
             </div>
 
             <div style={{ marginTop: '1rem', textAlign: 'right' }}>
-                <button className={styles.secondaryButton} onClick={onView}>View Full Portfolio →</button>
+                <Link href={`/savings/${account.id}`} className={styles.secondaryButton}>
+                    View Full Portfolio →
+                </Link>
             </div>
         </div>
     );

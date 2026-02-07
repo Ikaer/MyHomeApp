@@ -5,16 +5,19 @@ import {
     AssetPosition,
     AccountSummary,
     AssetPriceInfo,
-    TransactionType
+    TransactionType,
+    AnnualAccountValue
 } from '@/models/savings';
 import { readJsonFile, writeJsonFile, ensureDirectoryExists } from './data';
 
 const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const SAVINGS_DATA_PATH = path.join(DATA_PATH, 'savings');
 const ACCOUNTS_FILE = path.join(SAVINGS_DATA_PATH, 'accounts.json');
+const ANNUAL_VALUES_DIR = path.join(SAVINGS_DATA_PATH, 'annual-values');
 
 // Initialize sub-app directory
 ensureDirectoryExists(SAVINGS_DATA_PATH);
+ensureDirectoryExists(ANNUAL_VALUES_DIR);
 
 /**
  * Get all savings accounts
@@ -38,6 +41,14 @@ export function saveSavingsAccount(account: SavingsAccount): boolean {
     const accounts = getAllSavingsAccounts();
     const index = accounts.findIndex(a => a.id === account.id);
 
+    if (account.isDefault) {
+        for (const existing of accounts) {
+            if (existing.id !== account.id && existing.isDefault) {
+                existing.isDefault = false;
+            }
+        }
+    }
+
     if (index >= 0) {
         accounts[index] = account;
     } else {
@@ -45,6 +56,26 @@ export function saveSavingsAccount(account: SavingsAccount): boolean {
     }
 
     return writeJsonFile(ACCOUNTS_FILE, accounts);
+}
+
+/**
+ * Set the default savings account (exclusive)
+ */
+export function setDefaultSavingsAccount(accountId: string): SavingsAccount[] | null {
+    const accounts = getAllSavingsAccounts();
+    const target = accounts.find(a => a.id === accountId);
+
+    if (!target) {
+        return null;
+    }
+
+    const updated = accounts.map(account => ({
+        ...account,
+        isDefault: account.id === accountId
+    }));
+
+    const success = writeJsonFile(ACCOUNTS_FILE, updated);
+    return success ? updated : null;
 }
 
 /**
@@ -63,6 +94,22 @@ export function saveTransactions(accountId: string, transactions: Transaction[])
     ensureDirectoryExists(transactionsDir);
     const transactionsFile = path.join(transactionsDir, `${accountId}.json`);
     return writeJsonFile(transactionsFile, transactions);
+}
+
+/**
+ * Get annual account values for a specific account
+ */
+export function getAnnualAccountValues(accountId: string): AnnualAccountValue[] {
+    const valuesFile = path.join(ANNUAL_VALUES_DIR, `${accountId}.json`);
+    return readJsonFile<AnnualAccountValue[]>(valuesFile, []);
+}
+
+/**
+ * Save annual account values for a specific account
+ */
+export function saveAnnualAccountValues(accountId: string, values: AnnualAccountValue[]): boolean {
+    const valuesFile = path.join(ANNUAL_VALUES_DIR, `${accountId}.json`);
+    return writeJsonFile(valuesFile, values);
 }
 
 /**

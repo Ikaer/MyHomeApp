@@ -195,6 +195,46 @@ a:hover {
   text-decoration: none;
 }
 
+/* Tabs (Material-like) */
+.tab-bar {
+  display: inline-flex;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.tab-button {
+  background: transparent;
+  color: var(--text-secondary);
+  border: none;
+  padding: 0.5rem 0.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.tab-button:hover {
+  color: var(--text-primary);
+}
+
+.tab-button.active {
+  color: var(--text-primary);
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--accent-primary);
+  border-radius: 2px;
+}
+
 /* Status indicators */
 .status {
   display: inline-flex;

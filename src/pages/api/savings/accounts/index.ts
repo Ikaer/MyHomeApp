@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getAllSavingsAccounts, saveSavingsAccount } from '@/lib/savings';
+import { getAllSavingsAccounts, saveSavingsAccount, setDefaultSavingsAccount } from '@/lib/savings';
 import { SavingsAccount } from '@/models/savings';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -22,6 +22,20 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(201).json(account);
     }
 
-    res.setHeader('Allow', ['GET', 'POST']);
+    if (req.method === 'PATCH') {
+        const { accountId } = req.body as { accountId?: string };
+        if (!accountId) {
+            return res.status(400).json({ error: 'Missing account ID' });
+        }
+
+        const updated = setDefaultSavingsAccount(accountId);
+        if (!updated) {
+            return res.status(404).json({ error: 'Account not found or failed to update' });
+        }
+
+        return res.status(200).json(updated);
+    }
+
+    res.setHeader('Allow', ['GET', 'POST', 'PATCH']);
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
 }

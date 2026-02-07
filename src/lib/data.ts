@@ -194,7 +194,7 @@ export function getSubApps(): SubApp[] {
         name: 'Savings',
         description: 'Manage your financial investments',
         icon: '💰',
-        route: '/savings',
+        route: '/savings/default',
         enabled: true
       }
     ];

@@ -37,6 +37,7 @@ export interface SavingsAccount {
     type: 'PEA' | 'Life Insurance' | 'Other';
     description?: string;
     currency: string;
+    isDefault?: boolean;
 }
 
 export interface AccountSummary {
@@ -57,4 +58,10 @@ export interface AssetPriceInfo {
     currentPrice: number;
     priceHistory?: PriceHistory[]; // For sparklines
     lastUpdated: string;
+}
+
+export interface AnnualAccountValue {
+    year: number;
+    endValue: number;
+    endDate?: string;
 }
