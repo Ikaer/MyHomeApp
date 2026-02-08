@@ -1,0 +1,13 @@
+.assetMeta {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.assetMetaDivider {
+    color: #4b5563;
+}

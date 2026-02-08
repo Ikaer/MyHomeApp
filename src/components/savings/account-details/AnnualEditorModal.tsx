@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from '@/components/shared';
-import styles from '@/styles/savings.module.css';
+import sharedStyles from '@/components/savings/SavingsShared.module.css';
 
 interface AnnualEditorModalProps {
   open: boolean;
@@ -29,30 +29,30 @@ export default function AnnualEditorModal({
       size="sm"
       footer={
         <>
-          <button type="button" className={styles.secondaryButton} onClick={onClose}>
+          <button type="button" className={sharedStyles.secondaryButton} onClick={onClose}>
             Cancel
           </button>
-          <button type="button" className={styles.button} onClick={onSave}>
+          <button type="button" className={sharedStyles.button} onClick={onSave}>
             Save
           </button>
         </>
       }
     >
-      <div className={styles.formGroup}>
-        <label className={styles.label}>Year</label>
+      <div className={sharedStyles.formGroup}>
+        <label className={sharedStyles.label}>Year</label>
         <input
           type="text"
-          className={styles.input}
+          className={sharedStyles.input}
           value={year ?? ''}
           readOnly
         />
       </div>
-      <div className={styles.formGroup}>
-        <label className={styles.label}>End of Year Value ({currency})</label>
+      <div className={sharedStyles.formGroup}>
+        <label className={sharedStyles.label}>End of Year Value ({currency})</label>
         <input
           type="number"
           step="any"
-          className={styles.input}
+          className={sharedStyles.input}
           value={endValue}
           onChange={event => onChangeEndValue(event.target.value)}
           placeholder="e.g. 12500.45"

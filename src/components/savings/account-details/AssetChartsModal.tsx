@@ -9,7 +9,8 @@ import {
   YAxis
 } from 'recharts';
 import { Modal } from '@/components/shared';
-import styles from '@/styles/savings.module.css';
+import sharedStyles from '@/components/savings/SavingsShared.module.css';
+import styles from './AssetChartsModal.module.css';
 import { AssetChartPoint, AssetMetaInfo } from './types';
 
 interface AssetChartsModalProps {
@@ -48,12 +49,12 @@ export default function AssetChartsModal({
       }
     >
       {!activeIsin ? (
-        <div className={styles.chartEmpty}>No asset selected.</div>
+        <div className={sharedStyles.chartEmpty}>No asset selected.</div>
       ) : assetChartData[activeIsin]?.length ? (
-        <div className={styles.chartsGrid}>
-            <div className={styles.chartPanel}>
-              <div className={styles.chartPanelTitle}>Market Price</div>
-              <div className={styles.chartPanelBody}>
+        <div className={sharedStyles.chartsGrid}>
+            <div className={sharedStyles.chartPanel}>
+              <div className={sharedStyles.chartPanelTitle}>Market Price</div>
+              <div className={sharedStyles.chartPanelBody}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={assetChartData[activeIsin]} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
@@ -84,9 +85,9 @@ export default function AssetChartsModal({
                 </ResponsiveContainer>
               </div>
             </div>
-            <div className={styles.chartPanel}>
-              <div className={styles.chartPanelTitle}>Market Value</div>
-              <div className={styles.chartPanelBody}>
+            <div className={sharedStyles.chartPanel}>
+              <div className={sharedStyles.chartPanelTitle}>Market Value</div>
+              <div className={sharedStyles.chartPanelBody}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={assetChartData[activeIsin]} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
@@ -117,9 +118,9 @@ export default function AssetChartsModal({
                 </ResponsiveContainer>
               </div>
             </div>
-            <div className={styles.chartPanel}>
-              <div className={styles.chartPanelTitle}>Unrealized Gain/Loss</div>
-              <div className={styles.chartPanelBody}>
+            <div className={sharedStyles.chartPanel}>
+              <div className={sharedStyles.chartPanelTitle}>Unrealized Gain/Loss</div>
+              <div className={sharedStyles.chartPanelBody}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={assetChartData[activeIsin]} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
@@ -150,9 +151,9 @@ export default function AssetChartsModal({
                 </ResponsiveContainer>
               </div>
             </div>
-            <div className={styles.chartPanel}>
-              <div className={styles.chartPanelTitle}>Gain/Loss %</div>
-              <div className={styles.chartPanelBody}>
+            <div className={sharedStyles.chartPanel}>
+              <div className={sharedStyles.chartPanelTitle}>Gain/Loss %</div>
+              <div className={sharedStyles.chartPanelBody}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={assetChartData[activeIsin]} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
@@ -185,7 +186,7 @@ export default function AssetChartsModal({
             </div>
         </div>
       ) : (
-        <div className={styles.chartEmpty}>No historical data available.</div>
+        <div className={sharedStyles.chartEmpty}>No historical data available.</div>
       )}
     </Modal>
   );

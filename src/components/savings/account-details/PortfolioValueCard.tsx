@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
-import styles from '@/styles/savings.module.css';
+import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { HistoryChartPoint } from './types';
 
 interface PortfolioValueCardProps {
@@ -19,14 +19,14 @@ interface PortfolioValueCardProps {
 
 export default function PortfolioValueCard({ loading, data, formatCurrency }: PortfolioValueCardProps) {
   return (
-    <div className={styles.accountCard} style={{ cursor: 'default' }}>
-      <h2 className={styles.accountName}>Portfolio Value</h2>
+    <div className={sharedStyles.accountCard} style={{ cursor: 'default' }}>
+      <h2 className={sharedStyles.accountName}>Portfolio Value</h2>
       {loading ? (
-        <div className={styles.chartEmpty}>Loading history...</div>
+        <div className={sharedStyles.chartEmpty}>Loading history...</div>
       ) : data.length === 0 ? (
-        <div className={styles.chartEmpty}>No historical data available.</div>
+        <div className={sharedStyles.chartEmpty}>No historical data available.</div>
       ) : (
-        <div className={styles.chartContainer}>
+        <div className={sharedStyles.chartContainer}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
               <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />

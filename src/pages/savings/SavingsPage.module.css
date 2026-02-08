@@ -1,0 +1,58 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: #f3f4f6;
+}
+
+.accountHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.defaultToggle {
+    background: rgba(31, 41, 55, 0.6);
+    border: 1px solid rgba(75, 85, 99, 0.4);
+    color: #9ca3af;
+    font-size: 1.5rem;
+    line-height: 1;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.defaultToggle:hover {
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.5);
+    background: rgba(31, 41, 55, 0.8);
+    transform: scale(1.05);
+}
+
+.defaultActive {
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.6);
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.accountType {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    border-radius: 9999px;
+    font-weight: 500;
+}

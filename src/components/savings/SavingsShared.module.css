@@ -1,23 +1,3 @@
-.savingsContainer {
-    padding: 2rem;
-    max-width: 2560px;
-    margin: 0 auto;
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin: 0;
-    color: #f3f4f6;
-}
-
 .accountGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -41,56 +21,11 @@
     border-color: rgba(59, 130, 246, 0.5);
 }
 
-.accountHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1.5rem;
-}
-
-.defaultToggle {
-    background: rgba(31, 41, 55, 0.6);
-    border: 1px solid rgba(75, 85, 99, 0.4);
-    color: #9ca3af;
-    font-size: 1.5rem;
-    line-height: 1;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 9999px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
-}
-
-.defaultToggle:hover {
-    color: #fbbf24;
-    border-color: rgba(251, 191, 36, 0.5);
-    background: rgba(31, 41, 55, 0.8);
-    transform: scale(1.05);
-}
-
-.defaultActive {
-    color: #fbbf24;
-    border-color: rgba(251, 191, 36, 0.6);
-    background: rgba(251, 191, 36, 0.1);
-}
-
 .accountName {
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
     color: #f9fafb;
-}
-
-.accountType {
-    font-size: 0.875rem;
-    padding: 0.25rem 0.75rem;
-    background: rgba(59, 130, 246, 0.1);
-    color: #60a5fa;
-    border-radius: 9999px;
-    font-weight: 500;
 }
 
 .statsGrid {
@@ -124,20 +59,6 @@
 
 .negative {
     color: #ef4444;
-}
-
-.xirrBadge {
-    margin-top: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: #9ca3af;
-}
-
-.xirrValue {
-    font-weight: 700;
-    color: #10b981;
 }
 
 .tableContainer {
@@ -221,23 +142,9 @@
     color: #93c5fd;
 }
 
-.sparklineCell {
-    width: 160px;
-}
-
 .table td button.secondaryButton {
     padding: 0.4rem 0.75rem;
     font-size: 0.8rem;
-}
-
-.sparklineChart {
-    width: 140px;
-    height: 42px;
-}
-
-.sparklineEmpty {
-    color: #6b7280;
-    font-size: 0.875rem;
 }
 
 .emptyState {
@@ -287,40 +194,6 @@
     background: rgba(75, 85, 99, 0.7);
 }
 
-
-.modalOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(4px);
-}
-
-.modalContent {
-    background: #1f2937;
-    border: 1px solid rgba(75, 85, 99, 0.5);
-    border-radius: 1rem;
-    padding: 2rem;
-    width: 80vw;
-    max-width: 1200px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-.modalHeader {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-}
-
 .chartsGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -346,20 +219,6 @@
     width: 100%;
     height: 200px;
     margin-top: 0.75rem;
-}
-
-.assetMeta {
-    margin-top: 0.35rem;
-    font-size: 0.8rem;
-    color: #9ca3af;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    align-items: center;
-}
-
-.assetMetaDivider {
-    color: #4b5563;
 }
 
 .formGrid {

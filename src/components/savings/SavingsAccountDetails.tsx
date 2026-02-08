@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import styles from '@/styles/savings.module.css';
+import sharedStyles from '@/components/savings/SavingsShared.module.css';
+import detailsStyles from './SavingsAccountDetails.module.css';
 import { SavingsAccount, Transaction } from '@/models/savings';
 import TransactionForm from './account-details/TransactionForm';
 import AccountHeaderActions from './account-details/AccountHeaderActions';
@@ -174,8 +175,8 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
     return sortTransactions(transactions, transactionsSort);
   }, [transactions, transactionsSort]);
 
-  if (loading) return <div className={styles.emptyState}>Loading account details...</div>;
-  if (!data) return <div className={styles.emptyState}>Error loading data</div>;
+  if (loading) return <div className={sharedStyles.emptyState}>Loading account details...</div>;
+  if (!data) return <div className={sharedStyles.emptyState}>Error loading data</div>;
 
   const { summary } = data;
 
@@ -225,7 +226,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
         onShowCharts={() => setShowCharts(true)}
       />
 
-      <div className={styles.accountGrid}>
+      <div className={sharedStyles.accountGrid}>
         <PerformanceCard
           summary={summary}
           formatCurrency={formatCurrency}
@@ -248,7 +249,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
         />
       </div>
 
-      <div className={styles.header} style={{ borderBottom: '1px solid rgba(75, 85, 99, 0.3)', paddingBottom: '0.5rem' }}>
+      <div className={detailsStyles.tabHeader} style={{ borderBottom: '1px solid rgba(75, 85, 99, 0.3)', paddingBottom: '0.5rem' }}>
         <div className="tab-bar">
           <button
             className={`tab-button ${activeTab === 'positions' ? 'active' : ''}`}

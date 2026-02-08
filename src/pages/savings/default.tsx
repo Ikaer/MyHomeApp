@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import styles from '@/styles/savings.module.css';
+import layoutStyles from './SavingsLayout.module.css';
+import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount } from '@/models/savings';
 
 export default function SavingsDefaultRedirect() {
@@ -32,11 +33,11 @@ export default function SavingsDefaultRedirect() {
     }, [router]);
 
     return (
-        <div className={styles.savingsContainer}>
+        <div className={layoutStyles.savingsContainer}>
             <Head>
                 <title>MyHomeApp - Savings</title>
             </Head>
-            <div className={styles.emptyState}>Loading default account...</div>
+            <div className={sharedStyles.emptyState}>Loading default account...</div>
         </div>
     );
 }

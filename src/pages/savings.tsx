@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import styles from '@/styles/savings.module.css';
+import layoutStyles from './savings/SavingsLayout.module.css';
+import pageStyles from './savings/SavingsPage.module.css';
+import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, AccountSummary, AssetPosition } from '@/models/savings';
 
 export default function SavingsPage() {
@@ -43,33 +45,33 @@ export default function SavingsPage() {
     };
 
     return (
-        <div className={styles.savingsContainer}>
+        <div className={layoutStyles.savingsContainer}>
             <Head>
                 <title>MyHomeApp - Savings</title>
             </Head>
 
-            <div className={styles.header}>
+            <div className={pageStyles.header}>
                 <div>
-                    <h1 className={styles.title}>Savings Management</h1>
+                    <h1 className={pageStyles.title}>Savings Management</h1>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button className={styles.button} onClick={() => alert('Add Account feature coming soon!')}>
+                    <button className={sharedStyles.button} onClick={() => alert('Add Account feature coming soon!')}>
                         + New Account
                     </button>
                 </div>
             </div>
 
             {loading ? (
-                <div className={styles.emptyState}>Loading accounts...</div>
+                <div className={sharedStyles.emptyState}>Loading accounts...</div>
             ) : accounts.length === 0 ? (
-                <div className={styles.emptyState}>
+                <div className={sharedStyles.emptyState}>
                     <p>No savings accounts found.</p>
-                    <button className={styles.button} onClick={createSampleAccount}>
+                    <button className={sharedStyles.button} onClick={createSampleAccount}>
                         Create Sample PEA Account
                     </button>
                 </div>
             ) : (
-                <div className={styles.accountGrid}>
+                <div className={sharedStyles.accountGrid}>
                     {accounts.map(account => (
                         <AccountCard
                             key={account.id}
@@ -139,21 +141,21 @@ function AccountCard({
         return (val * 1).toFixed(2) + '%';
     };
 
-    if (loading) return <div className={styles.accountCard}>Loading summary...</div>;
-    if (!data) return <div className={styles.accountCard}>Error loading data</div>;
+    if (loading) return <div className={sharedStyles.accountCard}>Loading summary...</div>;
+    if (!data) return <div className={sharedStyles.accountCard}>Error loading data</div>;
 
     const { summary, positions } = data;
     const isPositive = summary.totalGainLoss >= 0;
 
     return (
-        <div className={styles.accountCard}>
-            <div className={styles.accountHeader}>
+        <div className={sharedStyles.accountCard}>
+            <div className={pageStyles.accountHeader}>
                 <div>
-                    <h2 className={styles.accountName}>{account.name}</h2>
-                    <span className={styles.accountType}>{account.type}</span>
+                    <h2 className={sharedStyles.accountName}>{account.name}</h2>
+                    <span className={pageStyles.accountType}>{account.type}</span>
                 </div>
                 <button
-                    className={`${styles.defaultToggle} ${account.isDefault ? styles.defaultActive : ''}`}
+                    className={`${pageStyles.defaultToggle} ${account.isDefault ? pageStyles.defaultActive : ''}`}
                     onClick={onSetDefault}
                     title={account.isDefault ? 'Default account' : 'Set as default'}
                     aria-label={account.isDefault ? 'Default account' : 'Set as default'}
@@ -162,24 +164,24 @@ function AccountCard({
                 </button>
             </div>
 
-            <div className={styles.statsGrid}>
-                <div className={styles.statItem}>
-                    <span className={styles.statLabel}>Total Invested</span>
-                    <span className={styles.statValue}>{formatCurrency(summary.totalInvested)}</span>
+            <div className={sharedStyles.statsGrid}>
+                <div className={sharedStyles.statItem}>
+                    <span className={sharedStyles.statLabel}>Total Invested</span>
+                    <span className={sharedStyles.statValue}>{formatCurrency(summary.totalInvested)}</span>
                 </div>
-                <div className={styles.statItem}>
-                    <span className={styles.statLabel}>Current Value</span>
-                    <span className={styles.statValue}>{formatCurrency(summary.currentValue)}</span>
+                <div className={sharedStyles.statItem}>
+                    <span className={sharedStyles.statLabel}>Current Value</span>
+                    <span className={sharedStyles.statValue}>{formatCurrency(summary.currentValue)}</span>
                 </div>
-                <div className={styles.statItem}>
-                    <span className={styles.statLabel}>Total Gain/Loss</span>
-                    <span className={`${styles.statValue} ${isPositive ? styles.positive : styles.negative}`}>
+                <div className={sharedStyles.statItem}>
+                    <span className={sharedStyles.statLabel}>Total Gain/Loss</span>
+                    <span className={`${sharedStyles.statValue} ${isPositive ? sharedStyles.positive : sharedStyles.negative}`}>
                         {isPositive ? '+' : ''}{formatCurrency(summary.totalGainLoss)}
                     </span>
                 </div>
-                <div className={styles.statItem}>
-                    <span className={styles.statLabel}>XIRR Performance</span>
-                    <span className={`${styles.statValue} ${summary.xirr >= 0 ? styles.positive : styles.negative}`}>
+                <div className={sharedStyles.statItem}>
+                    <span className={sharedStyles.statLabel}>XIRR Performance</span>
+                    <span className={`${sharedStyles.statValue} ${summary.xirr >= 0 ? sharedStyles.positive : sharedStyles.negative}`}>
                         {formatPercent(summary.xirr * 100)}
                     </span>
                 </div>
@@ -187,8 +189,8 @@ function AccountCard({
 
             <div style={{ marginTop: '1.5rem' }}>
                 <h3 style={{ fontSize: '0.875rem', color: '#9ca3af', marginBottom: '0.5rem' }}>Top Positions</h3>
-                <div className={styles.tableContainer}>
-                    <table className={styles.table}>
+                <div className={sharedStyles.tableContainer}>
+                    <table className={sharedStyles.table}>
                         <thead>
                             <tr>
                                 <th>Asset</th>
@@ -201,10 +203,10 @@ function AccountCard({
                                 <tr key={pos.ticker}>
                                     <td>
                                         <div>{pos.name}</div>
-                                        <div className={styles.ticker}>{pos.ticker}</div>
+                                        <div className={sharedStyles.ticker}>{pos.ticker}</div>
                                     </td>
                                     <td>{formatCurrency(pos.currentValue)}</td>
-                                    <td className={pos.unrealizedGainLoss >= 0 ? styles.positive : styles.negative}>
+                                    <td className={pos.unrealizedGainLoss >= 0 ? sharedStyles.positive : sharedStyles.negative}>
                                         {pos.unrealizedGainLoss >= 0 ? '+' : ''}{formatPercent(pos.unrealizedGainLossPercentage)}
                                     </td>
                                 </tr>
@@ -215,7 +217,7 @@ function AccountCard({
             </div>
 
             <div style={{ marginTop: '1rem', textAlign: 'right' }}>
-                <Link href={`/savings/${account.id}`} className={styles.secondaryButton}>
+                <Link href={`/savings/${account.id}`} className={sharedStyles.secondaryButton}>
                     View Full Portfolio →
                 </Link>
             </div>

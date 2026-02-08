@@ -9,7 +9,7 @@ import {
   YAxis
 } from 'recharts';
 import { Modal } from '@/components/shared';
-import styles from '@/styles/savings.module.css';
+import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { HistoryMetricPoint } from './types';
 
 interface AllChartsModalProps {
@@ -30,14 +30,14 @@ export default function AllChartsModal({
   return (
     <Modal open={open} title="All Charts" onClose={onClose} size="lg">
       {loading ? (
-        <div className={styles.chartEmpty}>Loading history...</div>
+        <div className={sharedStyles.chartEmpty}>Loading history...</div>
       ) : metrics.length === 0 ? (
-        <div className={styles.chartEmpty}>No historical data available.</div>
+        <div className={sharedStyles.chartEmpty}>No historical data available.</div>
       ) : (
-        <div className={styles.chartsGrid}>
-            <div className={styles.chartPanel}>
-              <div className={styles.chartPanelTitle}>Total Invested</div>
-              <div className={styles.chartPanelBody}>
+        <div className={sharedStyles.chartsGrid}>
+            <div className={sharedStyles.chartPanel}>
+              <div className={sharedStyles.chartPanelTitle}>Total Invested</div>
+              <div className={sharedStyles.chartPanelBody}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={metrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
@@ -68,9 +68,9 @@ export default function AllChartsModal({
                 </ResponsiveContainer>
               </div>
             </div>
-            <div className={styles.chartPanel}>
-              <div className={styles.chartPanelTitle}>Current Value</div>
-              <div className={styles.chartPanelBody}>
+            <div className={sharedStyles.chartPanel}>
+              <div className={sharedStyles.chartPanelTitle}>Current Value</div>
+              <div className={sharedStyles.chartPanelBody}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={metrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
@@ -101,9 +101,9 @@ export default function AllChartsModal({
                 </ResponsiveContainer>
               </div>
             </div>
-            <div className={styles.chartPanel}>
-              <div className={styles.chartPanelTitle}>Total Gain/Loss</div>
-              <div className={styles.chartPanelBody}>
+            <div className={sharedStyles.chartPanel}>
+              <div className={sharedStyles.chartPanelTitle}>Total Gain/Loss</div>
+              <div className={sharedStyles.chartPanelBody}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={metrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
@@ -134,9 +134,9 @@ export default function AllChartsModal({
                 </ResponsiveContainer>
               </div>
             </div>
-            <div className={styles.chartPanel}>
-              <div className={styles.chartPanelTitle}>XIRR</div>
-              <div className={styles.chartPanelBody}>
+            <div className={sharedStyles.chartPanel}>
+              <div className={sharedStyles.chartPanelTitle}>XIRR</div>
+              <div className={sharedStyles.chartPanelBody}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={metrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
@@ -167,9 +167,9 @@ export default function AllChartsModal({
                 </ResponsiveContainer>
               </div>
             </div>
-            <div className={styles.chartPanel}>
-              <div className={styles.chartPanelTitle}>Current Year XIRR</div>
-              <div className={styles.chartPanelBody}>
+            <div className={sharedStyles.chartPanel}>
+              <div className={sharedStyles.chartPanelTitle}>Current Year XIRR</div>
+              <div className={sharedStyles.chartPanelBody}>
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={metrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />

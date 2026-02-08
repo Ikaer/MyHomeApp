@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import styles from '@/styles/savings.module.css';
+import layoutStyles from './SavingsLayout.module.css';
+import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount } from '@/models/savings';
 import SavingsAccountDetails from '@/components/savings/SavingsAccountDetails';
 
@@ -35,24 +36,24 @@ export default function SavingsAccountPage() {
 
     if (loading) {
         return (
-            <div className={styles.savingsContainer}>
+            <div className={layoutStyles.savingsContainer}>
                 <Head>
                     <title>MyHomeApp - Savings</title>
                 </Head>
-                <div className={styles.emptyState}>Loading account...</div>
+                <div className={sharedStyles.emptyState}>Loading account...</div>
             </div>
         );
     }
 
     if (!account) {
         return (
-            <div className={styles.savingsContainer}>
+            <div className={layoutStyles.savingsContainer}>
                 <Head>
                     <title>MyHomeApp - Savings</title>
                 </Head>
-                <div className={styles.emptyState}>
+                <div className={sharedStyles.emptyState}>
                     <p>Account not found.</p>
-                    <Link href="/savings" className={styles.secondaryButton}>
+                    <Link href="/savings" className={sharedStyles.secondaryButton}>
                         ← Back to Savings
                     </Link>
                 </div>
@@ -61,7 +62,7 @@ export default function SavingsAccountPage() {
     }
 
     return (
-        <div className={styles.savingsContainer}>
+        <div className={layoutStyles.savingsContainer}>
             <Head>
                 <title>MyHomeApp - {account.name}</title>
             </Head>

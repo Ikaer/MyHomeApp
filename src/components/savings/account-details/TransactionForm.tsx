@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal } from '@/components/shared';
-import styles from '@/styles/savings.module.css';
+import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { Transaction, TransactionType } from '@/models/savings';
 
 interface TransactionFormProps {
@@ -105,23 +105,23 @@ export default function TransactionForm({
             size="md"
         >
             <form onSubmit={handleSubmit}>
-                <div className={styles.formGrid}>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Date</label>
+                <div className={sharedStyles.formGrid}>
+                    <div className={sharedStyles.formGroup}>
+                        <label className={sharedStyles.label}>Date</label>
                         <input
                             type="date"
                             name="date"
-                            className={styles.input}
+                            className={sharedStyles.input}
                             value={formData.date}
                             onChange={handleChange}
                             required
                         />
                     </div>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Type</label>
+                    <div className={sharedStyles.formGroup}>
+                        <label className={sharedStyles.label}>Type</label>
                         <select
                             name="type"
-                            className={styles.select}
+                            className={sharedStyles.select}
                             value={formData.type}
                             onChange={handleChange}
                         >
@@ -132,12 +132,12 @@ export default function TransactionForm({
                         </select>
                     </div>
 
-                    <div className={styles.formGroupFull}>
-                        <label className={styles.label}>Asset Name</label>
+                    <div className={sharedStyles.formGroupFull}>
+                        <label className={sharedStyles.label}>Asset Name</label>
                         <input
                             type="text"
                             name="assetName"
-                            className={styles.input}
+                            className={sharedStyles.input}
                             placeholder="e.g. iShares MSCI World Swap PEA"
                             value={formData.assetName}
                             onChange={handleChange}
@@ -145,84 +145,84 @@ export default function TransactionForm({
                         />
                     </div>
 
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Ticker</label>
+                    <div className={sharedStyles.formGroup}>
+                        <label className={sharedStyles.label}>Ticker</label>
                         <input
                             type="text"
                             name="ticker"
-                            className={styles.input}
+                            className={sharedStyles.input}
                             placeholder="e.g. WPEA.PA"
                             value={formData.ticker}
                             onChange={handleChange}
                             required
                         />
                     </div>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>ISIN</label>
+                    <div className={sharedStyles.formGroup}>
+                        <label className={sharedStyles.label}>ISIN</label>
                         <input
                             type="text"
                             name="isin"
-                            className={styles.input}
+                            className={sharedStyles.input}
                             placeholder="e.g. IE0002XZSHO1"
                             value={formData.isin}
                             onChange={handleChange}
                         />
                     </div>
 
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Quantity</label>
+                    <div className={sharedStyles.formGroup}>
+                        <label className={sharedStyles.label}>Quantity</label>
                         <input
                             type="number"
                             step="any"
                             name="quantity"
-                            className={styles.input}
+                            className={sharedStyles.input}
                             value={formData.quantity}
                             onChange={handleChange}
                             required
                         />
                     </div>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Unit Price (EUR)</label>
+                    <div className={sharedStyles.formGroup}>
+                        <label className={sharedStyles.label}>Unit Price (EUR)</label>
                         <input
                             type="number"
                             step="any"
                             name="unitPrice"
-                            className={styles.input}
+                            className={sharedStyles.input}
                             value={formData.unitPrice}
                             onChange={handleChange}
                             required
                         />
                     </div>
 
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>Fees (EUR)</label>
+                    <div className={sharedStyles.formGroup}>
+                        <label className={sharedStyles.label}>Fees (EUR)</label>
                         <input
                             type="number"
                             step="any"
                             name="fees"
-                            className={styles.input}
+                            className={sharedStyles.input}
                             value={formData.fees}
                             onChange={handleChange}
                         />
                     </div>
-                    <div className={styles.formGroup}>
-                        <label className={styles.label}>TTF (EUR)</label>
+                    <div className={sharedStyles.formGroup}>
+                        <label className={sharedStyles.label}>TTF (EUR)</label>
                         <input
                             type="number"
                             step="any"
                             name="ttf"
-                            className={styles.input}
+                            className={sharedStyles.input}
                             value={formData.ttf}
                             onChange={handleChange}
                         />
                     </div>
                 </div>
 
-                <div className={styles.formActions}>
-                    <button type="button" className={styles.secondaryButton} onClick={onClose}>
+                <div className={sharedStyles.formActions}>
+                    <button type="button" className={sharedStyles.secondaryButton} onClick={onClose}>
                         Cancel
                     </button>
-                    <button type="submit" className={styles.button}>
+                    <button type="submit" className={sharedStyles.button}>
                         {mode === 'edit' ? 'Save Changes' : 'Add Transaction'}
                     </button>
                 </div>
