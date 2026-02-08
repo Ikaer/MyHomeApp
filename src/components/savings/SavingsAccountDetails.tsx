@@ -268,6 +268,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
                     : 0;
                 return {
                     date: entry.timestamp.slice(0, 10),
+                    totalInvested: entry.totalInvested,
                     currentValue: entry.currentValue,
                     gainLossPct
                 };
@@ -491,7 +492,15 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
             )}
 
             <div className={styles.header}>
-                <button className={styles.secondaryButton} onClick={onBack}>← Go to accounts</button>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                    <button className={styles.secondaryButton} onClick={onBack}>← Go to accounts</button>
+                    <div style={{ width: '2rem' }} />
+                    <button className={styles.button} onClick={() => setShowForm(true)}>
+                        + Add Transaction
+                    </button>
+                    <button className={styles.secondaryButton} onClick={fetchData}>Refresh Prices</button>
+                    <button className={styles.secondaryButton} onClick={handleCopyContext}>Copy Context</button>
+                </div>
                 <h1 className={styles.title}>{account.name}</h1>
             </div>
 
@@ -519,73 +528,92 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
                     </div>
                 </div>
 
-                {/* History */}
+                {/* Portfolio Value */}
                 <div className={styles.accountCard} style={{ cursor: 'default' }}>
-                    <h2 className={styles.accountName}>History</h2>
+                    <h2 className={styles.accountName}>Portfolio Value</h2>
                     {historyLoading ? (
                         <div className={styles.chartEmpty}>Loading history...</div>
                     ) : historyChartData.length === 0 ? (
                         <div className={styles.chartEmpty}>No historical data available.</div>
                     ) : (
-                        <div className={styles.chartStack}>
-                            <div className={styles.chartBlock}>
-                                <div className={styles.chartTitle}>Portfolio Value</div>
-                                <div className={styles.chartContainer}>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={historyChartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                                            <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
-                                            <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
-                                            <YAxis
-                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
-                                                tickFormatter={value => formatCurrency(Number(value))}
-                                                width={90}
-                                            />
-                                            <Tooltip
-                                                contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
-                                                labelStyle={{ color: '#9ca3af' }}
-                                                formatter={(value) => formatCurrency(Number(value ?? 0))}
-                                            />
-                                            <Line
-                                                type="monotone"
-                                                dataKey="currentValue"
-                                                stroke="#60a5fa"
-                                                strokeWidth={2}
-                                                dot={false}
-                                                isAnimationActive={false}
-                                            />
-                                        </LineChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-                            <div className={styles.chartBlock}>
-                                <div className={styles.chartTitle}>Gain/Loss %</div>
-                                <div className={styles.chartContainer}>
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={historyChartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                                            <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
-                                            <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
-                                            <YAxis
-                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
-                                                tickFormatter={value => `${Number(value).toFixed(2)}%`}
-                                                width={70}
-                                            />
-                                            <Tooltip
-                                                contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
-                                                labelStyle={{ color: '#9ca3af' }}
-                                                formatter={(value) => `${Number(value ?? 0).toFixed(2)}%`}
-                                            />
-                                            <Line
-                                                type="monotone"
-                                                dataKey="gainLossPct"
-                                                stroke="#34d399"
-                                                strokeWidth={2}
-                                                dot={false}
-                                                isAnimationActive={false}
-                                            />
-                                        </LineChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
+                        <div className={styles.chartContainer}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={historyChartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                    <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                    <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                    <YAxis
+                                        tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                        tickFormatter={value => formatCurrency(Number(value))}
+                                        width={90}
+                                        domain={([dataMin, dataMax]) => {
+                                            const range = Math.max(dataMax - dataMin, 1);
+                                            return [dataMin - range * 0.05, dataMax + range * 0.05];
+                                        }}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                        labelStyle={{ color: '#9ca3af' }}
+                                        formatter={(value) => formatCurrency(Number(value ?? 0))}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="totalInvested"
+                                        stroke="#94a3b8"
+                                        strokeWidth={2}
+                                        dot={false}
+                                        isAnimationActive={false}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="currentValue"
+                                        stroke="#60a5fa"
+                                        strokeWidth={2}
+                                        dot={false}
+                                        isAnimationActive={false}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
+                </div>
+
+                {/* Gain/Loss % */}
+                <div className={styles.accountCard} style={{ cursor: 'default' }}>
+                    <h2 className={styles.accountName}>Gain/Loss %</h2>
+                    {historyLoading ? (
+                        <div className={styles.chartEmpty}>Loading history...</div>
+                    ) : historyChartData.length === 0 ? (
+                        <div className={styles.chartEmpty}>No historical data available.</div>
+                    ) : (
+                        <div className={styles.chartContainer}>
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={historyChartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                    <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                    <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                    <YAxis
+                                        tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                        tickFormatter={value => `${Number(value).toFixed(2)}%`}
+                                        width={70}
+                                        domain={([dataMin, dataMax]) => {
+                                            const range = Math.max(dataMax - dataMin, 0.1);
+                                            return [dataMin - range * 0.1, dataMax + range * 0.1];
+                                        }}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                        labelStyle={{ color: '#9ca3af' }}
+                                        formatter={(value) => `${Number(value ?? 0).toFixed(2)}%`}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="gainLossPct"
+                                        stroke="#34d399"
+                                        strokeWidth={2}
+                                        dot={false}
+                                        isAnimationActive={false}
+                                    />
+                                </LineChart>
+                            </ResponsiveContainer>
                         </div>
                     )}
                 </div>
@@ -633,21 +661,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
                     )}
                 </div>
 
-                {/* Quick Actions */}
-                <div className={styles.accountCard} style={{ cursor: 'default' }}>
-                    <h2 className={styles.accountName}>Actions</h2>
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
-                        <button
-                            className={styles.button}
-                            style={{ flex: 1 }}
-                            onClick={() => setShowForm(true)}
-                        >
-                            + Add Transaction
-                        </button>
-                        <button className={styles.secondaryButton} style={{ flex: 1 }} onClick={fetchData}>Refresh Prices</button>
-                        <button className={styles.secondaryButton} style={{ flex: 1 }} onClick={handleCopyContext}>Copy Context</button>
-                    </div>
-                </div>
+                
             </div>
 
             <div className={styles.header} style={{ borderBottom: '1px solid rgba(75, 85, 99, 0.3)', paddingBottom: '0.5rem' }}>
