@@ -7,7 +7,7 @@ interface AnnualEditorModalProps {
   endValue: string;
   currency: string;
   onChangeEndValue: (value: string) => void;
-  onCancel: () => void;
+  onClose: () => void;
   onSave: () => void;
 }
 
@@ -17,14 +17,14 @@ export default function AnnualEditorModal({
   endValue,
   currency,
   onChangeEndValue,
-  onCancel,
+  onClose,
   onSave
 }: AnnualEditorModalProps) {
   if (!open || year === null) return null;
 
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modalContent}>
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={event => event.stopPropagation()}>
         <h2 className={styles.accountName}>Annual Overview</h2>
         <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
           <label className={styles.label}>Year</label>
@@ -47,7 +47,7 @@ export default function AnnualEditorModal({
           />
         </div>
         <div className={styles.formActions}>
-          <button type="button" className={styles.secondaryButton} onClick={onCancel}>
+          <button type="button" className={styles.secondaryButton} onClick={onClose}>
             Cancel
           </button>
           <button type="button" className={styles.button} onClick={onSave}>

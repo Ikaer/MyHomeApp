@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import styles from '@/styles/savings.module.css';
 import { SavingsAccount, Transaction } from '@/models/savings';
-import TransactionForm from './TransactionForm';
+import TransactionForm from './account-details/TransactionForm';
 import AccountHeaderActions from './account-details/AccountHeaderActions';
 import PerformanceCard from './account-details/PerformanceCard';
 import PortfolioValueCard from './account-details/PortfolioValueCard';
@@ -181,15 +181,13 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
 
   return (
     <div>
-      {isTransactionEditorOpen && (
-        <TransactionForm
-          accountId={account.id}
-          mode={transactionEditorMode}
-          initialTransaction={editingTransaction}
-          onSave={saveTransaction}
-          onCancel={closeTransactionEditor}
-        />
-      )}
+      <TransactionForm
+        open={isTransactionEditorOpen}
+        mode={transactionEditorMode}
+        initialTransaction={editingTransaction}
+        onSave={saveTransaction}
+        onClose={closeTransactionEditor}
+      />
 
       <AnnualEditorModal
         open={editingYear !== null}
@@ -197,7 +195,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
         endValue={editingEndValue}
         currency={account.currency}
         onChangeEndValue={setEditingEndValue}
-        onCancel={closeAnnualEditor}
+        onClose={closeAnnualEditor}
         onSave={saveAnnualValue}
       />
 

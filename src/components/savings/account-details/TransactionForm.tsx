@@ -3,19 +3,19 @@ import styles from '@/styles/savings.module.css';
 import { Transaction, TransactionType } from '@/models/savings';
 
 interface TransactionFormProps {
-    accountId: string;
+    open?: boolean;
     mode?: 'add' | 'edit';
     initialTransaction?: Transaction | null;
     onSave: (transaction: Transaction) => void;
-    onCancel: () => void;
+    onClose: () => void;
 }
 
 export default function TransactionForm({
-    accountId,
+    open = true,
     mode = 'add',
     initialTransaction,
     onSave,
-    onCancel
+    onClose
 }: TransactionFormProps) {
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split('T')[0],
@@ -58,6 +58,8 @@ export default function TransactionForm({
         });
     }, [initialTransaction]);
 
+    if (!open) return null;
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -97,9 +99,14 @@ export default function TransactionForm({
     };
 
     return (
-        <div className={styles.modalOverlay}>
-            <div className={styles.modalContent}>
-                <h2 className={styles.accountName}>{mode === 'edit' ? 'Edit Transaction' : 'Add Transaction'}</h2>
+        <div className={styles.modalOverlay} onClick={onClose}>
+            <div className={styles.modalContent} onClick={event => event.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                    <h2 className={styles.accountName}>{mode === 'edit' ? 'Edit Transaction' : 'Add Transaction'}</h2>
+                    <button type="button" className={styles.secondaryButton} onClick={onClose}>
+                        Close
+                    </button>
+                </div>
                 <form onSubmit={handleSubmit}>
                     <div className={styles.formGrid}>
                         <div className={styles.formGroup}>
@@ -215,7 +222,7 @@ export default function TransactionForm({
                     </div>
 
                     <div className={styles.formActions}>
-                        <button type="button" className={styles.secondaryButton} onClick={onCancel}>
+                        <button type="button" className={styles.secondaryButton} onClick={onClose}>
                             Cancel
                         </button>
                         <button type="submit" className={styles.button}>
