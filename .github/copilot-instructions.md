@@ -150,6 +150,8 @@ const handleSubmit = async (e: React.FormEvent) => {
 };
 ```
 
+try to factorize common patterns into reusable hooks and utility functions to maintain consistency across the codebase (Modal, API calls, form handling, etc.)
+
 ## File Conventions
 
 ### TypeScript
@@ -303,4 +305,4 @@ export { NewComponent } from './NewComponent';
 export * from './[domain]';
 ```
 
-Remember: This project prioritizes maintainability, type safety, and consistent patterns across all subapps. When in doubt, follow the established patterns in the bookmarks and files subapps.
+Remember: This project prioritizes maintainability, type safety, and consistent patterns across all subapps. When in doubt, follow the established patterns in the animes and savings subapps, which are the most mature parts of the codebase.

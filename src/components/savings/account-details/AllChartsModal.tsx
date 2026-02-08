@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
+import { Modal } from '@/components/shared';
 import styles from '@/styles/savings.module.css';
 import { HistoryMetricPoint } from './types';
 
@@ -26,23 +27,14 @@ export default function AllChartsModal({
   onClose,
   formatCurrency
 }: AllChartsModalProps) {
-  if (!open) return null;
-
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalContent} onClick={event => event.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <h2 className={styles.accountName}>All Charts</h2>
-          <button type="button" className={styles.secondaryButton} onClick={onClose}>
-            Close
-          </button>
-        </div>
-        {loading ? (
-          <div className={styles.chartEmpty}>Loading history...</div>
-        ) : metrics.length === 0 ? (
-          <div className={styles.chartEmpty}>No historical data available.</div>
-        ) : (
-          <div className={styles.chartsGrid}>
+    <Modal open={open} title="All Charts" onClose={onClose} size="lg">
+      {loading ? (
+        <div className={styles.chartEmpty}>Loading history...</div>
+      ) : metrics.length === 0 ? (
+        <div className={styles.chartEmpty}>No historical data available.</div>
+      ) : (
+        <div className={styles.chartsGrid}>
             <div className={styles.chartPanel}>
               <div className={styles.chartPanelTitle}>Total Invested</div>
               <div className={styles.chartPanelBody}>
@@ -208,9 +200,8 @@ export default function AllChartsModal({
                 </ResponsiveContainer>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </Modal>
   );
 }

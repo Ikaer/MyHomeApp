@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Image from 'next/image';
 import { Bookmark, BookmarkCategory } from '@/types';
 
 interface BookmarkCardProps {
@@ -52,7 +53,7 @@ export default function BookmarkCard({ bookmark, categories, onEdit, onDelete }:
       <div className="bookmark-header">
         <div className="bookmark-favicon">
           {bookmark.favicon ? (
-            <img src={bookmark.favicon} alt="" width="16" height="16" />
+            <Image src={bookmark.favicon} alt="" width={16} height={16} unoptimized />
           ) : (
             <span>🔗</span>
           )}

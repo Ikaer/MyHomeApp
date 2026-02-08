@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Modal } from '@/components/shared';
 import { Bookmark, BookmarkCategory } from '@/types';
 
 interface BookmarkFormProps {
@@ -99,25 +100,24 @@ export default function BookmarkForm({ bookmark, categories, onSave, onCancel }:
   };
 
   return (
-    <div className="bookmark-form-overlay">
-      <div className="bookmark-form">
-        <div className="form-header">
-          <h2>{bookmark ? 'Edit Bookmark' : 'Add New Bookmark'}</h2>
-          <button onClick={onCancel} className="btn-close">✕</button>
+    <Modal
+      open={true}
+      title={bookmark ? 'Edit Bookmark' : 'Add New Bookmark'}
+      onClose={onCancel}
+      size="sm"
+    >
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="title">Title *</label>
+          <input
+            type="text"
+            id="title"
+            value={formData.title}
+            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+            required
+            placeholder="Enter bookmark title"
+          />
         </div>
-
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="title">Title *</label>
-            <input
-              type="text"
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              required
-              placeholder="Enter bookmark title"
-            />
-          </div>
 
           <div className="form-group">
             <label htmlFor="url">URL *</label>
@@ -203,20 +203,19 @@ export default function BookmarkForm({ bookmark, categories, onSave, onCancel }:
             )}
           </div>
 
-          <div className="form-actions">
-            <button type="button" onClick={onCancel} className="btn btn-secondary">
-              Cancel
-            </button>
-            <button 
-              type="submit" 
-              className="btn btn-primary"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Saving...' : (bookmark ? 'Update' : 'Create')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <div className="form-actions">
+          <button type="button" onClick={onCancel} className="btn btn-secondary">
+            Cancel
+          </button>
+          <button 
+            type="submit" 
+            className="btn btn-primary"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Saving...' : (bookmark ? 'Update' : 'Create')}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }

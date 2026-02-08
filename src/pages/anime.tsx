@@ -24,34 +24,6 @@ export default function AnimePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Check auth status on mount
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  // Handle OAuth callback
-  useEffect(() => {
-    if (!router.isReady) return;
-
-    const authParam = router.query.auth;
-    if (authParam) {
-      if (authParam === 'success') {
-        checkAuthStatus();
-      } else {
-        setAuthError('Authentication failed. Please try again.');
-      }
-      // Remove auth param from URL without affecting other params
-      const { auth, ...rest } = router.query;
-      router.replace({ pathname: router.pathname, query: rest }, undefined, { shallow: true });
-    }
-  }, [router.isReady, router.query, router]);
-
-  // Load animes when filters change
-  useEffect(() => {
-    if (!isReady) return;
-    loadAnimes();
-  }, [isReady, filters]);
-
   const checkAuthStatus = async () => {
     try {
       setIsAuthLoading(true);
@@ -117,6 +89,34 @@ export default function AnimePage() {
       setIsLoading(false);
     }
   }, [filters]);
+
+  // Check auth status on mount
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  // Handle OAuth callback
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const authParam = router.query.auth;
+    if (authParam) {
+      if (authParam === 'success') {
+        checkAuthStatus();
+      } else {
+        setAuthError('Authentication failed. Please try again.');
+      }
+      // Remove auth param from URL without affecting other params
+      const { auth, ...rest } = router.query;
+      router.replace({ pathname: router.pathname, query: rest }, undefined, { shallow: true });
+    }
+  }, [router.isReady, router.query, router]);
+
+  // Load animes when filters change
+  useEffect(() => {
+    if (!isReady) return;
+    loadAnimes();
+  }, [isReady, loadAnimes]);
 
   // Auth handlers
   const handleConnect = async () => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import TreeView, { TreeNode, buildTreeFromPaths } from '@/components/shared/TreeView';
 import styles from './FileExplorer.module.css';
 import type { FileSystemItem } from '@/models';
@@ -46,10 +46,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     { path: '/Downloads/README.md', name: 'README.md', type: 'file', size: 5120, extension: 'md' },
   ];
 
-  useEffect(() => {
-    loadFileSystem();
-  }, [rootPath, allowedExtensions, showHiddenFiles]);
-  const loadFileSystem = async () => {
+  const loadFileSystem = useCallback(async () => {
     setLoading(true);
     setError(null);
     
@@ -105,7 +102,11 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, [rootPath, allowedExtensions, showHiddenFiles]);
+
+  useEffect(() => {
+    loadFileSystem();
+  }, [loadFileSystem]);
 
   const getFileIcon = (file?: FileItem): string => {
     if (!file) return '📄';

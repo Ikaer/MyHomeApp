@@ -174,7 +174,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
     return sortTransactions(transactions, transactionsSort);
   }, [transactions, transactionsSort]);
 
-  if (loading) return <div className={styles.emptyState}>Loading PEA details...</div>;
+  if (loading) return <div className={styles.emptyState}>Loading account details...</div>;
   if (!data) return <div className={styles.emptyState}>Error loading data</div>;
 
   const { summary } = data;

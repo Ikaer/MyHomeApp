@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Modal } from '@/components/shared';
 import styles from '@/styles/savings.module.css';
 import { Transaction, TransactionType } from '@/models/savings';
 
@@ -58,8 +59,6 @@ export default function TransactionForm({
         });
     }, [initialTransaction]);
 
-    if (!open) return null;
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -99,138 +98,135 @@ export default function TransactionForm({
     };
 
     return (
-        <div className={styles.modalOverlay} onClick={onClose}>
-            <div className={styles.modalContent} onClick={event => event.stopPropagation()}>
-                <div className={styles.modalHeader}>
-                    <h2 className={styles.accountName}>{mode === 'edit' ? 'Edit Transaction' : 'Add Transaction'}</h2>
+        <Modal
+            open={open}
+            title={mode === 'edit' ? 'Edit Transaction' : 'Add Transaction'}
+            onClose={onClose}
+            size="md"
+        >
+            <form onSubmit={handleSubmit}>
+                <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Date</label>
+                        <input
+                            type="date"
+                            name="date"
+                            className={styles.input}
+                            value={formData.date}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Type</label>
+                        <select
+                            name="type"
+                            className={styles.select}
+                            value={formData.type}
+                            onChange={handleChange}
+                        >
+                            <option value="Buy">Buy</option>
+                            <option value="Sell">Sell</option>
+                            <option value="Dividend">Dividend</option>
+                            <option value="Fee">Fee</option>
+                        </select>
+                    </div>
+
+                    <div className={styles.formGroupFull}>
+                        <label className={styles.label}>Asset Name</label>
+                        <input
+                            type="text"
+                            name="assetName"
+                            className={styles.input}
+                            placeholder="e.g. iShares MSCI World Swap PEA"
+                            value={formData.assetName}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Ticker</label>
+                        <input
+                            type="text"
+                            name="ticker"
+                            className={styles.input}
+                            placeholder="e.g. WPEA.PA"
+                            value={formData.ticker}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>ISIN</label>
+                        <input
+                            type="text"
+                            name="isin"
+                            className={styles.input}
+                            placeholder="e.g. IE0002XZSHO1"
+                            value={formData.isin}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Quantity</label>
+                        <input
+                            type="number"
+                            step="any"
+                            name="quantity"
+                            className={styles.input}
+                            value={formData.quantity}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Unit Price (EUR)</label>
+                        <input
+                            type="number"
+                            step="any"
+                            name="unitPrice"
+                            className={styles.input}
+                            value={formData.unitPrice}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>Fees (EUR)</label>
+                        <input
+                            type="number"
+                            step="any"
+                            name="fees"
+                            className={styles.input}
+                            value={formData.fees}
+                            onChange={handleChange}
+                        />
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label className={styles.label}>TTF (EUR)</label>
+                        <input
+                            type="number"
+                            step="any"
+                            name="ttf"
+                            className={styles.input}
+                            value={formData.ttf}
+                            onChange={handleChange}
+                        />
+                    </div>
+                </div>
+
+                <div className={styles.formActions}>
                     <button type="button" className={styles.secondaryButton} onClick={onClose}>
-                        Close
+                        Cancel
+                    </button>
+                    <button type="submit" className={styles.button}>
+                        {mode === 'edit' ? 'Save Changes' : 'Add Transaction'}
                     </button>
                 </div>
-                <form onSubmit={handleSubmit}>
-                    <div className={styles.formGrid}>
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Date</label>
-                            <input
-                                type="date"
-                                name="date"
-                                className={styles.input}
-                                value={formData.date}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Type</label>
-                            <select
-                                name="type"
-                                className={styles.select}
-                                value={formData.type}
-                                onChange={handleChange}
-                            >
-                                <option value="Buy">Buy</option>
-                                <option value="Sell">Sell</option>
-                                <option value="Dividend">Dividend</option>
-                                <option value="Fee">Fee</option>
-                            </select>
-                        </div>
-
-                        <div className={styles.formGroupFull}>
-                            <label className={styles.label}>Asset Name</label>
-                            <input
-                                type="text"
-                                name="assetName"
-                                className={styles.input}
-                                placeholder="e.g. iShares MSCI World Swap PEA"
-                                value={formData.assetName}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Ticker</label>
-                            <input
-                                type="text"
-                                name="ticker"
-                                className={styles.input}
-                                placeholder="e.g. WPEA.PA"
-                                value={formData.ticker}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>ISIN</label>
-                            <input
-                                type="text"
-                                name="isin"
-                                className={styles.input}
-                                placeholder="e.g. IE0002XZSHO1"
-                                value={formData.isin}
-                                onChange={handleChange}
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Quantity</label>
-                            <input
-                                type="number"
-                                step="any"
-                                name="quantity"
-                                className={styles.input}
-                                value={formData.quantity}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Unit Price (EUR)</label>
-                            <input
-                                type="number"
-                                step="any"
-                                name="unitPrice"
-                                className={styles.input}
-                                value={formData.unitPrice}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>Fees (EUR)</label>
-                            <input
-                                type="number"
-                                step="any"
-                                name="fees"
-                                className={styles.input}
-                                value={formData.fees}
-                                onChange={handleChange}
-                            />
-                        </div>
-                        <div className={styles.formGroup}>
-                            <label className={styles.label}>TTF (EUR)</label>
-                            <input
-                                type="number"
-                                step="any"
-                                name="ttf"
-                                className={styles.input}
-                                value={formData.ttf}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </div>
-
-                    <div className={styles.formActions}>
-                        <button type="button" className={styles.secondaryButton} onClick={onClose}>
-                            Cancel
-                        </button>
-                        <button type="submit" className={styles.button}>
-                            {mode === 'edit' ? 'Save Changes' : 'Add Transaction'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            </form>
+        </Modal>
     );
 }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { AnimeWithExtensions, ImageSize, StatsColumn, VisibleColumns } from '@/models/anime';
 import { formatSeason, formatUserStatus } from '@/lib/animeUtils';
 import { generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
@@ -132,10 +133,13 @@ export default function AnimeCardView({
                 <div key={anime.id} className={styles.card}>
                     <div className={styles.imageContainer}>
                         {anime.main_picture?.large || anime.main_picture?.medium ? (
-                            <img
+                            <Image
                                 src={anime.main_picture?.large || anime.main_picture?.medium}
                                 alt={anime.title}
                                 className={styles.animeImage}
+                                fill
+                                sizes="(max-width: 1200px) 50vw, 280px"
+                                unoptimized
                             />
                         ) : (
                             <div className={styles.noImage}>No Image</div>
@@ -158,7 +162,13 @@ export default function AnimeCardView({
                                     className={styles.justWatchBtn}
                                     title="Search on JustWatch"
                                 >
-                                    <img src="/justwatch.png" alt="JustWatch" className={styles.justWatchIcon} />
+                                    <Image
+                                        src="/justwatch.png"
+                                        alt="JustWatch"
+                                        width={20}
+                                        height={20}
+                                        className={styles.justWatchIcon}
+                                    />
                                 </button>
                             </div>
                             <div className={styles.malActions}>

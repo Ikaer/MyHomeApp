@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import Image from 'next/image';
 import { AnimeWithExtensions, SortColumn, SortDirection, ImageSize, VisibleColumns } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
 import { formatSeason, formatUserStatus } from '@/lib/animeUtils';
@@ -13,6 +14,20 @@ const formatNumber = (num?: number) => {
     return num.toString();
   }
   return num.toFixed(2);
+};
+
+const getImageDimensions = (size: ImageSize) => {
+  switch (size) {
+    case 1:
+      return { width: 80, height: 112 };
+    case 2:
+      return { width: 160, height: 224 };
+    case 3:
+      return { width: 225, height: 315 };
+    case 0:
+    default:
+      return { width: 225, height: 315 };
+  }
 };
 
 interface MALStatusUpdate {
@@ -33,6 +48,7 @@ interface AnimeTableProps {
 
 export default function AnimeTable({ animes, imageSize, visibleColumns, sortColumn, sortDirection, onUpdateMALStatus, onHideToggle }: AnimeTableProps) {
   const [pendingUpdates, setPendingUpdates] = useState<Map<number, MALStatusUpdate>>(new Map());
+  const imageDimensions = getImageDimensions(imageSize);
 
   const sortedAnimes = useMemo(() => {
     const sorted = [...animes].sort((a, b) => {
@@ -240,9 +256,11 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
               className={styles.providerLink}
               title={`Watch on ${detectedProvider.name}`}
             >
-              <img
+              <Image
                 src={getProviderLogoPath(detectedProvider)}
                 alt={detectedProvider.name}
+                width={32}
+                height={32}
                 className={styles.providerLogo}
               />
             </a>
@@ -343,10 +361,14 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
               <tr key={anime.id}>
                 <td className={`${styles.imageCell} ${imageSize === 0 ? styles.imageCellOriginal : ''}`}>
                   {anime.main_picture?.large || anime.main_picture?.medium ? (
-                    <img
+                    <Image
                       src={anime.main_picture?.large || anime.main_picture?.medium}
                       alt={anime.title}
                       className={`${styles.animeImage} ${styles[`imageSize${imageSize}`]}`}
+                      width={imageDimensions.width}
+                      height={imageDimensions.height}
+                      sizes={`${imageDimensions.width}px`}
+                      unoptimized
                     />
                   ) : (
                     <div className={`${styles.noImage} ${styles[`imageSize${imageSize}`]}`}>No Image</div>
@@ -454,9 +476,11 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                       className={styles.justWatchButton}
                       title="Search on JustWatch"
                     >
-                      <img
+                      <Image
                         src="/justwatch.png"
                         alt="JustWatch"
+                        width={16}
+                        height={16}
                         className={styles.justWatchIcon}
                       />
                     </button>

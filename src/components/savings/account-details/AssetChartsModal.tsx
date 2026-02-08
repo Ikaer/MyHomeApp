@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
+import { Modal } from '@/components/shared';
 import styles from '@/styles/savings.module.css';
 import { AssetChartPoint, AssetMetaInfo } from './types';
 
@@ -28,32 +29,28 @@ export default function AssetChartsModal({
   onClose,
   formatCurrency
 }: AssetChartsModalProps) {
-  if (!open) return null;
-
   return (
-    <div className={styles.modalOverlay} onClick={onClose}>
-      <div className={styles.modalContent} onClick={event => event.stopPropagation()}>
-        <div className={styles.modalHeader}>
-          <div>
-            <h2 className={styles.accountName}>Asset Charts</h2>
-            {activeAssetInfo && (
-              <div className={styles.assetMeta}>
-                <span>{activeAssetInfo.name}</span>
-                <span className={styles.assetMetaDivider}>•</span>
-                <span>{activeAssetInfo.isin}</span>
-                <span className={styles.assetMetaDivider}>•</span>
-                <span>{activeAssetInfo.ticker}</span>
-              </div>
-            )}
+    <Modal
+      open={open}
+      title="Asset Charts"
+      onClose={onClose}
+      size="lg"
+      headerContent={
+        activeAssetInfo ? (
+          <div className={styles.assetMeta}>
+            <span>{activeAssetInfo.name}</span>
+            <span className={styles.assetMetaDivider}>•</span>
+            <span>{activeAssetInfo.isin}</span>
+            <span className={styles.assetMetaDivider}>•</span>
+            <span>{activeAssetInfo.ticker}</span>
           </div>
-          <button type="button" className={styles.secondaryButton} onClick={onClose}>
-            Close
-          </button>
-        </div>
-        {!activeIsin ? (
-          <div className={styles.chartEmpty}>No asset selected.</div>
-        ) : assetChartData[activeIsin]?.length ? (
-          <div className={styles.chartsGrid}>
+        ) : null
+      }
+    >
+      {!activeIsin ? (
+        <div className={styles.chartEmpty}>No asset selected.</div>
+      ) : assetChartData[activeIsin]?.length ? (
+        <div className={styles.chartsGrid}>
             <div className={styles.chartPanel}>
               <div className={styles.chartPanelTitle}>Market Price</div>
               <div className={styles.chartPanelBody}>
@@ -186,11 +183,10 @@ export default function AssetChartsModal({
                 </ResponsiveContainer>
               </div>
             </div>
-          </div>
-        ) : (
-          <div className={styles.chartEmpty}>No historical data available.</div>
-        )}
-      </div>
-    </div>
+        </div>
+      ) : (
+        <div className={styles.chartEmpty}>No historical data available.</div>
+      )}
+    </Modal>
   );
 }

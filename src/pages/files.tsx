@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import FileExplorer from '@/components/files/FileExplorer';
+import { Modal } from '@/components/shared';
 import type { FileRoot, FileSystemItem } from '@/models/files';
 
 export default function Files() {
@@ -9,12 +10,7 @@ export default function Files() {
   const [showAddRoot, setShowAddRoot] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load file roots on component mount
-  useEffect(() => {
-    loadFileRoots();
-  }, []);
-
-  const loadFileRoots = async () => {
+  const loadFileRoots = useCallback(async () => {
     try {
       setIsLoading(true);
       console.log('Loading file roots...');
@@ -24,8 +20,8 @@ export default function Files() {
         console.log('Loaded file roots:', data);
         setFileRoots(data);
         // Auto-select first root if available
-        if (data && data.length > 0 && !selectedRoot) {
-          setSelectedRoot(data[0]);
+        if (data && data.length > 0) {
+          setSelectedRoot(prev => prev ?? data[0]);
         }
       } else {
         console.error('Failed to load file roots:', response.status);
@@ -35,7 +31,12 @@ export default function Files() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  // Load file roots on component mount
+  useEffect(() => {
+    loadFileRoots();
+  }, [loadFileRoots]);
 
   const handleAddRoot = async (rootData: Omit<FileRoot, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
@@ -325,82 +326,54 @@ function AddRootModal({ onAdd, onCancel }: AddRootModalProps) {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <h3>Add File Location</h3>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">Name *</label>
-            <input
-              type="text"
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="e.g., Documents, Media Files"
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="path">Path *</label>
-            <input
-              type="text"
-              id="path"
-              value={formData.path}
-              onChange={(e) => setFormData(prev => ({ ...prev, path: e.target.value }))}
-              placeholder="e.g., /volume1/documents, C:\Users\John\Documents"
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Optional description"
-              rows={3}
-            />
-          </div>
-          
-          <div className="form-actions">
-            <button type="button" onClick={onCancel} className="btn btn-secondary">
-              Cancel
-            </button>
-            <button type="submit" className="btn btn-primary">
-              Add Location
-            </button>
-          </div>
-        </form>
-      </div>
+    <Modal open={true} title="Add File Location" onClose={onCancel} size="sm">
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="name">Name *</label>
+          <input
+            type="text"
+            id="name"
+            value={formData.name}
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+            placeholder="e.g., Documents, Media Files"
+            required
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="path">Path *</label>
+          <input
+            type="text"
+            id="path"
+            value={formData.path}
+            onChange={(e) => setFormData(prev => ({ ...prev, path: e.target.value }))}
+            placeholder="e.g., /volume1/documents, C:\\Users\\John\\Documents"
+            required
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            value={formData.description}
+            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+            placeholder="Optional description"
+            rows={3}
+          />
+        </div>
+        
+        <div className="form-actions">
+          <button type="button" onClick={onCancel} className="btn btn-secondary">
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary">
+            Add Location
+          </button>
+        </div>
+      </form>
 
       <style jsx>{`
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-        }
-        .modal {
-          background: white;
-          border-radius: 8px;
-          padding: 2rem;
-          width: 100%;
-          max-width: 500px;
-          max-height: 90vh;
-          overflow-y: auto;
-        }
-        .modal h3 {
-          margin: 0 0 1.5rem 0;
-          color: #333;
-        }
         .form-group {
           margin-bottom: 1rem;
         }
@@ -451,6 +424,6 @@ function AddRootModal({ onAdd, onCancel }: AddRootModalProps) {
           opacity: 0.9;
         }
       `}</style>
-    </div>
+    </Modal>
   );
 }
