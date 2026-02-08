@@ -203,6 +203,49 @@ export function calculateXIRR(transactions: Transaction[], currentValue: number)
 }
 
 /**
+ * Calculate current year XIRR for an account
+ */
+export function calculateCurrentYearXIRR(accountId: string, currentValue: number): number {
+    const transactions = getTransactions(accountId);
+    if (transactions.length === 0) return 0;
+
+    const now = new Date();
+    const year = now.getFullYear();
+    const startDate = new Date(year, 0, 1);
+    const endDate = new Date(now.setHours(0, 0, 0, 0));
+
+    const annualValues = getAnnualAccountValues(accountId);
+    const previousYearValue = annualValues.find(v => v.year === year - 1)?.endValue;
+
+    const firstTransactionYear = Math.min(
+        ...transactions.map(t => new Date(`${t.date}T00:00:00`).getFullYear())
+    );
+
+    if (previousYearValue === undefined && firstTransactionYear !== year) {
+        return 0;
+    }
+
+    const startValue = previousYearValue ?? 0;
+
+    const cashflows = transactions
+        .map(t => ({
+            amount: t.type === 'Buy' ? -t.totalAmount : t.totalAmount,
+            when: new Date(`${t.date}T00:00:00`)
+        }))
+        .filter(t => t.when >= startDate && t.when <= endDate);
+
+    cashflows.unshift({ amount: -startValue, when: startDate });
+    cashflows.push({ amount: currentValue, when: endDate });
+
+    try {
+        return xirr(cashflows);
+    } catch (error) {
+        console.error('Current year XIRR calculation failed:', error);
+        return 0;
+    }
+}
+
+/**
  * Get account summary
  */
 export function getAccountSummary(accountId: string, currentPrices: Record<string, number>): AccountSummary | undefined {
