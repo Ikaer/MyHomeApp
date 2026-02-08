@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import xirr from 'xirr';
 import styles from '@/styles/savings.module.css';
 import { SavingsAccount, Transaction } from '@/models/savings';
 import TransactionForm from './TransactionForm';
@@ -12,6 +11,10 @@ import PositionsTable from './account-details/PositionsTable';
 import TransactionsTable from './account-details/TransactionsTable';
 import AllChartsModal from './account-details/AllChartsModal';
 import AssetChartsModal from './account-details/AssetChartsModal';
+import { buildClipboardText } from './account-details/helpers/clipboard';
+import { buildAnnualXirr } from './account-details/helpers/xirr';
+import { buildAnnualOverviewRows } from './account-details/helpers/annualOverview';
+import { sortPositions, sortTransactions } from './account-details/helpers/sorting';
 import {
   AnnualOverviewRow,
   AssetChartPoint,
@@ -26,6 +29,13 @@ import {
 import { useSavingsAccountData } from '@/hooks/savings/useSavingsAccountData';
 import { useAccountHistory } from '@/hooks/savings/useAccountHistory';
 import { useAssetHistory } from '@/hooks/savings/useAssetHistory';
+import {
+  getActiveAssetInfo,
+  mapAssetChartData,
+  mapAssetSparklineData,
+  mapHistoryChartData,
+  mapHistoryMetrics
+} from './account-details/helpers/mappers';
 
 interface SavingsAccountDetailsProps {
   account: SavingsAccount;
@@ -88,46 +98,16 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
     }
   };
 
-  const buildClipboardText = () => {
-    if (!data) return '';
-
-    const lines: string[] = [];
-    lines.push(`Savings Account: ${account.name} (${account.type})`);
-    lines.push(`Currency: ${account.currency}`);
-    lines.push('');
-    lines.push('Summary');
-    lines.push(`- Current Value: ${formatCurrency(data.summary.currentValue)}`);
-    lines.push(`- Total Invested: ${formatCurrency(data.summary.totalInvested)}`);
-    lines.push(`- Total Gain/Loss: ${data.summary.totalGainLoss >= 0 ? '+' : ''}${formatCurrency(data.summary.totalGainLoss)}`);
-    lines.push(`- XIRR (Annualized): ${data.summary.xirr >= 0 ? '+' : ''}${formatPercent(data.summary.xirr * 100)}`);
-    lines.push('');
-    lines.push('Annual Overview');
-    if (annualOverviewRows.length === 0) {
-      lines.push('- No annual data');
-    } else {
-      annualOverviewRows.forEach(entry => {
-        const endValue = entry.endValue === undefined ? '—' : formatCurrency(entry.endValue);
-        const xirrValue = entry.xirr === undefined ? '—' : `${entry.xirr >= 0 ? '+' : ''}${formatPercent(entry.xirr * 100)}`;
-        lines.push(`- ${entry.year}: End Value ${endValue}, XIRR ${xirrValue}`);
-      });
-    }
-    lines.push('');
-    lines.push('Positions');
-    data.positions.forEach(pos => {
-      lines.push(`- ${pos.name} (${pos.ticker}): Qty ${pos.quantity.toFixed(2)}, PRU ${formatCurrency(pos.averagePurchasePrice)}, Curr. Price ${formatCurrency(pos.currentPrice)}, Value ${formatCurrency(pos.currentValue)}, G/L ${pos.unrealizedGainLoss >= 0 ? '+' : ''}${formatCurrency(pos.unrealizedGainLoss)} (${pos.unrealizedGainLossPercentage >= 0 ? '+' : ''}${formatPercent(pos.unrealizedGainLossPercentage)})`);
-    });
-    lines.push('');
-    lines.push('Transactions (latest first)');
-    const sortedTransactions = [...transactions].sort((a, b) => b.date.localeCompare(a.date));
-    sortedTransactions.forEach(t => {
-      lines.push(`- ${t.date} ${t.type}: ${t.assetName} (${t.ticker}) Qty ${t.quantity} @ ${formatCurrency(t.unitPrice)} | Fees ${formatCurrency(t.fees)} | TTF ${formatCurrency(t.ttf)} | Total ${formatCurrency(t.totalAmount)}`);
-    });
-
-    return lines.join('\n');
-  };
-
   const handleCopyContext = async () => {
-    const text = buildClipboardText();
+    if (!data) return;
+    const text = buildClipboardText({
+      account,
+      data,
+      annualOverviewRows,
+      transactions,
+      formatCurrency,
+      formatPercent
+    });
     if (!text) return;
 
     try {
@@ -138,139 +118,40 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
   };
 
   const annualXirr = useMemo(() => {
-    if (transactions.length === 0) return [] as { year: number; value: number }[];
-
-    const parsedTransactions = [...transactions]
-      .map(t => ({ ...t, dateObj: new Date(`${t.date}T00:00:00`) }))
-      .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
-
-    const firstYear = parsedTransactions[0].dateObj.getFullYear();
-    const currentYear = new Date().getFullYear();
-    const annualValueMap = annualValues.reduce<Record<number, number>>((acc, entry) => {
-      acc[entry.year] = entry.endValue;
-      return acc;
-    }, {});
-
-    const results: { year: number; value: number }[] = [];
-
-    for (let year = firstYear; year <= currentYear; year += 1) {
-      const fallbackCurrentValue = year === currentYear ? data?.summary.currentValue : undefined;
-      const endValue = annualValueMap[year] ?? fallbackCurrentValue;
-      if (endValue === undefined) continue;
-
-      const startDate = new Date(year, 0, 1);
-      const endDate = year === currentYear
-        ? new Date(new Date().setHours(0, 0, 0, 0))
-        : new Date(year, 11, 31);
-      const startValue = year === firstYear ? 0 : annualValueMap[year - 1];
-      if (startValue === undefined) continue;
-
-      const cashflows = parsedTransactions
-        .filter(t => t.dateObj >= startDate && t.dateObj <= endDate)
-        .map(t => ({
-          amount: t.type === 'Buy' ? -t.totalAmount : t.totalAmount,
-          when: t.dateObj
-        }));
-
-      cashflows.unshift({ amount: -startValue, when: startDate });
-      cashflows.push({ amount: endValue, when: endDate });
-
-      try {
-        const value = xirr(cashflows);
-        if (Number.isFinite(value)) {
-          results.push({ year, value });
-        }
-      } catch (error) {
-        // Skip years where XIRR fails to converge or lacks cashflows
-      }
-    }
-
-    return results;
+    return buildAnnualXirr({
+      transactions,
+      annualValues,
+      currentValue: data?.summary.currentValue
+    });
   }, [transactions, annualValues, data?.summary.currentValue]);
 
   const annualOverviewRows: AnnualOverviewRow[] = useMemo(() => {
-    const years: number[] = [];
-    const currentYear = new Date().getFullYear();
-
-    if (transactions.length > 0) {
-      const firstYear = Math.min(...transactions.map(t => new Date(`${t.date}T00:00:00`).getFullYear()));
-      for (let year = firstYear; year <= currentYear; year += 1) {
-        years.push(year);
-      }
-    } else {
-      years.push(currentYear);
-    }
-
-    const valueMap = annualValues.reduce<Record<number, number>>((acc, entry) => {
-      acc[entry.year] = entry.endValue;
-      return acc;
-    }, {});
-    const xirrMap = annualXirr.reduce<Record<number, number>>((acc, entry) => {
-      acc[entry.year] = entry.value;
-      return acc;
-    }, {});
-
-    return years.map(year => ({
-      year,
-      endValue: valueMap[year] ?? (year === currentYear ? data?.summary.currentValue : undefined),
-      xirr: xirrMap[year]
-    }));
+    return buildAnnualOverviewRows({
+      transactions,
+      annualValues,
+      annualXirr,
+      currentValue: data?.summary.currentValue
+    });
   }, [transactions, annualValues, annualXirr, data?.summary.currentValue]);
 
   const historyChartData: HistoryChartPoint[] = useMemo(() => {
-    return history.map(entry => {
-      const gainLossPct = entry.totalInvested > 0
-        ? (entry.totalGainLoss / entry.totalInvested) * 100
-        : 0;
-      return {
-        date: entry.timestamp.slice(0, 10),
-        totalInvested: entry.totalInvested,
-        currentValue: entry.currentValue,
-        gainLossPct
-      };
-    });
+    return mapHistoryChartData(history);
   }, [history]);
 
   const historyMetrics: HistoryMetricPoint[] = useMemo(() => {
-    return history.map(entry => ({
-      date: entry.timestamp.slice(0, 10),
-      totalInvested: entry.totalInvested,
-      currentValue: entry.currentValue,
-      totalGainLoss: entry.totalGainLoss,
-      xirr: entry.xirr,
-      currentYearXirr: entry.currentYearXirr
-    }));
+    return mapHistoryMetrics(history);
   }, [history]);
 
   const assetSparklineData: Record<string, AssetSparklinePoint[]> = useMemo(() => {
-    const map: Record<string, AssetSparklinePoint[]> = {};
-    Object.entries(assetHistory).forEach(([isin, entries]) => {
-      map[isin] = entries.map(entry => ({
-        date: entry.timestamp.slice(0, 10),
-        value: entry.currentPrice
-      }));
-    });
-    return map;
+    return mapAssetSparklineData(assetHistory);
   }, [assetHistory]);
 
   const assetChartData: Record<string, AssetChartPoint[]> = useMemo(() => {
-    const map: Record<string, AssetChartPoint[]> = {};
-    Object.entries(assetHistory).forEach(([isin, entries]) => {
-      map[isin] = entries.map(entry => ({
-        date: entry.timestamp.slice(0, 10),
-        currentPrice: entry.currentPrice,
-        currentValue: entry.currentValue,
-        unrealizedGainLoss: entry.unrealizedGainLoss,
-        unrealizedGainLossPercentage: entry.unrealizedGainLossPercentage
-      }));
-    });
-    return map;
+    return mapAssetChartData(assetHistory);
   }, [assetHistory]);
 
   const activeAssetInfo: AssetMetaInfo | null = useMemo(() => {
-    if (!activeAssetIsin || !data?.positions) return null;
-    const match = data.positions.find(pos => pos.isin === activeAssetIsin);
-    return match ? { name: match.name, isin: match.isin, ticker: match.ticker } : null;
+    return getActiveAssetInfo(activeAssetIsin, data?.positions);
   }, [activeAssetIsin, data?.positions]);
 
   const openAnnualEditor = (year: number, endValue?: number) => {
@@ -327,111 +208,11 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
 
   const positionsSorted = useMemo(() => {
     if (!data) return [];
-    const sorted = [...data.positions].sort((a, b) => {
-      let left: number | string = '';
-      let right: number | string = '';
-
-      switch (positionsSort.key) {
-        case 'asset':
-          left = a.name;
-          right = b.name;
-          break;
-        case 'quantity':
-          left = a.quantity;
-          right = b.quantity;
-          break;
-        case 'avgPrice':
-          left = a.averagePurchasePrice;
-          right = b.averagePurchasePrice;
-          break;
-        case 'currentPrice':
-          left = a.currentPrice;
-          right = b.currentPrice;
-          break;
-        case 'value':
-          left = a.currentValue;
-          right = b.currentValue;
-          break;
-        case 'gainLoss':
-          left = a.unrealizedGainLoss;
-          right = b.unrealizedGainLoss;
-          break;
-        case 'gainLossPct':
-          left = a.unrealizedGainLossPercentage;
-          right = b.unrealizedGainLossPercentage;
-          break;
-      }
-
-      if (typeof left === 'string' || typeof right === 'string') {
-        const result = String(left).localeCompare(String(right));
-        return positionsSort.direction === 'asc' ? result : -result;
-      }
-
-      const result = Number(left) - Number(right);
-      return positionsSort.direction === 'asc' ? result : -result;
-    });
-
-    return sorted;
+    return sortPositions(data.positions, positionsSort);
   }, [data, positionsSort]);
 
   const transactionsSorted = useMemo(() => {
-    const sorted = [...transactions].sort((a, b) => {
-      let left: number | string = '';
-      let right: number | string = '';
-
-      switch (transactionsSort.key) {
-        case 'date':
-          left = a.date;
-          right = b.date;
-          break;
-        case 'type':
-          left = a.type;
-          right = b.type;
-          break;
-        case 'asset':
-          left = a.assetName;
-          right = b.assetName;
-          break;
-        case 'ticker':
-          left = a.ticker;
-          right = b.ticker;
-          break;
-        case 'isin':
-          left = a.isin;
-          right = b.isin;
-          break;
-        case 'quantity':
-          left = a.quantity;
-          right = b.quantity;
-          break;
-        case 'price':
-          left = a.unitPrice;
-          right = b.unitPrice;
-          break;
-        case 'fees':
-          left = a.fees;
-          right = b.fees;
-          break;
-        case 'ttf':
-          left = a.ttf;
-          right = b.ttf;
-          break;
-        case 'total':
-          left = a.totalAmount;
-          right = b.totalAmount;
-          break;
-      }
-
-      if (typeof left === 'string' || typeof right === 'string') {
-        const result = String(left).localeCompare(String(right));
-        return transactionsSort.direction === 'asc' ? result : -result;
-      }
-
-      const result = Number(left) - Number(right);
-      return transactionsSort.direction === 'asc' ? result : -result;
-    });
-
-    return sorted;
+    return sortTransactions(transactions, transactionsSort);
   }, [transactions, transactionsSort]);
 
   if (loading) return <div className={styles.emptyState}>Loading PEA details...</div>;
