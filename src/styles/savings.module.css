@@ -225,6 +225,11 @@
     width: 160px;
 }
 
+.table td button.secondaryButton {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+}
+
 .sparklineChart {
     width: 140px;
     height: 42px;
@@ -302,9 +307,59 @@
     border: 1px solid rgba(75, 85, 99, 0.5);
     border-radius: 1rem;
     padding: 2rem;
-    width: 100%;
-    max-width: 600px;
+    width: 80vw;
+    max-width: 1200px;
+    max-height: 80vh;
+    overflow-y: auto;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.chartsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.chartPanel {
+    background: rgba(17, 24, 39, 0.4);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(75, 85, 99, 0.25);
+    padding: 1rem;
+}
+
+.chartPanelTitle {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+.chartPanelBody {
+    width: 100%;
+    height: 200px;
+    margin-top: 0.75rem;
+}
+
+.assetMeta {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-items: center;
+}
+
+.assetMetaDivider {
+    color: #4b5563;
 }
 
 .formGrid {

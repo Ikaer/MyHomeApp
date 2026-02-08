@@ -53,6 +53,9 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'positions' | 'transactions'>('positions');
     const [showForm, setShowForm] = useState(false);
+    const [showCharts, setShowCharts] = useState(false);
+    const [showAssetCharts, setShowAssetCharts] = useState(false);
+    const [activeAssetIsin, setActiveAssetIsin] = useState<string | null>(null);
     const [editingYear, setEditingYear] = useState<number | null>(null);
     const [editingEndValue, setEditingEndValue] = useState<string>('');
     const [positionsSort, setPositionsSort] = useState<{ key: PositionSortKey; direction: SortDirection }>(
@@ -320,6 +323,17 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
             });
     }, [history]);
 
+    const historyMetrics = useMemo(() => {
+        return history.map(entry => ({
+            date: entry.timestamp.slice(0, 10),
+            totalInvested: entry.totalInvested,
+            currentValue: entry.currentValue,
+            totalGainLoss: entry.totalGainLoss,
+            xirr: entry.xirr,
+            currentYearXirr: entry.currentYearXirr
+        }));
+    }, [history]);
+
     const assetSparklineData = useMemo(() => {
         const map: Record<string, { date: string; value: number }[]> = {};
         Object.entries(assetHistory).forEach(([isin, entries]) => {
@@ -330,6 +344,31 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
         });
         return map;
     }, [assetHistory]);
+
+    const assetChartData = useMemo(() => {
+        const map: Record<string, {
+            date: string;
+            currentPrice: number;
+            currentValue: number;
+            unrealizedGainLoss: number;
+            unrealizedGainLossPercentage: number;
+        }[]> = {};
+        Object.entries(assetHistory).forEach(([isin, entries]) => {
+            map[isin] = entries.map(entry => ({
+                date: entry.timestamp.slice(0, 10),
+                currentPrice: entry.currentPrice,
+                currentValue: entry.currentValue,
+                unrealizedGainLoss: entry.unrealizedGainLoss,
+                unrealizedGainLossPercentage: entry.unrealizedGainLossPercentage
+            }));
+        });
+        return map;
+    }, [assetHistory]);
+
+    const activeAssetInfo = useMemo(() => {
+        if (!activeAssetIsin || !data?.positions) return null;
+        return data.positions.find(pos => pos.isin === activeAssetIsin) || null;
+    }, [activeAssetIsin, data?.positions]);
 
     const openAnnualEditor = (year: number, endValue?: number) => {
         setEditingYear(year);
@@ -547,6 +586,356 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
                 </div>
             )}
 
+            {showCharts && (
+                <div className={styles.modalOverlay} onClick={() => setShowCharts(false)}>
+                    <div className={styles.modalContent} onClick={event => event.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <h2 className={styles.accountName}>All Charts</h2>
+                            <button type="button" className={styles.secondaryButton} onClick={() => setShowCharts(false)}>
+                                Close
+                            </button>
+                        </div>
+                        {historyLoading ? (
+                            <div className={styles.chartEmpty}>Loading history...</div>
+                        ) : historyMetrics.length === 0 ? (
+                            <div className={styles.chartEmpty}>No historical data available.</div>
+                        ) : (
+                            <div className={styles.chartsGrid}>
+                                <div className={styles.chartPanel}>
+                                    <div className={styles.chartPanelTitle}>Total Invested</div>
+                                    <div className={styles.chartPanelBody}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={historyMetrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                                <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                                <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                                <YAxis
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickFormatter={value => formatCurrency(Number(value))}
+                                                    width={90}
+                                                    domain={([dataMin, dataMax]) => {
+                                                        const range = Math.max(dataMax - dataMin, 1);
+                                                        return [dataMin - range * 0.05, dataMax + range * 0.05];
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                    labelStyle={{ color: '#9ca3af' }}
+                                                    formatter={(value) => formatCurrency(Number(value ?? 0))}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="totalInvested"
+                                                    stroke="#94a3b8"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                    isAnimationActive={false}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                                <div className={styles.chartPanel}>
+                                    <div className={styles.chartPanelTitle}>Current Value</div>
+                                    <div className={styles.chartPanelBody}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={historyMetrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                                <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                                <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                                <YAxis
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickFormatter={value => formatCurrency(Number(value))}
+                                                    width={90}
+                                                    domain={([dataMin, dataMax]) => {
+                                                        const range = Math.max(dataMax - dataMin, 1);
+                                                        return [dataMin - range * 0.05, dataMax + range * 0.05];
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                    labelStyle={{ color: '#9ca3af' }}
+                                                    formatter={(value) => formatCurrency(Number(value ?? 0))}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="currentValue"
+                                                    stroke="#60a5fa"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                    isAnimationActive={false}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                                <div className={styles.chartPanel}>
+                                    <div className={styles.chartPanelTitle}>Total Gain/Loss</div>
+                                    <div className={styles.chartPanelBody}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={historyMetrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                                <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                                <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                                <YAxis
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickFormatter={value => formatCurrency(Number(value))}
+                                                    width={90}
+                                                    domain={([dataMin, dataMax]) => {
+                                                        const range = Math.max(dataMax - dataMin, 1);
+                                                        return [dataMin - range * 0.05, dataMax + range * 0.05];
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                    labelStyle={{ color: '#9ca3af' }}
+                                                    formatter={(value) => formatCurrency(Number(value ?? 0))}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="totalGainLoss"
+                                                    stroke="#34d399"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                    isAnimationActive={false}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                                <div className={styles.chartPanel}>
+                                    <div className={styles.chartPanelTitle}>XIRR</div>
+                                    <div className={styles.chartPanelBody}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={historyMetrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                                <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                                <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                                <YAxis
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickFormatter={value => `${(Number(value) * 100).toFixed(2)}%`}
+                                                    width={70}
+                                                    domain={([dataMin, dataMax]) => {
+                                                        const range = Math.max(dataMax - dataMin, 0.001);
+                                                        return [dataMin - range * 0.1, dataMax + range * 0.1];
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                    labelStyle={{ color: '#9ca3af' }}
+                                                    formatter={(value) => `${(Number(value ?? 0) * 100).toFixed(2)}%`}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="xirr"
+                                                    stroke="#fbbf24"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                    isAnimationActive={false}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                                <div className={styles.chartPanel}>
+                                    <div className={styles.chartPanelTitle}>Current Year XIRR</div>
+                                    <div className={styles.chartPanelBody}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={historyMetrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                                <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                                <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                                <YAxis
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickFormatter={value => `${(Number(value) * 100).toFixed(2)}%`}
+                                                    width={70}
+                                                    domain={([dataMin, dataMax]) => {
+                                                        const range = Math.max(dataMax - dataMin, 0.001);
+                                                        return [dataMin - range * 0.1, dataMax + range * 0.1];
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                    labelStyle={{ color: '#9ca3af' }}
+                                                    formatter={(value) => `${(Number(value ?? 0) * 100).toFixed(2)}%`}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="currentYearXirr"
+                                                    stroke="#a78bfa"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                    isAnimationActive={false}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {showAssetCharts && (
+                <div className={styles.modalOverlay} onClick={() => setShowAssetCharts(false)}>
+                    <div className={styles.modalContent} onClick={event => event.stopPropagation()}>
+                        <div className={styles.modalHeader}>
+                            <div>
+                                <h2 className={styles.accountName}>Asset Charts</h2>
+                                {activeAssetInfo && (
+                                    <div className={styles.assetMeta}>
+                                        <span>{activeAssetInfo.name}</span>
+                                        <span className={styles.assetMetaDivider}>•</span>
+                                        <span>{activeAssetInfo.isin}</span>
+                                        <span className={styles.assetMetaDivider}>•</span>
+                                        <span>{activeAssetInfo.ticker}</span>
+                                    </div>
+                                )}
+                            </div>
+                            <button type="button" className={styles.secondaryButton} onClick={() => setShowAssetCharts(false)}>
+                                Close
+                            </button>
+                        </div>
+                        {!activeAssetIsin ? (
+                            <div className={styles.chartEmpty}>No asset selected.</div>
+                        ) : assetChartData[activeAssetIsin]?.length ? (
+                            <div className={styles.chartsGrid}>
+                                <div className={styles.chartPanel}>
+                                    <div className={styles.chartPanelTitle}>Market Price</div>
+                                    <div className={styles.chartPanelBody}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={assetChartData[activeAssetIsin]} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                                <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                                <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                                <YAxis
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickFormatter={value => formatCurrency(Number(value))}
+                                                    width={90}
+                                                    domain={([dataMin, dataMax]) => {
+                                                        const range = Math.max(dataMax - dataMin, 0.01);
+                                                        return [dataMin - range * 0.1, dataMax + range * 0.1];
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                    labelStyle={{ color: '#9ca3af' }}
+                                                    formatter={(value) => formatCurrency(Number(value ?? 0))}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="currentPrice"
+                                                    stroke="#93c5fd"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                    isAnimationActive={false}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                                <div className={styles.chartPanel}>
+                                    <div className={styles.chartPanelTitle}>Market Value</div>
+                                    <div className={styles.chartPanelBody}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={assetChartData[activeAssetIsin]} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                                <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                                <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                                <YAxis
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickFormatter={value => formatCurrency(Number(value))}
+                                                    width={90}
+                                                    domain={([dataMin, dataMax]) => {
+                                                        const range = Math.max(dataMax - dataMin, 1);
+                                                        return [dataMin - range * 0.05, dataMax + range * 0.05];
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                    labelStyle={{ color: '#9ca3af' }}
+                                                    formatter={(value) => formatCurrency(Number(value ?? 0))}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="currentValue"
+                                                    stroke="#60a5fa"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                    isAnimationActive={false}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                                <div className={styles.chartPanel}>
+                                    <div className={styles.chartPanelTitle}>Unrealized Gain/Loss</div>
+                                    <div className={styles.chartPanelBody}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={assetChartData[activeAssetIsin]} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                                <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                                <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                                <YAxis
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickFormatter={value => formatCurrency(Number(value))}
+                                                    width={90}
+                                                    domain={([dataMin, dataMax]) => {
+                                                        const range = Math.max(dataMax - dataMin, 1);
+                                                        return [dataMin - range * 0.1, dataMax + range * 0.1];
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                    labelStyle={{ color: '#9ca3af' }}
+                                                    formatter={(value) => formatCurrency(Number(value ?? 0))}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="unrealizedGainLoss"
+                                                    stroke="#34d399"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                    isAnimationActive={false}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                                <div className={styles.chartPanel}>
+                                    <div className={styles.chartPanelTitle}>Gain/Loss %</div>
+                                    <div className={styles.chartPanelBody}>
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <LineChart data={assetChartData[activeAssetIsin]} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                                <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                                <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                                <YAxis
+                                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                    tickFormatter={value => `${Number(value).toFixed(2)}%`}
+                                                    width={70}
+                                                    domain={([dataMin, dataMax]) => {
+                                                        const range = Math.max(dataMax - dataMin, 0.1);
+                                                        return [dataMin - range * 0.1, dataMax + range * 0.1];
+                                                    }}
+                                                />
+                                                <Tooltip
+                                                    contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                    labelStyle={{ color: '#9ca3af' }}
+                                                    formatter={(value) => `${Number(value ?? 0).toFixed(2)}%`}
+                                                />
+                                                <Line
+                                                    type="monotone"
+                                                    dataKey="unrealizedGainLossPercentage"
+                                                    stroke="#f472b6"
+                                                    strokeWidth={2}
+                                                    dot={false}
+                                                    isAnimationActive={false}
+                                                />
+                                            </LineChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className={styles.chartEmpty}>No historical data available.</div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             <div className={styles.header}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                     <button className={styles.secondaryButton} onClick={onBack}>← Go to accounts</button>
@@ -556,6 +945,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
                     </button>
                     <button className={styles.secondaryButton} onClick={fetchData}>Refresh Prices</button>
                     <button className={styles.secondaryButton} onClick={handleCopyContext}>Copy Context</button>
+                    <button className={styles.secondaryButton} onClick={() => setShowCharts(true)}>All Charts</button>
                 </div>
                 <h1 className={styles.title}>{account.name}</h1>
             </div>
@@ -820,6 +1210,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
                                         </span>
                                     </button>
                                 </th>
+                                <th>Charts</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -869,6 +1260,18 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
                                     </td>
                                     <td className={pos.unrealizedGainLossPercentage >= 0 ? styles.positive : styles.negative}>
                                         {pos.unrealizedGainLossPercentage >= 0 ? '+' : ''}{formatPercent(pos.unrealizedGainLossPercentage)}
+                                    </td>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            className={styles.secondaryButton}
+                                            onClick={() => {
+                                                setActiveAssetIsin(pos.isin || null);
+                                                setShowAssetCharts(true);
+                                            }}
+                                        >
+                                            All charts
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
