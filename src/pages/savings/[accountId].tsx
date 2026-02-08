@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styles from '@/styles/savings.module.css';
 import { SavingsAccount } from '@/models/savings';
-import PEAOverview from '@/components/savings/PEAOverview';
+import SavingsAccountDetails from '@/components/savings/SavingsAccountDetails';
 
 export default function SavingsAccountPage() {
     const router = useRouter();
@@ -65,7 +65,7 @@ export default function SavingsAccountPage() {
             <Head>
                 <title>MyHomeApp - {account.name}</title>
             </Head>
-            <PEAOverview
+            <SavingsAccountDetails
                 account={account}
                 onBack={() => router.push('/savings')}
             />

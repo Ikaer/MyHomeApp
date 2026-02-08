@@ -227,6 +227,40 @@
     color: #9ca3af;
 }
 
+.chartStack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 1rem;
+}
+
+.chartBlock {
+    background: rgba(17, 24, 39, 0.4);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(75, 85, 99, 0.25);
+    padding: 1rem;
+}
+
+.chartTitle {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+.chartContainer {
+    width: 100%;
+    height: 220px;
+    margin-top: 0.75rem;
+}
+
+.chartEmpty {
+    text-align: center;
+    padding: 1.5rem 0;
+    color: #9ca3af;
+}
+
 .button {
     background: #3b82f6;
     color: white;

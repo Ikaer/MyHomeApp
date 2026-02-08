@@ -1,18 +1,40 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import xirr from 'xirr';
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+    CartesianGrid
+} from 'recharts';
 import styles from '@/styles/savings.module.css';
 import { SavingsAccount, Transaction, AssetPosition, AccountSummary, AnnualAccountValue } from '@/models/savings';
 import TransactionForm from './TransactionForm';
 
-interface PEAOverviewProps {
+interface SavingsAccountDetailsProps {
     account: SavingsAccount;
     onBack: () => void;
 }
 
-export default function PEAOverview({ account, onBack }: PEAOverviewProps) {
+interface HistoricalAccountRecord {
+    timestamp: string;
+    accountId: string;
+    accountName: string;
+    totalInvested: number;
+    currentValue: number;
+    totalGainLoss: number;
+    xirr: number;
+    currentYearXirr: number;
+}
+
+export default function SavingsAccountDetails({ account, onBack }: SavingsAccountDetailsProps) {
     const [data, setData] = useState<{ summary: AccountSummary; positions: AssetPosition[] } | null>(null);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [annualValues, setAnnualValues] = useState<AnnualAccountValue[]>([]);
+    const [history, setHistory] = useState<HistoricalAccountRecord[]>([]);
+    const [historyLoading, setHistoryLoading] = useState(true);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'positions' | 'transactions'>('positions');
     const [showForm, setShowForm] = useState(false);
@@ -28,6 +50,7 @@ export default function PEAOverview({ account, onBack }: PEAOverviewProps) {
     useEffect(() => {
         fetchData();
         fetchAnnualValues();
+        fetchHistory();
     }, [account.id]);
 
     const fetchData = async () => {
@@ -58,6 +81,24 @@ export default function PEAOverview({ account, onBack }: PEAOverviewProps) {
             }
         } catch (error) {
             console.error('Failed to fetch annual values:', error);
+        }
+    };
+
+    const fetchHistory = async () => {
+        setHistoryLoading(true);
+        try {
+            const res = await fetch(`/api/savings/historical/accounts/${account.id}`);
+            if (res.ok) {
+                const data = await res.json();
+                setHistory(data);
+            } else {
+                setHistory([]);
+            }
+        } catch (error) {
+            console.error('Failed to fetch account history:', error);
+            setHistory([]);
+        } finally {
+            setHistoryLoading(false);
         }
     };
 
@@ -218,6 +259,20 @@ export default function PEAOverview({ account, onBack }: PEAOverviewProps) {
             xirr: xirrMap[year]
         }));
     }, [transactions, annualValues, annualXirr, data?.summary.currentValue]);
+
+    const historyChartData = useMemo(() => {
+        return history
+            .map(entry => {
+                const gainLossPct = entry.totalInvested > 0
+                    ? (entry.totalGainLoss / entry.totalInvested) * 100
+                    : 0;
+                return {
+                    date: entry.timestamp.slice(0, 10),
+                    currentValue: entry.currentValue,
+                    gainLossPct
+                };
+            });
+    }, [history]);
 
     const openAnnualEditor = (year: number, endValue?: number) => {
         setEditingYear(year);
@@ -462,6 +517,77 @@ export default function PEAOverview({ account, onBack }: PEAOverviewProps) {
                             </span>
                         </div>
                     </div>
+                </div>
+
+                {/* History */}
+                <div className={styles.accountCard} style={{ cursor: 'default' }}>
+                    <h2 className={styles.accountName}>History</h2>
+                    {historyLoading ? (
+                        <div className={styles.chartEmpty}>Loading history...</div>
+                    ) : historyChartData.length === 0 ? (
+                        <div className={styles.chartEmpty}>No historical data available.</div>
+                    ) : (
+                        <div className={styles.chartStack}>
+                            <div className={styles.chartBlock}>
+                                <div className={styles.chartTitle}>Portfolio Value</div>
+                                <div className={styles.chartContainer}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={historyChartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                            <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                            <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                            <YAxis
+                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                tickFormatter={value => formatCurrency(Number(value))}
+                                                width={90}
+                                            />
+                                            <Tooltip
+                                                contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                labelStyle={{ color: '#9ca3af' }}
+                                                formatter={(value) => formatCurrency(Number(value ?? 0))}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="currentValue"
+                                                stroke="#60a5fa"
+                                                strokeWidth={2}
+                                                dot={false}
+                                                isAnimationActive={false}
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                            <div className={styles.chartBlock}>
+                                <div className={styles.chartTitle}>Gain/Loss %</div>
+                                <div className={styles.chartContainer}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={historyChartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                            <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                            <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                            <YAxis
+                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                tickFormatter={value => `${Number(value).toFixed(2)}%`}
+                                                width={70}
+                                            />
+                                            <Tooltip
+                                                contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                labelStyle={{ color: '#9ca3af' }}
+                                                formatter={(value) => `${Number(value ?? 0).toFixed(2)}%`}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="gainLossPct"
+                                                stroke="#34d399"
+                                                strokeWidth={2}
+                                                dot={false}
+                                                isAnimationActive={false}
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Annual XIRR */}
