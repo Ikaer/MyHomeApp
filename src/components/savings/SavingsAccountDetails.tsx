@@ -29,12 +29,27 @@ interface HistoricalAccountRecord {
     currentYearXirr: number;
 }
 
+interface HistoricalAssetRecord {
+    timestamp: string;
+    isin: string;
+    ticker: string;
+    name: string;
+    quantity: number;
+    averagePurchasePrice: number;
+    totalInvested: number;
+    currentPrice: number;
+    currentValue: number;
+    unrealizedGainLoss: number;
+    unrealizedGainLossPercentage: number;
+}
+
 export default function SavingsAccountDetails({ account, onBack }: SavingsAccountDetailsProps) {
     const [data, setData] = useState<{ summary: AccountSummary; positions: AssetPosition[] } | null>(null);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [annualValues, setAnnualValues] = useState<AnnualAccountValue[]>([]);
     const [history, setHistory] = useState<HistoricalAccountRecord[]>([]);
     const [historyLoading, setHistoryLoading] = useState(true);
+    const [assetHistory, setAssetHistory] = useState<Record<string, HistoricalAssetRecord[]>>({});
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'positions' | 'transactions'>('positions');
     const [showForm, setShowForm] = useState(false);
@@ -52,6 +67,13 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
         fetchAnnualValues();
         fetchHistory();
     }, [account.id]);
+
+    useEffect(() => {
+        if (!data?.positions?.length) return;
+        const isins = data.positions.map(pos => pos.isin).filter(Boolean);
+        if (isins.length === 0) return;
+        fetchAssetHistory(isins);
+    }, [data?.positions]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -99,6 +121,29 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
             setHistory([]);
         } finally {
             setHistoryLoading(false);
+        }
+    };
+
+    const fetchAssetHistory = async (isins: string[]) => {
+        const uniqueIsins = Array.from(new Set(isins));
+        if (uniqueIsins.length === 0) return;
+
+        try {
+            const results = await Promise.all(uniqueIsins.map(async (isin) => {
+                const res = await fetch(`/api/savings/historical/assets/${encodeURIComponent(isin)}`);
+                if (!res.ok) return [isin, []] as const;
+                const data = await res.json();
+                return [isin, data] as const;
+            }));
+
+            const nextHistory: Record<string, HistoricalAssetRecord[]> = {};
+            results.forEach(([isin, entries]) => {
+                nextHistory[isin] = entries as HistoricalAssetRecord[];
+            });
+            setAssetHistory(nextHistory);
+        } catch (error) {
+            console.error('Failed to fetch asset history:', error);
+            setAssetHistory({});
         }
     };
 
@@ -274,6 +319,17 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
                 };
             });
     }, [history]);
+
+    const assetSparklineData = useMemo(() => {
+        const map: Record<string, { date: string; value: number }[]> = {};
+        Object.entries(assetHistory).forEach(([isin, entries]) => {
+            map[isin] = entries.map(entry => ({
+                date: entry.timestamp.slice(0, 10),
+                value: entry.currentPrice
+            }));
+        });
+        return map;
+    }, [assetHistory]);
 
     const openAnnualEditor = (year: number, endValue?: number) => {
         setEditingYear(year);
@@ -730,6 +786,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
                                         </span>
                                     </button>
                                 </th>
+                                <th>Market Trend</th>
                                 <th className={styles.sortableHeader}>
                                     <button
                                         className={`${styles.sortButton} ${positionsSort.key === 'value' ? styles.sortActive : ''}`}
@@ -776,6 +833,36 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
                                     <td>{pos.quantity.toFixed(2)}</td>
                                     <td>{formatCurrency(pos.averagePurchasePrice)}</td>
                                     <td>{formatCurrency(pos.currentPrice)}</td>
+                                    <td className={styles.sparklineCell}>
+                                        {pos.isin && assetSparklineData[pos.isin]?.length ? (
+                                            <div className={styles.sparklineChart}>
+                                                <LineChart
+                                                    width={140}
+                                                    height={42}
+                                                    data={assetSparklineData[pos.isin]}
+                                                    margin={{ top: 4, right: 4, left: 4, bottom: 4 }}
+                                                >
+                                                    <YAxis
+                                                        hide
+                                                        domain={([dataMin, dataMax]) => {
+                                                            const range = Math.max(dataMax - dataMin, 0.01);
+                                                            return [dataMin - range * 0.1, dataMax + range * 0.1];
+                                                        }}
+                                                    />
+                                                    <Line
+                                                        type="monotone"
+                                                        dataKey="value"
+                                                        stroke="#93c5fd"
+                                                        strokeWidth={2}
+                                                        dot={false}
+                                                        isAnimationActive={false}
+                                                    />
+                                                </LineChart>
+                                            </div>
+                                        ) : (
+                                            <span className={styles.sparklineEmpty}>—</span>
+                                        )}
+                                    </td>
                                     <td>{formatCurrency(pos.currentValue)}</td>
                                     <td className={pos.unrealizedGainLoss >= 0 ? styles.positive : styles.negative}>
                                         {pos.unrealizedGainLoss >= 0 ? '+' : ''}{formatCurrency(pos.unrealizedGainLoss)}

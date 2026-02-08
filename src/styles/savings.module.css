@@ -221,6 +221,20 @@
     color: #93c5fd;
 }
 
+.sparklineCell {
+    width: 160px;
+}
+
+.sparklineChart {
+    width: 140px;
+    height: 42px;
+}
+
+.sparklineEmpty {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
 .emptyState {
     text-align: center;
     padding: 4rem;
