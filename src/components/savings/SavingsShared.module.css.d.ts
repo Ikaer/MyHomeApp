@@ -1,0 +1,36 @@
+declare const styles: {
+  readonly "accountCard": string;
+  readonly "accountGrid": string;
+  readonly "accountName": string;
+  readonly "button": string;
+  readonly "chartContainer": string;
+  readonly "chartEmpty": string;
+  readonly "chartPanel": string;
+  readonly "chartPanelBody": string;
+  readonly "chartPanelTitle": string;
+  readonly "chartsGrid": string;
+  readonly "emptyState": string;
+  readonly "formActions": string;
+  readonly "formGrid": string;
+  readonly "formGroup": string;
+  readonly "formGroupFull": string;
+  readonly "input": string;
+  readonly "label": string;
+  readonly "negative": string;
+  readonly "positive": string;
+  readonly "secondaryButton": string;
+  readonly "select": string;
+  readonly "sortActive": string;
+  readonly "sortButton": string;
+  readonly "sortIndicator": string;
+  readonly "sortableHeader": string;
+  readonly "statItem": string;
+  readonly "statLabel": string;
+  readonly "statValue": string;
+  readonly "statsGrid": string;
+  readonly "table": string;
+  readonly "tableContainer": string;
+  readonly "ticker": string;
+};
+export = styles;
+

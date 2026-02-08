@@ -218,7 +218,7 @@
     background: var(--score-1);
 }
 
-.scoreNA {
+.scoreNa {
     background: var(--score-na);
 }
 
@@ -394,4 +394,14 @@
 .planToWatch {
     background: #8b5cf6;
     color: white;
+}
+
+.noImage{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1f2937;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    font-weight: 600;
 }

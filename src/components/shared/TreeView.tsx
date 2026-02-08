@@ -96,7 +96,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
       </div>
       
       {hasChildren && isExpanded && (
-        <div className={styles.treeChildren}>
+        <div>
           {node.children!.map(child => (
             <TreeNodeComponent
               key={child.id}

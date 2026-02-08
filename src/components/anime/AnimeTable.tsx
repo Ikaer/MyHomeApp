@@ -201,7 +201,7 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
   };
 
   const getScoreClass = (score?: number) => {
-    if (score === undefined || score === 0) return styles.scoreNA;
+    if (score === undefined || score === 0) return styles.scoreNa;
     const s = Math.floor(score);
     if (s >= 10) return styles.score10;
     if (s >= 9) return styles.score9;
@@ -327,7 +327,7 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
   }
 
   return (
-    <div className={styles.animeTableContainer}>
+    <div>
       <div className={styles.tableWrapper}>
         <table className={styles.animeTable}>
           <thead>

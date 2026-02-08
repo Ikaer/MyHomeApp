@@ -86,7 +86,7 @@ export default function AnimeCardView({
     };
 
     const getScoreClass = (score?: number) => {
-        if (score === undefined || score === 0) return styles.scoreNA;
+        if (score === undefined || score === 0) return styles.scoreNa;
         const s = Math.floor(score);
         if (s >= 10) return styles.score10;
         if (s >= 9) return styles.score9;
