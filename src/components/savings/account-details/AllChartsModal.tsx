@@ -1,0 +1,216 @@
+import React from 'react';
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis
+} from 'recharts';
+import styles from '@/styles/savings.module.css';
+import { HistoryMetricPoint } from './types';
+
+interface AllChartsModalProps {
+  open: boolean;
+  loading: boolean;
+  metrics: HistoryMetricPoint[];
+  onClose: () => void;
+  formatCurrency: (val: number) => string;
+}
+
+export default function AllChartsModal({
+  open,
+  loading,
+  metrics,
+  onClose,
+  formatCurrency
+}: AllChartsModalProps) {
+  if (!open) return null;
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.modalContent} onClick={event => event.stopPropagation()}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.accountName}>All Charts</h2>
+          <button type="button" className={styles.secondaryButton} onClick={onClose}>
+            Close
+          </button>
+        </div>
+        {loading ? (
+          <div className={styles.chartEmpty}>Loading history...</div>
+        ) : metrics.length === 0 ? (
+          <div className={styles.chartEmpty}>No historical data available.</div>
+        ) : (
+          <div className={styles.chartsGrid}>
+            <div className={styles.chartPanel}>
+              <div className={styles.chartPanelTitle}>Total Invested</div>
+              <div className={styles.chartPanelBody}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={metrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                    <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                    <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                    <YAxis
+                      tick={{ fill: '#9ca3af', fontSize: 12 }}
+                      tickFormatter={value => formatCurrency(Number(value))}
+                      width={90}
+                      domain={([dataMin, dataMax]) => {
+                        const range = Math.max(dataMax - dataMin, 1);
+                        return [dataMin - range * 0.05, dataMax + range * 0.05];
+                      }}
+                    />
+                    <Tooltip
+                      contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                      labelStyle={{ color: '#9ca3af' }}
+                      formatter={(value) => formatCurrency(Number(value ?? 0))}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="totalInvested"
+                      stroke="#94a3b8"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className={styles.chartPanel}>
+              <div className={styles.chartPanelTitle}>Current Value</div>
+              <div className={styles.chartPanelBody}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={metrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                    <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                    <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                    <YAxis
+                      tick={{ fill: '#9ca3af', fontSize: 12 }}
+                      tickFormatter={value => formatCurrency(Number(value))}
+                      width={90}
+                      domain={([dataMin, dataMax]) => {
+                        const range = Math.max(dataMax - dataMin, 1);
+                        return [dataMin - range * 0.05, dataMax + range * 0.05];
+                      }}
+                    />
+                    <Tooltip
+                      contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                      labelStyle={{ color: '#9ca3af' }}
+                      formatter={(value) => formatCurrency(Number(value ?? 0))}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="currentValue"
+                      stroke="#60a5fa"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className={styles.chartPanel}>
+              <div className={styles.chartPanelTitle}>Total Gain/Loss</div>
+              <div className={styles.chartPanelBody}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={metrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                    <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                    <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                    <YAxis
+                      tick={{ fill: '#9ca3af', fontSize: 12 }}
+                      tickFormatter={value => formatCurrency(Number(value))}
+                      width={90}
+                      domain={([dataMin, dataMax]) => {
+                        const range = Math.max(dataMax - dataMin, 1);
+                        return [dataMin - range * 0.05, dataMax + range * 0.05];
+                      }}
+                    />
+                    <Tooltip
+                      contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                      labelStyle={{ color: '#9ca3af' }}
+                      formatter={(value) => formatCurrency(Number(value ?? 0))}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="totalGainLoss"
+                      stroke="#34d399"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className={styles.chartPanel}>
+              <div className={styles.chartPanelTitle}>XIRR</div>
+              <div className={styles.chartPanelBody}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={metrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                    <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                    <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                    <YAxis
+                      tick={{ fill: '#9ca3af', fontSize: 12 }}
+                      tickFormatter={value => `${(Number(value) * 100).toFixed(2)}%`}
+                      width={70}
+                      domain={([dataMin, dataMax]) => {
+                        const range = Math.max(dataMax - dataMin, 0.001);
+                        return [dataMin - range * 0.1, dataMax + range * 0.1];
+                      }}
+                    />
+                    <Tooltip
+                      contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                      labelStyle={{ color: '#9ca3af' }}
+                      formatter={(value) => `${(Number(value ?? 0) * 100).toFixed(2)}%`}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="xirr"
+                      stroke="#fbbf24"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div className={styles.chartPanel}>
+              <div className={styles.chartPanelTitle}>Current Year XIRR</div>
+              <div className={styles.chartPanelBody}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={metrics} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                    <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                    <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                    <YAxis
+                      tick={{ fill: '#9ca3af', fontSize: 12 }}
+                      tickFormatter={value => `${(Number(value) * 100).toFixed(2)}%`}
+                      width={70}
+                      domain={([dataMin, dataMax]) => {
+                        const range = Math.max(dataMax - dataMin, 0.001);
+                        return [dataMin - range * 0.1, dataMax + range * 0.1];
+                      }}
+                    />
+                    <Tooltip
+                      contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                      labelStyle={{ color: '#9ca3af' }}
+                      formatter={(value) => `${(Number(value ?? 0) * 100).toFixed(2)}%`}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="currentYearXirr"
+                      stroke="#a78bfa"
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
