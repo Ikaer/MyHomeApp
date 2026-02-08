@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Bookmark, BookmarkCategory } from '@/types';
+import styles from './BookmarkCard.module.css';
 
 interface BookmarkCardProps {
   bookmark: Bookmark;
@@ -49,17 +50,17 @@ export default function BookmarkCard({ bookmark, categories, onEdit, onDelete }:
   };
 
   return (
-    <div className="bookmark-card">
-      <div className="bookmark-header">
-        <div className="bookmark-favicon">
+    <div className={styles.bookmarkCard}>
+      <div className={styles.bookmarkHeader}>
+        <div className={styles.bookmarkFavicon}>
           {bookmark.favicon ? (
             <Image src={bookmark.favicon} alt="" width={16} height={16} unoptimized />
           ) : (
             <span>🔗</span>
           )}
         </div>
-        <div className="bookmark-info">
-          <h3 className="bookmark-title">
+        <div className={styles.bookmarkInfo}>
+          <h3 className={styles.bookmarkTitle}>
             <a 
               href={bookmark.url} 
               target="_blank" 
@@ -69,19 +70,19 @@ export default function BookmarkCard({ bookmark, categories, onEdit, onDelete }:
               {bookmark.title}
             </a>
           </h3>
-          <p className="bookmark-domain">{getDomain(bookmark.url)}</p>
+          <p className={styles.bookmarkDomain}>{getDomain(bookmark.url)}</p>
         </div>
-        <div className="bookmark-actions">
+        <div className={styles.bookmarkActions}>
           <button 
             onClick={() => onEdit(bookmark)}
-            className="btn-icon"
+            className={styles.iconButton}
             title="Edit bookmark"
           >
             ✏️
           </button>
           <button 
             onClick={handleDelete}
-            className="btn-icon btn-danger"
+            className={`${styles.iconButton} ${styles.iconDanger}`}
             title="Delete bookmark"
             disabled={isDeleting}
           >
@@ -91,13 +92,13 @@ export default function BookmarkCard({ bookmark, categories, onEdit, onDelete }:
       </div>
       
       {bookmark.description && (
-        <p className="bookmark-description">{bookmark.description}</p>
+        <p className={styles.bookmarkDescription}>{bookmark.description}</p>
       )}
       
-      <div className="bookmark-meta">
+      <div className={styles.bookmarkMeta}>
         {category && (
           <span 
-            className="bookmark-category"
+            className={styles.bookmarkCategory}
             style={{ backgroundColor: category.color + '20', color: category.color }}
           >
             {category.icon} {category.name}
@@ -105,20 +106,20 @@ export default function BookmarkCard({ bookmark, categories, onEdit, onDelete }:
         )}
         
         {bookmark.path && (
-          <span className="bookmark-path" title="Chrome folder path">
+          <span className={styles.bookmarkPath} title="Chrome folder path">
             📁 {bookmark.path}
           </span>
         )}
         
         {bookmark.tags.length > 0 && (
-          <div className="bookmark-tags">
+          <div className={styles.bookmarkTags}>
             {bookmark.tags.map(tag => (
-              <span key={tag} className="bookmark-tag">#{tag}</span>
+              <span key={tag} className={styles.bookmarkTag}>#{tag}</span>
             ))}
           </div>
         )}
         
-        <span className="bookmark-date">
+        <span className={styles.bookmarkDate}>
           Updated {formatDate(bookmark.updatedAt)}
         </span>
       </div>

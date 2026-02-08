@@ -106,11 +106,6 @@ export default function Files() {
       </Head>
 
       <div>
-        <h1 className="page-title">File Explorer</h1>
-        <p className="page-subtitle">
-          Browse files and folders from your configured locations
-        </p>
-
         {/* File Roots Management */}
         <div className="file-roots-section" style={{ marginBottom: '2rem' }}>
           <div className="section-header">
@@ -184,17 +179,6 @@ export default function Files() {
       </div>
 
       <style jsx>{`
-        .page-title {
-          font-size: 2rem;
-          font-weight: 700;
-          margin-bottom: 0.5rem;
-          color: #333;
-        }
-        .page-subtitle {
-          font-size: 1.1rem;
-          color: #666;
-          margin-bottom: 2rem;
-        }
         .file-roots-section {
           background: #f8f9fa;
           border-radius: 8px;

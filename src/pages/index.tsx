@@ -19,11 +19,6 @@ export default function Home({ subApps }: HomeProps) {
       </Head>
 
       <div>
-        <h1 className="page-title">MyHomeApp</h1>
-        <p className="page-subtitle">
-          Your personal home server dashboard
-        </p>
-
         <div className="card-grid">
           {subApps.map((subApp) => (
             <SubAppCard key={subApp.id} subApp={subApp} />

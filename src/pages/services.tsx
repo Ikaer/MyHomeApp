@@ -17,11 +17,6 @@ export default function Services({ services }: ServicesProps) {
       </Head>
 
       <div>
-        <h1 className="page-title">Services</h1>
-        <p className="page-subtitle">
-          Quick access to all your self-hosted services
-        </p>
-
         <div className="card-grid">
           {services.map((service) => (
             <ServiceCard key={service.id} service={service} />

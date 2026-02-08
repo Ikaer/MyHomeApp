@@ -3,6 +3,7 @@ import Head from 'next/head';
 import BookmarkCard from '@/components/bookmarks/BookmarkCard';
 import BookmarkForm from '@/components/bookmarks/BookmarkForm';
 import { Bookmark, BookmarkCategory } from '@/types';
+import styles from './bookmarks/BookmarksPage.module.css';
 
 export default function Bookmarks() {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
@@ -193,11 +194,6 @@ export default function Bookmarks() {
       </Head>
 
       <div>
-        <h1 className="page-title">Bookmarks</h1>
-        <p className="page-subtitle">
-          Organize and manage your bookmarks
-        </p>
-
         {/* Loading State */}
         {isLoading ? (
           <div key="loading" style={{ textAlign: 'center', padding: '3rem' }}>
@@ -206,35 +202,35 @@ export default function Bookmarks() {
         ) : (
           <div key="loaded">
             {/* Stats */}
-            <div className="bookmark-stats">
-              <div className="stat-card">
-                <div className="stat-number">{totalBookmarks}</div>
-                <div className="stat-label">Total Bookmarks</div>
+            <div className={styles.bookmarkStats}>
+              <div className={styles.statCard}>
+                <div className={styles.statNumber}>{totalBookmarks}</div>
+                <div className={styles.statLabel}>Total Bookmarks</div>
               </div>
               {categoryStats.map(category => (
-                <div key={category.id} className="stat-card">
-                  <div className="stat-number" style={{ color: category.color }}>
+                <div key={category.id} className={styles.statCard}>
+                  <div className={styles.statNumber} style={{ color: category.color }}>
                     {category.count}
                   </div>
-                  <div className="stat-label">{category.icon} {category.name}</div>
+                  <div className={styles.statLabel}>{category.icon} {category.name}</div>
                 </div>
               ))}
             </div>
 
             {/* Controls */}
-            <div className="bookmark-controls">
+            <div className={styles.bookmarkControls}>
               <input
                 type="text"
                 placeholder="Search bookmarks..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
+                className={styles.searchInput}
               />
               
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="category-filter"
+                className={styles.categoryFilter}
               >
                 <option value="">All Categories</option>
                 {categories.map(category => (
@@ -265,7 +261,7 @@ export default function Bookmarks() {
 
             {/* Bookmarks Grid */}
             {filteredBookmarks.length > 0 ? (
-              <div className="bookmark-grid">
+              <div className={styles.bookmarkGrid}>
                 {filteredBookmarks.map(bookmark => (
                   <BookmarkCard
                     key={bookmark.id}
@@ -277,7 +273,7 @@ export default function Bookmarks() {
                 ))}
               </div>
             ) : (
-              <div className="empty-state">
+              <div className={styles.emptyState}>
                 <h3>
                   {searchTerm || selectedCategory 
                     ? 'No bookmarks found' 

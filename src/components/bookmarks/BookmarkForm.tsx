@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Modal } from '@/components/shared';
 import { Bookmark, BookmarkCategory } from '@/types';
+import styles from './BookmarkForm.module.css';
 
 interface BookmarkFormProps {
   bookmark?: Bookmark | null;
@@ -107,7 +108,7 @@ export default function BookmarkForm({ bookmark, categories, onSave, onCancel }:
       size="sm"
     >
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="title">Title *</label>
           <input
             type="text"
@@ -119,7 +120,7 @@ export default function BookmarkForm({ bookmark, categories, onSave, onCancel }:
           />
         </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="url">URL *</label>
             <input
               type="url"
@@ -131,7 +132,7 @@ export default function BookmarkForm({ bookmark, categories, onSave, onCancel }:
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="description">Description</label>
             <textarea
               id="description"
@@ -142,7 +143,7 @@ export default function BookmarkForm({ bookmark, categories, onSave, onCancel }:
             />
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="category">Category *</label>
             <select
               id="category"
@@ -158,7 +159,7 @@ export default function BookmarkForm({ bookmark, categories, onSave, onCancel }:
             </select>
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="path">Chrome Folder Path</label>
             <input
               type="text"
@@ -167,12 +168,12 @@ export default function BookmarkForm({ bookmark, categories, onSave, onCancel }:
               onChange={(e) => setFormData(prev => ({ ...prev, path: e.target.value }))}
               placeholder="e.g., Bookmarks Bar / Work / Tools"
             />
-            <small className="form-help">Original Chrome bookmark folder path (automatically filled for imports)</small>
+            <small className={styles.formHelp}>Original Chrome bookmark folder path (automatically filled for imports)</small>
           </div>
 
-          <div className="form-group">
+          <div className={styles.formGroup}>
             <label htmlFor="tags">Tags</label>
-            <div className="tag-input-container">
+            <div className={styles.tagInputContainer}>
               <input
                 type="text"
                 id="tags"
@@ -186,14 +187,14 @@ export default function BookmarkForm({ bookmark, categories, onSave, onCancel }:
               </button>
             </div>
             {formData.tags.length > 0 && (
-              <div className="tags-display">
+              <div className={styles.tagsDisplay}>
                 {formData.tags.map(tag => (
-                  <span key={tag} className="tag-item">
+                  <span key={tag} className={styles.tagItem}>
                     #{tag}
                     <button 
                       type="button" 
                       onClick={() => removeTag(tag)}
-                      className="tag-remove"
+                      className={styles.tagRemove}
                     >
                       ✕
                     </button>
@@ -203,7 +204,7 @@ export default function BookmarkForm({ bookmark, categories, onSave, onCancel }:
             )}
           </div>
 
-        <div className="form-actions">
+        <div className={styles.formActions}>
           <button type="button" onClick={onCancel} className="btn btn-secondary">
             Cancel
           </button>
