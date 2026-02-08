@@ -11,6 +11,7 @@ import PositionsTable from './account-details/PositionsTable';
 import TransactionsTable from './account-details/TransactionsTable';
 import AllChartsModal from './account-details/AllChartsModal';
 import AssetChartsModal from './account-details/AssetChartsModal';
+import AnnualEditorModal from './account-details/AnnualEditorModal';
 import { buildClipboardText } from './account-details/helpers/clipboard';
 import { buildAnnualXirr } from './account-details/helpers/xirr';
 import { buildAnnualOverviewRows } from './account-details/helpers/annualOverview';
@@ -29,6 +30,8 @@ import {
 import { useSavingsAccountData } from '@/hooks/savings/useSavingsAccountData';
 import { useAccountHistory } from '@/hooks/savings/useAccountHistory';
 import { useAssetHistory } from '@/hooks/savings/useAssetHistory';
+import { useAnnualValueEditor } from '@/hooks/savings/useAnnualValueEditor';
+import { useTransactionEditor } from '@/hooks/savings/useTransactionEditor';
 import {
   getActiveAssetInfo,
   mapAssetChartData,
@@ -56,12 +59,9 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
   const { assetHistory } = useAssetHistory(isins);
 
   const [activeTab, setActiveTab] = useState<'positions' | 'transactions'>('positions');
-  const [showForm, setShowForm] = useState(false);
   const [showCharts, setShowCharts] = useState(false);
   const [showAssetCharts, setShowAssetCharts] = useState(false);
   const [activeAssetIsin, setActiveAssetIsin] = useState<string | null>(null);
-  const [editingYear, setEditingYear] = useState<number | null>(null);
-  const [editingEndValue, setEditingEndValue] = useState<string>('');
   const [positionsSort, setPositionsSort] = useState<{ key: PositionSortKey; direction: SortDirection }>(
     { key: 'asset', direction: 'asc' }
   );
@@ -77,26 +77,15 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
     return (val * 1).toFixed(2) + '%';
   };
 
-  const handleSaveTransaction = async (transaction: Transaction) => {
-    try {
-      const res = await fetch(`/api/savings/transactions/${account.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(transaction)
-      });
-
-      if (res.ok) {
-        setShowForm(false);
-        refreshData();
-      } else {
-        const err = await res.json();
-        alert(`Failed to save transaction: ${err.error}`);
-      }
-    } catch (error) {
-      console.error('Error saving transaction:', error);
-      alert('An error occurred while saving the transaction.');
-    }
-  };
+  const {
+    isOpen: isTransactionEditorOpen,
+    mode: transactionEditorMode,
+    editingTransaction,
+    openAddTransaction,
+    openEditTransaction,
+    closeTransactionEditor,
+    saveTransaction
+  } = useTransactionEditor({ accountId: account.id, onRefresh: refreshData });
 
   const handleCopyContext = async () => {
     if (!data) return;
@@ -154,47 +143,17 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
     return getActiveAssetInfo(activeAssetIsin, data?.positions);
   }, [activeAssetIsin, data?.positions]);
 
-  const openAnnualEditor = (year: number, endValue?: number) => {
-    setEditingYear(year);
-    setEditingEndValue(endValue !== undefined ? endValue.toString() : '');
-  };
-
-  const closeAnnualEditor = () => {
-    setEditingYear(null);
-    setEditingEndValue('');
-  };
-
-  const saveAnnualValue = async () => {
-    if (editingYear === null) return;
-    const parsedValue = parseFloat(editingEndValue);
-    if (Number.isNaN(parsedValue)) {
-      alert('Please enter a valid end-of-year value.');
-      return;
-    }
-
-    try {
-      const res = await fetch(`/api/savings/annual/${account.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          year: editingYear,
-          endValue: parsedValue
-        })
-      });
-
-      if (res.ok) {
-        const updated = await res.json();
-        setAnnualValues(updated);
-        closeAnnualEditor();
-      } else {
-        const err = await res.json();
-        alert(`Failed to save annual value: ${err.error}`);
-      }
-    } catch (error) {
-      console.error('Failed to save annual value:', error);
-      alert('An error occurred while saving the annual value.');
-    }
-  };
+  const {
+    editingYear,
+    editingEndValue,
+    setEditingEndValue,
+    openAnnualEditor,
+    closeAnnualEditor,
+    saveAnnualValue
+  } = useAnnualValueEditor({
+    accountId: account.id,
+    setAnnualValues
+  });
 
   const toggleSort = <TKey extends string>(
     current: { key: TKey; direction: SortDirection },
@@ -222,49 +181,25 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
 
   return (
     <div>
-      {showForm && (
+      {isTransactionEditorOpen && (
         <TransactionForm
           accountId={account.id}
-          onSave={handleSaveTransaction}
-          onCancel={() => setShowForm(false)}
+          mode={transactionEditorMode}
+          initialTransaction={editingTransaction}
+          onSave={saveTransaction}
+          onCancel={closeTransactionEditor}
         />
       )}
 
-      {editingYear !== null && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalContent}>
-            <h2 className={styles.accountName}>Annual Overview</h2>
-            <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
-              <label className={styles.label}>Year</label>
-              <input
-                type="text"
-                className={styles.input}
-                value={editingYear}
-                readOnly
-              />
-            </div>
-            <div className={styles.formGroup} style={{ marginTop: '1rem' }}>
-              <label className={styles.label}>End of Year Value ({account.currency})</label>
-              <input
-                type="number"
-                step="any"
-                className={styles.input}
-                value={editingEndValue}
-                onChange={event => setEditingEndValue(event.target.value)}
-                placeholder="e.g. 12500.45"
-              />
-            </div>
-            <div className={styles.formActions}>
-              <button type="button" className={styles.secondaryButton} onClick={closeAnnualEditor}>
-                Cancel
-              </button>
-              <button type="button" className={styles.button} onClick={saveAnnualValue}>
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnnualEditorModal
+        open={editingYear !== null}
+        year={editingYear}
+        endValue={editingEndValue}
+        currency={account.currency}
+        onChangeEndValue={setEditingEndValue}
+        onCancel={closeAnnualEditor}
+        onSave={saveAnnualValue}
+      />
 
       <AllChartsModal
         open={showCharts}
@@ -286,7 +221,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
       <AccountHeaderActions
         title={account.name}
         onBack={onBack}
-        onAddTransaction={() => setShowForm(true)}
+        onAddTransaction={openAddTransaction}
         onRefreshPrices={refreshData}
         onCopyContext={handleCopyContext}
         onShowCharts={() => setShowCharts(true)}
@@ -351,6 +286,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
           transactionsSort={transactionsSort}
           onToggleSort={(key) => setTransactionsSort(toggleSort(transactionsSort, key))}
           formatCurrency={formatCurrency}
+          onEditTransaction={openEditTransaction}
         />
       )}
     </div>

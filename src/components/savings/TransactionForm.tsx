@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '@/styles/savings.module.css';
 import { Transaction, TransactionType } from '@/models/savings';
 
 interface TransactionFormProps {
     accountId: string;
+    mode?: 'add' | 'edit';
+    initialTransaction?: Transaction | null;
     onSave: (transaction: Transaction) => void;
     onCancel: () => void;
 }
 
-export default function TransactionForm({ accountId, onSave, onCancel }: TransactionFormProps) {
+export default function TransactionForm({
+    accountId,
+    mode = 'add',
+    initialTransaction,
+    onSave,
+    onCancel
+}: TransactionFormProps) {
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split('T')[0],
         type: 'Buy' as TransactionType,
@@ -20,6 +28,35 @@ export default function TransactionForm({ accountId, onSave, onCancel }: Transac
         fees: '0',
         ttf: '0'
     });
+
+    useEffect(() => {
+        if (!initialTransaction) {
+            setFormData({
+                date: new Date().toISOString().split('T')[0],
+                type: 'Buy' as TransactionType,
+                assetName: '',
+                isin: '',
+                ticker: '',
+                quantity: '',
+                unitPrice: '',
+                fees: '0',
+                ttf: '0'
+            });
+            return;
+        }
+
+        setFormData({
+            date: initialTransaction.date,
+            type: initialTransaction.type,
+            assetName: initialTransaction.assetName,
+            isin: initialTransaction.isin,
+            ticker: initialTransaction.ticker,
+            quantity: initialTransaction.quantity.toString(),
+            unitPrice: initialTransaction.unitPrice.toString(),
+            fees: initialTransaction.fees.toString(),
+            ttf: initialTransaction.ttf.toString()
+        });
+    }, [initialTransaction]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -43,7 +80,7 @@ export default function TransactionForm({ accountId, onSave, onCancel }: Transac
         }
 
         const transaction: Transaction = {
-            id: Math.random().toString(36).substr(2, 9),
+            id: initialTransaction?.id ?? Math.random().toString(36).substr(2, 9),
             date: formData.date,
             type: formData.type,
             assetName: formData.assetName,
@@ -62,7 +99,7 @@ export default function TransactionForm({ accountId, onSave, onCancel }: Transac
     return (
         <div className={styles.modalOverlay}>
             <div className={styles.modalContent}>
-                <h2 className={styles.accountName}>Add Transaction</h2>
+                <h2 className={styles.accountName}>{mode === 'edit' ? 'Edit Transaction' : 'Add Transaction'}</h2>
                 <form onSubmit={handleSubmit}>
                     <div className={styles.formGrid}>
                         <div className={styles.formGroup}>
@@ -182,7 +219,7 @@ export default function TransactionForm({ accountId, onSave, onCancel }: Transac
                             Cancel
                         </button>
                         <button type="submit" className={styles.button}>
-                            Add Transaction
+                            {mode === 'edit' ? 'Save Changes' : 'Add Transaction'}
                         </button>
                     </div>
                 </form>

@@ -6,7 +6,8 @@ export default function TransactionsTable({
   transactions,
   transactionsSort,
   onToggleSort,
-  formatCurrency
+  formatCurrency,
+  onEditTransaction
 }: TransactionsTableProps) {
   return (
     <div className={styles.tableContainer}>
@@ -123,6 +124,7 @@ export default function TransactionsTable({
                 </span>
               </button>
             </th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -138,6 +140,15 @@ export default function TransactionsTable({
               <td>{formatCurrency(t.fees)}</td>
               <td>{formatCurrency(t.ttf)}</td>
               <td>{formatCurrency(t.totalAmount)}</td>
+              <td>
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => onEditTransaction(t)}
+                >
+                  Edit
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

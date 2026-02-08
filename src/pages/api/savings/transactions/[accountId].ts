@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getTransactions, addTransaction } from '@/lib/savings';
+import { getTransactions, addTransaction, updateTransaction } from '@/lib/savings';
 import { Transaction } from '@/models/savings';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -28,6 +28,20 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         return res.status(201).json(transaction);
     }
 
-    res.setHeader('Allow', ['GET', 'POST']);
+    if (req.method === 'PUT') {
+        const transaction: Transaction = req.body;
+        if (!transaction.id || !transaction.ticker) {
+            return res.status(400).json({ error: 'Missing transaction data' });
+        }
+
+        const success = updateTransaction(accountId, transaction);
+        if (!success) {
+            return res.status(404).json({ error: 'Transaction not found' });
+        }
+
+        return res.status(200).json(transaction);
+    }
+
+    res.setHeader('Allow', ['GET', 'POST', 'PUT']);
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
 }

@@ -81,6 +81,7 @@ export interface TransactionsTableProps {
   transactionsSort: { key: TransactionSortKey; direction: SortDirection };
   onToggleSort: (key: TransactionSortKey) => void;
   formatCurrency: (val: number) => string;
+  onEditTransaction: (transaction: Transaction) => void;
 }
 
 export type SortDirection = 'asc' | 'desc';

@@ -122,6 +122,17 @@ export function addTransaction(accountId: string, transaction: Transaction): boo
 }
 
 /**
+ * Update an existing transaction in an account
+ */
+export function updateTransaction(accountId: string, transaction: Transaction): boolean {
+    const transactions = getTransactions(accountId);
+    const index = transactions.findIndex(t => t.id === transaction.id);
+    if (index === -1) return false;
+    transactions[index] = transaction;
+    return saveTransactions(accountId, transactions);
+}
+
+/**
  * Calculate positions and aggregation for an account
  */
 export function calculateAccountPositions(accountId: string, currentPrices: Record<string, number>): AssetPosition[] {
