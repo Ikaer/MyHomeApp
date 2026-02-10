@@ -6,6 +6,8 @@ import layoutStyles from './SavingsLayout.module.css';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount } from '@/models/savings';
 import SavingsAccountDetails from '@/components/savings/SavingsAccountDetails';
+import BalanceAccountDetails from '@/components/savings/BalanceAccountDetails';
+import InteressementDetails from '@/components/savings/InteressementDetails';
 
 export default function SavingsAccountPage() {
     const router = useRouter();
@@ -61,15 +63,50 @@ export default function SavingsAccountPage() {
         );
     }
 
+    const handleBack = () => router.push('/savings');
+
+    const renderDetails = () => {
+        switch (account.type) {
+            case 'PEA':
+                return (
+                    <SavingsAccountDetails
+                        account={account}
+                        onBack={handleBack}
+                    />
+                );
+            case 'Interessement':
+                return (
+                    <InteressementDetails
+                        account={account}
+                        onBack={handleBack}
+                    />
+                );
+            case 'CompteCourant':
+            case 'PEL':
+            case 'LivretA':
+            case 'AssuranceVie':
+                return (
+                    <BalanceAccountDetails
+                        account={account}
+                        onBack={handleBack}
+                    />
+                );
+            default:
+                return (
+                    <BalanceAccountDetails
+                        account={account}
+                        onBack={handleBack}
+                    />
+                );
+        }
+    };
+
     return (
         <div className={layoutStyles.savingsContainer}>
             <Head>
                 <title>MyHomeApp - {account.name}</title>
             </Head>
-            <SavingsAccountDetails
-                account={account}
-                onBack={() => router.push('/savings')}
-            />
+            {renderDetails()}
         </div>
     );
 }

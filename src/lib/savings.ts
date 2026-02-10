@@ -1,12 +1,21 @@
 import path from 'path';
 import {
     SavingsAccount,
+    AccountType,
     Transaction,
     AssetPosition,
     AccountSummary,
     AssetPriceInfo,
     TransactionType,
-    AnnualAccountValue
+    AnnualAccountValue,
+    BalanceRecord,
+    DepositRecord,
+    AccountValuation,
+    NetWorthSummary,
+    PELConfig,
+    LivretAConfig,
+    AssuranceVieConfig,
+    InteressementConfig,
 } from '@/models/savings';
 import { readJsonFile, writeJsonFile, ensureDirectoryExists } from './data';
 
@@ -14,10 +23,14 @@ const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const SAVINGS_DATA_PATH = path.join(DATA_PATH, 'savings');
 const ACCOUNTS_FILE = path.join(SAVINGS_DATA_PATH, 'accounts.json');
 const ANNUAL_VALUES_DIR = path.join(SAVINGS_DATA_PATH, 'annual-values');
+const BALANCES_DIR = path.join(SAVINGS_DATA_PATH, 'balances');
+const DEPOSITS_DIR = path.join(SAVINGS_DATA_PATH, 'deposits');
 
-// Initialize sub-app directory
+// Initialize sub-app directories
 ensureDirectoryExists(SAVINGS_DATA_PATH);
 ensureDirectoryExists(ANNUAL_VALUES_DIR);
+ensureDirectoryExists(BALANCES_DIR);
+ensureDirectoryExists(DEPOSITS_DIR);
 
 /**
  * Get all savings accounts
@@ -185,6 +198,66 @@ export function calculateAccountPositions(accountId: string, currentPrices: Reco
     });
 }
 
+// ── Balance Records (CompteCourant, PEL, LivretA, AssuranceVie) ────────────
+
+export function getBalanceRecords(accountId: string): BalanceRecord[] {
+    const file = path.join(BALANCES_DIR, `${accountId}.json`);
+    const records = readJsonFile<BalanceRecord[]>(file, []);
+    return records.sort((a, b) => b.date.localeCompare(a.date)); // newest first
+}
+
+export function saveBalanceRecords(accountId: string, records: BalanceRecord[]): boolean {
+    const file = path.join(BALANCES_DIR, `${accountId}.json`);
+    return writeJsonFile(file, records);
+}
+
+export function addBalanceRecord(accountId: string, record: BalanceRecord): boolean {
+    const records = getBalanceRecords(accountId);
+    // Replace if same date exists, otherwise add
+    const idx = records.findIndex(r => r.date === record.date);
+    if (idx >= 0) {
+        records[idx] = record;
+    } else {
+        records.push(record);
+    }
+    return saveBalanceRecords(accountId, records);
+}
+
+export function getLatestBalance(accountId: string): BalanceRecord | null {
+    const records = getBalanceRecords(accountId);
+    return records.length > 0 ? records[0] : null;
+}
+
+// ── Deposit Records (Intéressement) ────────────────────────────────────────────
+
+export function getDepositRecords(accountId: string): DepositRecord[] {
+    const file = path.join(DEPOSITS_DIR, `${accountId}.json`);
+    return readJsonFile<DepositRecord[]>(file, []);
+}
+
+export function saveDepositRecords(accountId: string, records: DepositRecord[]): boolean {
+    const file = path.join(DEPOSITS_DIR, `${accountId}.json`);
+    return writeJsonFile(file, records);
+}
+
+export function addOrUpdateDeposit(accountId: string, deposit: DepositRecord): boolean {
+    const records = getDepositRecords(accountId);
+    const idx = records.findIndex(r => r.id === deposit.id);
+    if (idx >= 0) {
+        records[idx] = deposit;
+    } else {
+        records.push(deposit);
+    }
+    return saveDepositRecords(accountId, records);
+}
+
+export function deleteDeposit(accountId: string, depositId: string): boolean {
+    const records = getDepositRecords(accountId);
+    const filtered = records.filter(r => r.id !== depositId);
+    if (filtered.length === records.length) return false;
+    return saveDepositRecords(accountId, filtered);
+}
+
 import xirr from 'xirr';
 
 /**
@@ -277,5 +350,288 @@ export function getAccountSummary(accountId: string, currentPrices: Record<strin
         currentValue: currentValueSum,
         totalGainLoss,
         xirr
+    };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// Valuation functions — one per account type, all returning AccountValuation
+// ══════════════════════════════════════════════════════════════════════════════
+
+function daysBetween(a: string, b: string): number {
+    const msPerDay = 1000 * 60 * 60 * 24;
+    return Math.floor((new Date(b).getTime() - new Date(a).getTime()) / msPerDay);
+}
+
+function yearsBetween(a: string, b: string): number {
+    return daysBetween(a, b) / 365.25;
+}
+
+/**
+ * Valuate a PEA account using live market prices.
+ * This calls the existing getAccountSummary logic.
+ */
+async function valuatePEA(account: SavingsAccount, currentPrices: Record<string, number>): Promise<AccountValuation> {
+    const summary = getAccountSummary(account.id, currentPrices);
+    const transactions = getTransactions(account.id);
+    const lastTransaction = transactions.length > 0
+        ? transactions.sort((a, b) => b.date.localeCompare(a.date))[0].date
+        : new Date().toISOString().split('T')[0];
+
+    return {
+        accountId: account.id,
+        accountName: account.name,
+        accountType: account.type,
+        currentValue: summary?.currentValue ?? 0,
+        totalContributed: summary?.totalInvested ?? 0,
+        totalGainLoss: summary?.totalGainLoss ?? 0,
+        gainLossPercentage: summary && summary.totalInvested > 0
+            ? (summary.totalGainLoss / summary.totalInvested) * 100
+            : 0,
+        lastUpdated: new Date().toISOString().split('T')[0],
+        isEstimated: false,
+    };
+}
+
+/**
+ * Valuate a Compte Courant — just the latest balance snapshot.
+ */
+function valuateCompteCourant(account: SavingsAccount): AccountValuation {
+    const latest = getLatestBalance(account.id);
+    const value = latest?.balance ?? 0;
+
+    return {
+        accountId: account.id,
+        accountName: account.name,
+        accountType: account.type,
+        currentValue: value,
+        totalContributed: value, // No savings, contributed == current
+        totalGainLoss: 0,
+        gainLossPercentage: 0,
+        lastUpdated: latest?.date ?? '',
+        isEstimated: false,
+    };
+}
+
+/**
+ * Valuate Intéressement — sum of current values across all deposits.
+ */
+function valuateInteressement(account: SavingsAccount): AccountValuation {
+    const deposits = getDepositRecords(account.id);
+    const totalDeposited = deposits.reduce((s, d) => s + d.deposit_amount, 0);
+    const currentValue = deposits.reduce((s, d) => s + d.current_value, 0);
+    const gainLoss = currentValue - totalDeposited;
+    const latestValueDate = deposits.length > 0
+        ? deposits.sort((a, b) => b.value_date.localeCompare(a.value_date))[0].value_date
+        : '';
+
+    return {
+        accountId: account.id,
+        accountName: account.name,
+        accountType: account.type,
+        currentValue,
+        totalContributed: totalDeposited,
+        totalGainLoss: gainLoss,
+        gainLossPercentage: totalDeposited > 0 ? (gainLoss / totalDeposited) * 100 : 0,
+        lastUpdated: latestValueDate,
+        isEstimated: false,
+    };
+}
+
+/**
+ * Valuate PEL — compound interest from last known balance.
+ */
+function valuatePEL(account: SavingsAccount): AccountValuation {
+    const config = account.config as PELConfig | undefined;
+    const latest = getLatestBalance(account.id);
+
+    if (!latest || !config) {
+        return {
+            accountId: account.id,
+            accountName: account.name,
+            accountType: account.type,
+            currentValue: latest?.balance ?? 0,
+            totalContributed: latest?.balance ?? 0,
+            totalGainLoss: 0,
+            gainLossPercentage: 0,
+            lastUpdated: latest?.date ?? '',
+            isEstimated: false,
+        };
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const fractionOfYear = daysBetween(latest.date, today) / 365;
+
+    // Tax regime
+    const openingDate = config.opening_date;
+    const accountAgeYears = yearsBetween(openingDate, today);
+    const openedBefore2018 = new Date(openingDate).getFullYear() < 2018;
+    const taxRate = openedBefore2018 && accountAgeYears < 12 ? 0.172 : 0.30;
+    const netRate = config.gross_rate * (1 - taxRate);
+
+    // Linear interpolation for partial year since interest is credited annually
+    const estimatedValue = latest.balance * (1 + netRate * fractionOfYear);
+
+    // Total contributed: use oldest balance if available, otherwise current balance
+    const allBalances = getBalanceRecords(account.id);
+    const oldest = allBalances.length > 0
+        ? allBalances[allBalances.length - 1]
+        : latest;
+
+    return {
+        accountId: account.id,
+        accountName: account.name,
+        accountType: account.type,
+        currentValue: Math.round(estimatedValue * 100) / 100,
+        totalContributed: oldest.balance,
+        totalGainLoss: Math.round((estimatedValue - oldest.balance) * 100) / 100,
+        gainLossPercentage: oldest.balance > 0
+            ? Math.round(((estimatedValue - oldest.balance) / oldest.balance) * 10000) / 100
+            : 0,
+        lastUpdated: latest.date,
+        isEstimated: fractionOfYear > 0,
+    };
+}
+
+/**
+ * Valuate Livret A — tax-free interest from last known balance.
+ */
+function valuateLivretA(account: SavingsAccount): AccountValuation {
+    const config = account.config as LivretAConfig | undefined;
+    const latest = getLatestBalance(account.id);
+
+    if (!latest || !config) {
+        return {
+            accountId: account.id,
+            accountName: account.name,
+            accountType: account.type,
+            currentValue: latest?.balance ?? 0,
+            totalContributed: latest?.balance ?? 0,
+            totalGainLoss: 0,
+            gainLossPercentage: 0,
+            lastUpdated: latest?.date ?? '',
+            isEstimated: false,
+        };
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const fractionOfYear = daysBetween(latest.date, today) / 365;
+
+    // Livret A is tax-free — rate is already net
+    const estimatedValue = latest.balance * (1 + config.current_rate * fractionOfYear);
+
+    const allBalances = getBalanceRecords(account.id);
+    const oldest = allBalances.length > 0
+        ? allBalances[allBalances.length - 1]
+        : latest;
+
+    return {
+        accountId: account.id,
+        accountName: account.name,
+        accountType: account.type,
+        currentValue: Math.round(estimatedValue * 100) / 100,
+        totalContributed: oldest.balance,
+        totalGainLoss: Math.round((estimatedValue - oldest.balance) * 100) / 100,
+        gainLossPercentage: oldest.balance > 0
+            ? Math.round(((estimatedValue - oldest.balance) / oldest.balance) * 10000) / 100
+            : 0,
+        lastUpdated: latest.date,
+        isEstimated: fractionOfYear > 0,
+    };
+}
+
+/**
+ * Valuate Assurance-Vie — last balance + monthly contributions since.
+ */
+function valuateAssuranceVie(account: SavingsAccount): AccountValuation {
+    const config = account.config as AssuranceVieConfig | undefined;
+    const latest = getLatestBalance(account.id);
+
+    if (!latest || !config) {
+        return {
+            accountId: account.id,
+            accountName: account.name,
+            accountType: account.type,
+            currentValue: latest?.balance ?? 0,
+            totalContributed: latest?.balance ?? 0,
+            totalGainLoss: 0,
+            gainLossPercentage: 0,
+            lastUpdated: latest?.date ?? '',
+            isEstimated: false,
+        };
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const monthsSince = daysBetween(latest.date, today) / 30.44; // avg days/month
+    const monthsElapsed = Math.max(0, Math.floor(monthsSince));
+
+    const estimatedValue = latest.balance + (config.monthly_contribution * monthsElapsed);
+
+    // Use all balances to estimate total contributed
+    const allBalances = getBalanceRecords(account.id);
+    const oldest = allBalances.length > 0
+        ? allBalances[allBalances.length - 1]
+        : latest;
+
+    return {
+        accountId: account.id,
+        accountName: account.name,
+        accountType: account.type,
+        currentValue: Math.round(estimatedValue * 100) / 100,
+        totalContributed: Math.round(estimatedValue * 100) / 100, // For AV, contributed ≈ current (gains are small intra-year)
+        totalGainLoss: 0, // Real gain only known at year-end
+        gainLossPercentage: 0,
+        lastUpdated: latest.date,
+        isEstimated: monthsElapsed > 0,
+    };
+}
+
+/**
+ * Get the valuation of a single account.
+ * For PEA accounts, currentPrices must be provided.
+ */
+export async function getAccountValuation(
+    account: SavingsAccount,
+    currentPrices?: Record<string, number>
+): Promise<AccountValuation> {
+    switch (account.type) {
+        case 'PEA':
+            return valuatePEA(account, currentPrices ?? {});
+        case 'CompteCourant':
+            return valuateCompteCourant(account);
+        case 'Interessement':
+            return valuateInteressement(account);
+        case 'PEL':
+            return valuatePEL(account);
+        case 'LivretA':
+            return valuateLivretA(account);
+        case 'AssuranceVie':
+            return valuateAssuranceVie(account);
+        default:
+            return {
+                accountId: account.id,
+                accountName: account.name,
+                accountType: account.type,
+                currentValue: 0,
+                totalContributed: 0,
+                totalGainLoss: 0,
+                gainLossPercentage: 0,
+                lastUpdated: '',
+                isEstimated: false,
+            };
+    }
+}
+
+/**
+ * Compute net worth: sum of all account valuations.
+ */
+export async function getNetWorth(currentPrices?: Record<string, number>): Promise<NetWorthSummary> {
+    const accounts = getAllSavingsAccounts();
+    const valuations = await Promise.all(
+        accounts.map(account => getAccountValuation(account, currentPrices))
+    );
+    const total = valuations.reduce((sum, v) => sum + v.currentValue, 0);
+    return {
+        total: Math.round(total * 100) / 100,
+        accounts: valuations,
     };
 }

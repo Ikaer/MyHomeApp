@@ -1,32 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import layoutStyles from './savings/SavingsLayout.module.css';
 import pageStyles from './savings/SavingsPage.module.css';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
-import { SavingsAccount, AccountSummary, AssetPosition } from '@/models/savings';
+import { SavingsAccount, AccountValuation, NetWorthSummary, ACCOUNT_TYPE_LABELS, AccountType } from '@/models/savings';
+import CreateAccountModal from '@/components/savings/CreateAccountModal';
 
 export default function SavingsPage() {
     const [accounts, setAccounts] = useState<SavingsAccount[]>([]);
+    const [netWorth, setNetWorth] = useState<NetWorthSummary | null>(null);
     const [loading, setLoading] = useState(true);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
-    useEffect(() => {
-        fetchAccounts();
-    }, []);
-
-    const fetchAccounts = async () => {
+    const fetchData = useCallback(async () => {
         try {
-            const res = await fetch('/api/savings/accounts');
-            if (res.ok) {
-                const data = await res.json();
-                setAccounts(data);
-            }
+            const [accountsRes, netWorthRes] = await Promise.all([
+                fetch('/api/savings/accounts'),
+                fetch('/api/savings/net-worth'),
+            ]);
+
+            if (accountsRes.ok) setAccounts(await accountsRes.json());
+            if (netWorthRes.ok) setNetWorth(await netWorthRes.json());
         } catch (error) {
-            console.error('Failed to fetch accounts:', error);
+            console.error('Failed to fetch savings data:', error);
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     const setDefaultAccount = async (accountId: string) => {
         try {
@@ -44,18 +49,33 @@ export default function SavingsPage() {
         }
     };
 
+    const handleAccountCreated = () => {
+        setShowCreateModal(false);
+        setLoading(true);
+        fetchData();
+    };
+
+    const formatCurrency = (val: number) =>
+        new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(val);
+
     return (
         <div className={layoutStyles.savingsContainer}>
             <Head>
                 <title>MyHomeApp - Savings</title>
             </Head>
 
+            <CreateAccountModal
+                open={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onCreated={handleAccountCreated}
+            />
+
             <div className={pageStyles.header}>
                 <div>
                     <h1 className={pageStyles.title}>Savings Management</h1>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button className={sharedStyles.button} onClick={() => alert('Add Account feature coming soon!')}>
+                    <button className={sharedStyles.button} onClick={() => setShowCreateModal(true)}>
                         + New Account
                     </button>
                 </div>
@@ -63,162 +83,122 @@ export default function SavingsPage() {
 
             {loading ? (
                 <div className={sharedStyles.emptyState}>Loading accounts...</div>
-            ) : accounts.length === 0 ? (
-                <div className={sharedStyles.emptyState}>
-                    <p>No savings accounts found.</p>
-                    <button className={sharedStyles.button} onClick={createSampleAccount}>
-                        Create Sample PEA Account
-                    </button>
-                </div>
             ) : (
-                <div className={sharedStyles.accountGrid}>
-                    {accounts.map(account => (
-                        <AccountCard
-                            key={account.id}
-                            account={account}
-                            onSetDefault={() => setDefaultAccount(account.id)}
-                        />
-                    ))}
-                </div>
+                <>
+                    {/* Net Worth Banner */}
+                    {netWorth && (
+                        <div className={sharedStyles.accountCard} style={{ marginBottom: '2rem', cursor: 'default' }}>
+                            <h2 className={sharedStyles.accountName} style={{ marginBottom: '0.5rem' }}>
+                                Total Net Worth
+                            </h2>
+                            <span style={{ fontSize: '2.5rem', fontWeight: 700, color: '#f3f4f6' }}>
+                                {formatCurrency(netWorth.total)}
+                            </span>
+                            <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#9ca3af' }}>
+                                {netWorth.accounts.length} account{netWorth.accounts.length !== 1 ? 's' : ''}
+                            </div>
+                        </div>
+                    )}
+
+                    {accounts.length === 0 ? (
+                        <div className={sharedStyles.emptyState}>
+                            <p>No savings accounts found.</p>
+                            <button className={sharedStyles.button} onClick={() => setShowCreateModal(true)}>
+                                + Create Your First Account
+                            </button>
+                        </div>
+                    ) : (
+                        <div className={sharedStyles.accountGrid}>
+                            {accounts.map(account => {
+                                const valuation = netWorth?.accounts.find(v => v.accountId === account.id);
+                                return (
+                                    <AccountCard
+                                        key={account.id}
+                                        account={account}
+                                        valuation={valuation}
+                                        onSetDefault={() => setDefaultAccount(account.id)}
+                                        formatCurrency={formatCurrency}
+                                    />
+                                );
+                            })}
+                        </div>
+                    )}
+                </>
             )}
         </div>
     );
-
-    async function createSampleAccount() {
-        const sampleAccount: SavingsAccount = {
-            id: 'pea-main',
-            name: 'Main PEA',
-            type: 'PEA',
-            currency: 'EUR',
-            isDefault: true
-        };
-
-        try {
-            const res = await fetch('/api/savings/accounts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(sampleAccount)
-            });
-            if (res.ok) fetchAccounts();
-        } catch (error) {
-            console.error('Failed to create sample account:', error);
-        }
-    }
 }
 
 function AccountCard({
     account,
-    onSetDefault
+    valuation,
+    onSetDefault,
+    formatCurrency,
 }: {
     account: SavingsAccount;
+    valuation?: AccountValuation;
     onSetDefault: () => void;
+    formatCurrency: (val: number) => string;
 }) {
-    const [data, setData] = useState<{ summary: AccountSummary; positions: AssetPosition[] } | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchSummary = async () => {
-            try {
-                const res = await fetch(`/api/savings/summary/${account.id}`);
-                if (res.ok) {
-                    const summaryData = await res.json();
-                    setData(summaryData);
-                }
-            } catch (error) {
-                console.error('Failed to fetch summary:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchSummary();
-    }, [account.id]);
-
-    const formatCurrency = (val: number) => {
-        return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: account.currency }).format(val);
-    };
-
-    const formatPercent = (val: number) => {
-        return (val * 1).toFixed(2) + '%';
-    };
-
-    if (loading) return <div className={sharedStyles.accountCard}>Loading summary...</div>;
-    if (!data) return <div className={sharedStyles.accountCard}>Error loading data</div>;
-
-    const { summary, positions } = data;
-    const isPositive = summary.totalGainLoss >= 0;
+    const typeLabel = ACCOUNT_TYPE_LABELS[account.type] || account.type;
+    const hasGainLoss = valuation && valuation.totalGainLoss !== 0;
+    const isPositive = (valuation?.totalGainLoss ?? 0) >= 0;
 
     return (
         <div className={sharedStyles.accountCard}>
             <div className={pageStyles.accountHeader}>
                 <div>
                     <h2 className={sharedStyles.accountName}>{account.name}</h2>
-                    <span className={pageStyles.accountType}>{account.type}</span>
+                    <span className={pageStyles.accountType}>{typeLabel}</span>
                 </div>
                 <button
                     className={`${pageStyles.defaultToggle} ${account.isDefault ? pageStyles.defaultActive : ''}`}
                     onClick={onSetDefault}
                     title={account.isDefault ? 'Default account' : 'Set as default'}
-                    aria-label={account.isDefault ? 'Default account' : 'Set as default'}
                 >
                     {account.isDefault ? '★' : '☆'}
                 </button>
             </div>
 
-            <div className={sharedStyles.statsGrid}>
-                <div className={sharedStyles.statItem}>
-                    <span className={sharedStyles.statLabel}>Total Invested</span>
-                    <span className={sharedStyles.statValue}>{formatCurrency(summary.totalInvested)}</span>
+            {valuation ? (
+                <div className={sharedStyles.statsGrid}>
+                    <div className={sharedStyles.statItem}>
+                        <span className={sharedStyles.statLabel}>Current Value</span>
+                        <span className={sharedStyles.statValue}>{formatCurrency(valuation.currentValue)}</span>
+                    </div>
+                    {hasGainLoss && (
+                        <div className={sharedStyles.statItem}>
+                            <span className={sharedStyles.statLabel}>Gain/Loss</span>
+                            <span className={`${sharedStyles.statValue} ${isPositive ? sharedStyles.positive : sharedStyles.negative}`}>
+                                {isPositive ? '+' : ''}{formatCurrency(valuation.totalGainLoss)}
+                                {valuation.gainLossPercentage !== 0 && (
+                                    <span style={{ fontSize: '0.85em', marginLeft: '0.5rem' }}>
+                                        ({isPositive ? '+' : ''}{valuation.gainLossPercentage.toFixed(2)}%)
+                                    </span>
+                                )}
+                            </span>
+                        </div>
+                    )}
+                    {valuation.lastUpdated && (
+                        <div className={sharedStyles.statItem}>
+                            <span className={sharedStyles.statLabel}>
+                                Last Updated{valuation.isEstimated ? ' (est.)' : ''}
+                            </span>
+                            <span className={sharedStyles.statValue} style={{ fontSize: '0.9rem' }}>
+                                {valuation.lastUpdated}
+                            </span>
+                        </div>
+                    )}
                 </div>
-                <div className={sharedStyles.statItem}>
-                    <span className={sharedStyles.statLabel}>Current Value</span>
-                    <span className={sharedStyles.statValue}>{formatCurrency(summary.currentValue)}</span>
+            ) : (
+                <div style={{ padding: '1rem 0', color: '#9ca3af', fontSize: '0.875rem' }}>
+                    Loading valuation...
                 </div>
-                <div className={sharedStyles.statItem}>
-                    <span className={sharedStyles.statLabel}>Total Gain/Loss</span>
-                    <span className={`${sharedStyles.statValue} ${isPositive ? sharedStyles.positive : sharedStyles.negative}`}>
-                        {isPositive ? '+' : ''}{formatCurrency(summary.totalGainLoss)}
-                    </span>
-                </div>
-                <div className={sharedStyles.statItem}>
-                    <span className={sharedStyles.statLabel}>XIRR Performance</span>
-                    <span className={`${sharedStyles.statValue} ${summary.xirr >= 0 ? sharedStyles.positive : sharedStyles.negative}`}>
-                        {formatPercent(summary.xirr * 100)}
-                    </span>
-                </div>
-            </div>
-
-            <div style={{ marginTop: '1.5rem' }}>
-                <h3 style={{ fontSize: '0.875rem', color: '#9ca3af', marginBottom: '0.5rem' }}>Top Positions</h3>
-                <div className={sharedStyles.tableContainer}>
-                    <table className={sharedStyles.table}>
-                        <thead>
-                            <tr>
-                                <th>Asset</th>
-                                <th>Value</th>
-                                <th>G/L</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {positions.slice(0, 3).map(pos => (
-                                <tr key={pos.ticker}>
-                                    <td>
-                                        <div>{pos.name}</div>
-                                        <div className={sharedStyles.ticker}>{pos.ticker}</div>
-                                    </td>
-                                    <td>{formatCurrency(pos.currentValue)}</td>
-                                    <td className={pos.unrealizedGainLoss >= 0 ? sharedStyles.positive : sharedStyles.negative}>
-                                        {pos.unrealizedGainLoss >= 0 ? '+' : ''}{formatPercent(pos.unrealizedGainLossPercentage)}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            )}
 
             <div style={{ marginTop: '1rem', textAlign: 'right' }}>
                 <Link href={`/savings/${account.id}`} className={sharedStyles.secondaryButton}>
-                    View Full Portfolio →
+                    View Details →
                 </Link>
             </div>
         </div>

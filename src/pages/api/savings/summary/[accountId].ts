@@ -1,5 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getAccountSummary, getTransactions, calculateAccountPositions } from '@/lib/savings';
+import {
+    getAccountSummary,
+    getTransactions,
+    calculateAccountPositions,
+    getSavingsAccount,
+    getAccountValuation
+} from '@/lib/savings';
 import { fetchCurrentPrices } from '@/lib/finance';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -10,22 +16,38 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-        const transactions = getTransactions(accountId);
-        const tickers = Array.from(new Set(transactions.map(t => t.ticker)));
-
-        // Fetch current prices
-        const currentPrices = await fetchCurrentPrices(tickers);
-
-        const summary = getAccountSummary(accountId, currentPrices);
-        const positions = calculateAccountPositions(accountId, currentPrices);
-
-        if (!summary) {
+        const account = getSavingsAccount(accountId);
+        if (!account) {
             return res.status(404).json({ error: 'Account not found' });
         }
 
+        // For PEA accounts, return the full positions-based summary
+        if (account.type === 'PEA') {
+            const transactions = getTransactions(accountId);
+            const tickers = Array.from(new Set(transactions.map(t => t.ticker)));
+            const currentPrices = await fetchCurrentPrices(tickers);
+            const summary = getAccountSummary(accountId, currentPrices);
+            const positions = calculateAccountPositions(accountId, currentPrices);
+
+            if (!summary) {
+                return res.status(404).json({ error: 'Account not found' });
+            }
+
+            return res.status(200).json({ summary, positions });
+        }
+
+        // For all other account types, return the unified valuation
+        const valuation = await getAccountValuation(account);
         return res.status(200).json({
-            summary,
-            positions
+            summary: {
+                accountId: valuation.accountId,
+                totalInvested: valuation.totalContributed,
+                currentValue: valuation.currentValue,
+                totalGainLoss: valuation.totalGainLoss,
+                xirr: 0,
+            },
+            positions: [],
+            valuation,
         });
     } catch (error) {
         console.error('Error fetching account summary:', error);
