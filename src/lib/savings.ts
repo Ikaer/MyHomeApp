@@ -635,3 +635,198 @@ export async function getNetWorth(currentPrices?: Record<string, number>): Promi
         accounts: valuations,
     };
 }
+
+// Historical data storage functions
+
+const HISTORICAL_DIR = path.join(SAVINGS_DATA_PATH, 'historical');
+const HISTORICAL_ASSETS_DIR = path.join(HISTORICAL_DIR, 'assets');
+const HISTORICAL_ACCOUNTS_DIR = path.join(HISTORICAL_DIR, 'accounts');
+
+interface HistoricalAssetRecord {
+    timestamp: string;
+    isin: string;
+    ticker: string;
+    name: string;
+    quantity: number;
+    averagePurchasePrice: number;
+    totalInvested: number;
+    currentPrice: number;
+    currentValue: number;
+    unrealizedGainLoss: number;
+    unrealizedGainLossPercentage: number;
+}
+
+interface HistoricalAccountRecord {
+    timestamp: string;
+    accountId: string;
+    accountName: string;
+    totalInvested: number;
+    currentValue: number;
+    totalGainLoss: number;
+    xirr: number;
+    currentYearXirr: number;
+}
+
+function sanitizeFileSegmentForAssets(value: string): string {
+    const trimmed = value.trim();
+    const safe = trimmed.replace(/[^a-zA-Z0-9_-]/g, '');
+    return safe || 'unknown';
+}
+
+function sanitizeFileSegmentForAccounts(value: string): string {
+    const trimmed = value.trim().toLowerCase();
+    const dashed = trimmed.replace(/\s+/g, '-');
+    const safe = dashed.replace(/[^a-z0-9_-]/g, '');
+    return safe || 'unknown';
+}
+
+function getAssetFilePath(isin: string, ticker: string): string {
+    const base = sanitizeFileSegmentForAssets(isin || ticker || 'unknown');
+    return path.join(HISTORICAL_ASSETS_DIR, `${base}.json`);
+}
+
+function getAccountHistoricalFilePath(accountName: string, accountId: string): string {
+    const base = sanitizeFileSegmentForAccounts(accountName || accountId || 'unknown');
+    return path.join(HISTORICAL_ACCOUNTS_DIR, `${base}.json`);
+}
+
+/**
+ * Store current asset values to historical records
+ * Returns the number of assets stored and the timestamp
+ */
+export async function storeHistoricalAssetsValues(): Promise<{
+    assetCount: number;
+    timestamp: string;
+}> {
+    const accounts = getAllSavingsAccounts();
+    const transactionsByAccount = accounts.map(account => ({
+        accountId: account.id,
+        transactions: getTransactions(account.id)
+    }));
+
+    const allTickers = Array.from(
+        new Set(transactionsByAccount.flatMap(entry => entry.transactions.map(t => t.ticker)))
+    );
+
+    const { fetchCurrentPrices } = await import('./finance');
+    const currentPrices = await fetchCurrentPrices(allTickers);
+    
+    interface AggregatedAsset {
+        isin: string;
+        ticker: string;
+        name: string;
+        quantity: number;
+        totalInvested: number;
+        currentValue: number;
+    }
+    
+    const aggregated: Record<string, AggregatedAsset> = {};
+
+    transactionsByAccount.forEach(entry => {
+        const positions = calculateAccountPositions(entry.accountId, currentPrices);
+        positions.forEach(pos => {
+            const key = pos.isin || pos.ticker;
+            if (!key) return;
+
+            if (!aggregated[key]) {
+                aggregated[key] = {
+                    isin: pos.isin || key,
+                    ticker: pos.ticker,
+                    name: pos.name,
+                    quantity: 0,
+                    totalInvested: 0,
+                    currentValue: 0
+                };
+            }
+
+            aggregated[key].quantity += pos.quantity;
+            aggregated[key].totalInvested += pos.totalInvested;
+            aggregated[key].currentValue += pos.currentValue;
+        });
+    });
+
+    ensureDirectoryExists(HISTORICAL_ASSETS_DIR);
+    const timestamp = new Date().toISOString();
+    let writtenCount = 0;
+
+    Object.values(aggregated).forEach(asset => {
+        const averagePurchasePrice = asset.quantity > 0 ? asset.totalInvested / asset.quantity : 0;
+        const currentPrice = asset.quantity > 0 ? asset.currentValue / asset.quantity : 0;
+        const unrealizedGainLoss = asset.currentValue - asset.totalInvested;
+        const unrealizedGainLossPercentage = asset.totalInvested > 0
+            ? (unrealizedGainLoss / asset.totalInvested) * 100
+            : 0;
+
+        const record: HistoricalAssetRecord = {
+            timestamp,
+            isin: asset.isin,
+            ticker: asset.ticker,
+            name: asset.name,
+            quantity: asset.quantity,
+            averagePurchasePrice,
+            totalInvested: asset.totalInvested,
+            currentPrice,
+            currentValue: asset.currentValue,
+            unrealizedGainLoss,
+            unrealizedGainLossPercentage
+        };
+
+        const filePath = getAssetFilePath(asset.isin, asset.ticker);
+        const existing = readJsonFile<HistoricalAssetRecord[]>(filePath, []);
+        existing.push(record);
+
+        if (writeJsonFile(filePath, existing)) {
+            writtenCount += 1;
+        }
+    });
+
+    return { assetCount: writtenCount, timestamp };
+}
+
+/**
+ * Store current account values to historical records
+ * Returns the number of accounts stored and the timestamp
+ */
+export async function storeHistoricalAccountsValues(): Promise<{
+    accountCount: number;
+    timestamp: string;
+}> {
+    const accounts = getAllSavingsAccounts();
+    const allTransactions = accounts.flatMap(account => getTransactions(account.id));
+    const allTickers = Array.from(new Set(allTransactions.map(t => t.ticker)));
+    
+    const { fetchCurrentPrices } = await import('./finance');
+    const currentPrices = await fetchCurrentPrices(allTickers);
+
+    ensureDirectoryExists(HISTORICAL_ACCOUNTS_DIR);
+    const timestamp = new Date().toISOString();
+    let writtenCount = 0;
+
+    accounts.forEach(account => {
+        const summary = getAccountSummary(account.id, currentPrices);
+        if (!summary) return;
+
+        const currentYearXirr = calculateCurrentYearXIRR(account.id, summary.currentValue);
+
+        const record: HistoricalAccountRecord = {
+            timestamp,
+            accountId: account.id,
+            accountName: account.name,
+            totalInvested: summary.totalInvested,
+            currentValue: summary.currentValue,
+            totalGainLoss: summary.totalGainLoss,
+            xirr: summary.xirr,
+            currentYearXirr
+        };
+
+        const filePath = getAccountHistoricalFilePath(account.name, account.id);
+        const existing = readJsonFile<HistoricalAccountRecord[]>(filePath, []);
+        existing.push(record);
+
+        if (writeJsonFile(filePath, existing)) {
+            writtenCount += 1;
+        }
+    });
+
+    return { accountCount: writtenCount, timestamp };
+}
