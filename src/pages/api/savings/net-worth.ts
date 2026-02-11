@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getNetWorth, getTransactions, getAllSavingsAccounts } from '@/lib/savings';
-import { fetchCurrentPrices } from '@/lib/finance';
+import { getNetWorthWithCurrentPrices } from '@/lib/savings';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'GET') {
@@ -9,21 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     try {
-        // Gather tickers from all PEA accounts for price fetching
-        const accounts = getAllSavingsAccounts();
-        const peaAccounts = accounts.filter(a => a.type === 'PEA');
-        const allTickers = new Set<string>();
-
-        for (const pea of peaAccounts) {
-            const transactions = getTransactions(pea.id);
-            transactions.forEach(t => allTickers.add(t.ticker));
-        }
-
-        const currentPrices = allTickers.size > 0
-            ? await fetchCurrentPrices(Array.from(allTickers))
-            : {};
-
-        const netWorth = await getNetWorth(currentPrices);
+        const netWorth = await getNetWorthWithCurrentPrices();
         return res.status(200).json(netWorth);
     } catch (error) {
         console.error('Error computing net worth:', error);

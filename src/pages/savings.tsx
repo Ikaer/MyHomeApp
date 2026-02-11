@@ -1,15 +1,32 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import {
+    CartesianGrid,
+    Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis
+} from 'recharts';
 import layoutStyles from './savings/SavingsLayout.module.css';
 import pageStyles from './savings/SavingsPage.module.css';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, AccountValuation, NetWorthSummary, ACCOUNT_TYPE_LABELS, AccountType } from '@/models/savings';
 import CreateAccountModal from '@/components/savings/CreateAccountModal';
 
+interface HistoricalWealthRecord {
+    timestamp: string;
+    total: number;
+    accountsCount: number;
+}
+
 export default function SavingsPage() {
     const [accounts, setAccounts] = useState<SavingsAccount[]>([]);
     const [netWorth, setNetWorth] = useState<NetWorthSummary | null>(null);
+    const [wealthHistory, setWealthHistory] = useState<HistoricalWealthRecord[]>([]);
+    const [wealthHistoryLoading, setWealthHistoryLoading] = useState(true);
     const [loading, setLoading] = useState(true);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -29,9 +46,30 @@ export default function SavingsPage() {
         }
     }, []);
 
+    const fetchWealthHistory = useCallback(async () => {
+        setWealthHistoryLoading(true);
+        try {
+            const res = await fetch('/api/savings/historical/general/wealth');
+            if (res.ok) {
+                setWealthHistory(await res.json());
+            } else {
+                setWealthHistory([]);
+            }
+        } catch (error) {
+            console.error('Failed to fetch wealth history:', error);
+            setWealthHistory([]);
+        } finally {
+            setWealthHistoryLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    useEffect(() => {
+        fetchWealthHistory();
+    }, [fetchWealthHistory]);
 
     const setDefaultAccount = async (accountId: string) => {
         try {
@@ -57,6 +95,13 @@ export default function SavingsPage() {
 
     const formatCurrency = (val: number) =>
         new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(val);
+
+    const wealthChartData = useMemo(() => {
+        return wealthHistory.map(entry => ({
+            date: entry.timestamp.slice(0, 10),
+            total: entry.total
+        }));
+    }, [wealthHistory]);
 
     return (
         <div className={layoutStyles.savingsContainer}>
@@ -97,6 +142,42 @@ export default function SavingsPage() {
                             <div style={{ marginTop: '1rem', fontSize: '0.8rem', color: '#9ca3af' }}>
                                 {netWorth.accounts.length} account{netWorth.accounts.length !== 1 ? 's' : ''}
                             </div>
+                            {wealthHistoryLoading ? (
+                                <div className={sharedStyles.chartEmpty}>Loading history...</div>
+                            ) : wealthChartData.length === 0 ? (
+                                <div className={sharedStyles.chartEmpty}>No historical data available.</div>
+                            ) : (
+                                <div className={sharedStyles.chartContainer} style={{ height: '180px' }}>
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={wealthChartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                                            <CartesianGrid stroke="rgba(75, 85, 99, 0.25)" vertical={false} />
+                                            <XAxis dataKey="date" tick={{ fill: '#9ca3af', fontSize: 12 }} />
+                                            <YAxis
+                                                tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                                tickFormatter={value => formatCurrency(Number(value))}
+                                                width={90}
+                                                domain={([dataMin, dataMax]) => {
+                                                    const range = Math.max(dataMax - dataMin, 1);
+                                                    return [dataMin - range * 0.05, dataMax + range * 0.05];
+                                                }}
+                                            />
+                                            <Tooltip
+                                                contentStyle={{ background: '#111827', border: '1px solid rgba(75, 85, 99, 0.4)' }}
+                                                labelStyle={{ color: '#9ca3af' }}
+                                                formatter={(value) => formatCurrency(Number(value ?? 0))}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="total"
+                                                stroke="#60a5fa"
+                                                strokeWidth={2}
+                                                dot={false}
+                                                isAnimationActive={false}
+                                            />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            )}
                         </div>
                     )}
 

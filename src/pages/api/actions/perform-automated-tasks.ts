@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import { randomUUID } from 'crypto';
 import { getMALAuthData, isMALTokenValid, performBigSync } from '@/lib/anime';
-import { storeHistoricalAssetsValues, storeHistoricalAccountsValues } from '@/lib/savings';
+import { storeHistoricalAssetsValues, storeHistoricalAccountsValues, storeHistoricalWealthValues } from '@/lib/savings';
 import { ensureDirectoryExists, readJsonFile, writeJsonFile } from '@/lib/data';
 import {
   AutomatedTaskRequest,
@@ -110,6 +110,29 @@ async function taskStoreAccountsValues(): Promise<TaskResult> {
   }
 }
 
+async function taskStoreWealthValues(): Promise<TaskResult> {
+  const startTime = Date.now();
+
+  try {
+    const { timestamp } = await storeHistoricalWealthValues();
+
+    return {
+      taskName: 'store-wealth-values',
+      status: 'success',
+      message: 'Wealth values stored successfully',
+      duration: Date.now() - startTime,
+      details: { timestamp }
+    };
+  } catch (error) {
+    return {
+      taskName: 'store-wealth-values',
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      duration: Date.now() - startTime
+    };
+  }
+}
+
 // Main automated tasks handler
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -135,13 +158,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const startTime = Date.now();
 
     // Execute all tasks in parallel
-    const [animeResult, assetsResult, accountsResult] = await Promise.all([
+    const [animeResult, assetsResult, accountsResult, wealthResult] = await Promise.all([
       taskAnimeCronSync(),
       taskStoreAssetsValues(),
-      taskStoreAccountsValues()
+      taskStoreAccountsValues(),
+      taskStoreWealthValues()
     ]);
 
-    const results = [animeResult, assetsResult, accountsResult];
+    const results = [animeResult, assetsResult, accountsResult, wealthResult];
     const completedAt = new Date().toISOString();
     const totalDuration = Date.now() - startTime;
 

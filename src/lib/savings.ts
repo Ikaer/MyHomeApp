@@ -636,11 +636,26 @@ export async function getNetWorth(currentPrices?: Record<string, number>): Promi
     };
 }
 
+export async function getNetWorthWithCurrentPrices(): Promise<NetWorthSummary> {
+    const accounts = getAllSavingsAccounts();
+    const allTransactions = accounts.flatMap(account => getTransactions(account.id));
+    const allTickers = Array.from(new Set(allTransactions.map(t => t.ticker)));
+
+    const { fetchCurrentPrices } = await import('./finance');
+    const currentPrices = allTickers.length > 0
+        ? await fetchCurrentPrices(allTickers)
+        : {};
+
+    return getNetWorth(currentPrices);
+}
+
 // Historical data storage functions
 
 const HISTORICAL_DIR = path.join(SAVINGS_DATA_PATH, 'historical');
 const HISTORICAL_ASSETS_DIR = path.join(HISTORICAL_DIR, 'assets');
 const HISTORICAL_ACCOUNTS_DIR = path.join(HISTORICAL_DIR, 'accounts');
+const HISTORICAL_GENERAL_DIR = path.join(HISTORICAL_DIR, 'general');
+const HISTORICAL_WEALTH_FILE = path.join(HISTORICAL_GENERAL_DIR, 'wealth.json');
 
 interface HistoricalAssetRecord {
     timestamp: string;
@@ -665,6 +680,12 @@ interface HistoricalAccountRecord {
     totalGainLoss: number;
     xirr: number;
     currentYearXirr: number;
+}
+
+interface HistoricalWealthRecord {
+    timestamp: string;
+    total: number;
+    accountsCount: number;
 }
 
 function sanitizeFileSegmentForAssets(value: string): string {
@@ -829,4 +850,28 @@ export async function storeHistoricalAccountsValues(): Promise<{
     });
 
     return { accountCount: writtenCount, timestamp };
+}
+
+/**
+ * Store current net worth to historical records
+ * Returns the timestamp
+ */
+export async function storeHistoricalWealthValues(): Promise<{
+    timestamp: string;
+}> {
+    ensureDirectoryExists(HISTORICAL_GENERAL_DIR);
+    const timestamp = new Date().toISOString();
+    const netWorth = await getNetWorthWithCurrentPrices();
+
+    const record: HistoricalWealthRecord = {
+        timestamp,
+        total: netWorth.total,
+        accountsCount: netWorth.accounts.length
+    };
+
+    const existing = readJsonFile<HistoricalWealthRecord[]>(HISTORICAL_WEALTH_FILE, []);
+    existing.push(record);
+    writeJsonFile(HISTORICAL_WEALTH_FILE, existing);
+
+    return { timestamp };
 }

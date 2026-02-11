@@ -2,6 +2,10 @@
 
 This file contains instructions for GitHub Copilot to understand the MyHomeApp project structure, patterns, and conventions.
 
+## General Guidelines
+- Always prioritize refactoring over duplication. If you see repeated code, consider creating a reusable function or component.
+- Dont wait for the user to ask for a refactor, proactively suggest it when you see an opportunity.
+
 ## Project Overview
 
 MyHomeApp is a unified dashboard application for Synology NAS management, built with Next.js 14, TypeScript, and deployed via Docker. The app provides quick access to services and data management tools through a subapp-based architecture.
