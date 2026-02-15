@@ -1,9 +1,0 @@
-- ✅ Files explorer: file-roots.json now properly organized in files/ subdirectory
-- ✅ Fixed anime page navigation: removed duplicate navigation, added dynamic anime link, removed redundant "Dashboard" link
-- ✅ Redesigned anime controls: moved auth/sync controls to header area for inline, less blocky design
-- ✅ Optimized for 4K TV: removed mobile responsiveness, removed unnecessary header text, lightened connection status text
-- ✅ Implemented dark theme for anime table: converted white table to dark theme with proper contrast and colors
-- ✅ Improved table layout: removed "Showing X anime" text, expanded max-width from 1400px to 2560px for better 4K TV utilization
-- ✅ Refactored CSS organization: moved AnimeTable styles from JSX to CSS module (AnimeTable.module.css) for better maintainability
-- [ ] Store some state about the UI in local storage (for example, the score evolution period selected) to persist across sessions
-- [ ] Add a sort dropdown on the score evolution column to sort by metrics (score, rank, popularity, number of scoring users, number of list users)

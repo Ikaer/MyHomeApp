@@ -17,7 +17,8 @@ The project is organized around domain-specific subapps:
 - **Services**: Quick access dashboard to NAS services
 - **Bookmarks**: Full CRUD bookmark management with categories and tags
 - **Files**: File explorer with TreeView and directory browsing
-- **Anime**: (Planned) MyAnimeList integration for anime tracking
+- **Anime**:  MyAnimeList integration for anime tracking
+- **Savings**: Personal finance tracking and management
 
 ### Directory Structure
 ```
@@ -26,12 +27,14 @@ src/
 │   ├── shared/           # Cross-subapp components (TreeView, etc.)
 │   ├── bookmarks/        # Bookmark-specific components
 │   ├── files/            # File explorer components
-│   └── services/         # Service dashboard components
+│   ├── anime/            # Anime tracking components
+│   └── savings/          # Savings management components
 ├── models/
 │   ├── shared/           # Common types and interfaces
 │   ├── bookmarks/        # Bookmark domain models
 │   ├── files/            # File system models
-│   └── index.ts          # Central exports
+│   ├── anime/            # Anime tracking models
+│   └── savings/          # Savings management models
 ├── pages/
 │   ├── api/
 │   │   ├── bookmarks/    # Bookmark API endpoints
