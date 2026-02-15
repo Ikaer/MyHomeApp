@@ -13,3 +13,4 @@ The agent will do an extensive use of the typescript compilation (either through
 Before deleting any code or file, the agent will be sure to keep a list of the symbols presents in the code or file, then once the code or file is deleted, the agent will check that there are no remaining references to those symbols in the codebase. This will help ensure that there are no broken references or issues caused by the removal of the sub-application, it goes for css classes as well, the agent will check that there are no remaining references to the css classes in the codebase after the deletion of the sub-application.
 
 Any empty folder after the deletion of the sub-application will be removed as well, to keep the codebase clean and organized. The agent will also update any documentation or references to the removed sub-application to ensure that they are accurate and up-to-date.
+
