@@ -10,7 +10,5 @@ export * from '@/models';
 export type {
   SubApp,
   ServiceLink,
-  AppConfig,
-  Bookmark,
-  BookmarkCategory
+  AppConfig
 } from '@/models';

@@ -80,7 +80,6 @@ Once deployed, access the application at:
 ```
 /volume4/root4/AppData/MyHomeApp/
 ├── database/           # JSON data files
-│   ├── bookmarks/     # Bookmark data (Phase 2)
 │   ├── anime/         # Anime list data (Phase 3)
 │   └── services/      # Service data
 └── config/            # App configuration

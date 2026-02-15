@@ -5,7 +5,6 @@
 
 // Re-export all subapp models
 export * from './anime';
-export * from './bookmarks';
 export * from './services';
 export * from './shared';
 export * from './savings';
@@ -13,11 +12,6 @@ export * from './anime';
 
 // Legacy compatibility - keeping the old structure for now
 // TODO: Remove these when all imports are updated
-export type {
-  Bookmark,
-  BookmarkCategory
-} from './bookmarks';
-
 export type {
   SubApp,
   ServiceLink,

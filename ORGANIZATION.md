@@ -10,27 +10,17 @@ src/
 │   ├── shared/             # Shared components used across subapps
 │   │   ├── TreeView.tsx    # Hierarchical tree component
 │   │   └── index.ts        # Exports for shared components
-│   ├── bookmarks/          # Bookmark app specific components
-│   │   └── index.ts
 │   └── services/           # Services app specific components
 │       └── index.ts
 ├── models/
 │   ├── shared/             # Common types and interfaces
 │   │   └── index.ts        # API responses, pagination, etc.
-│   ├── bookmarks/          # Bookmark domain models
-│   │   └── index.ts        # Bookmark, BookmarkCategory, etc.
 │   ├── services/           # Services domain models
 │   │   └── index.ts        # ServiceLink, AppConfig, etc.
 │   └── index.ts            # Central export (re-exports all subdomains)
 ├── pages/
 │   ├── api/
-│   │   ├── bookmarks/      # Bookmark API endpoints
-│   │   │   ├── index.ts    # GET/POST /api/bookmarks
-│   │   │   ├── [id].ts     # GET/PUT/DELETE /api/bookmarks/:id
-│   │   │   ├── categories/ # Bookmark categories
-│   │   │   └── export/     # Bookmark export functionality
 │   │   └── services/       # Future services API endpoints
-│   ├── bookmarks.tsx       # Bookmarks app page
 │   └── services.tsx       # Services app page
 └── types/                  # Legacy compatibility (deprecated)
     └── index.ts            # Re-exports from models/
@@ -39,7 +29,7 @@ src/
 ## Organizational Principles
 
 ### 1. **Subapp-Centric Organization**
-Each major feature (bookmarks, services) has its own:
+Each major feature (services) has its own:
 - Component directory with app-specific UI components
 - Model directory with domain-specific types and interfaces
 - API directory with related endpoints grouped under a common route prefix
@@ -50,21 +40,20 @@ Common components and types that are used across multiple subapps are placed in 
 ### 3. **Clear Import Paths**
 ```typescript
 // Subapp-specific imports
-import { BookmarkCard } from '@/components/bookmarks';
-import { Bookmark } from '@/models/bookmarks';
+import { ServiceCard } from '@/components/services';
+import { ServiceLink } from '@/models/services';
 
 // Shared component imports  
 import { TreeView } from '@/components/shared';
 import { ApiResponse } from '@/models/shared';
 
 // Central imports (when you need multiple domains)
-import { Bookmark, ServiceLink } from '@/models';
+import { ServiceLink, SubApp } from '@/models';
 ```
 
 ### 4. **API Route Organization**
 API routes follow REST conventions within subapp contexts:
 ```
-/api/bookmarks/*     # All bookmark-related endpoints
 /api/services/*      # All service-related endpoints
 ```
 

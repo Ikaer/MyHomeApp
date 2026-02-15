@@ -9,9 +9,9 @@ After deployment, your NAS should have:
 ```
 /volume4/root4/AppData/MyHomeApp/
 ├── database/              # Auto-created by app
-│   ├── bookmarks/        # For Phase 2
-│   ├── anime/           # For Phase 3
-│   └── services/        # For Phase 3
+│   ├── anime/           # Anime data
+│   ├── services/        # Services data
+│   └── savings/         # Savings data
 ├── config/               # Auto-created by app
 │   └── app.json         # Auto-generated config
 └── logs/                 # Application logs
@@ -77,9 +77,8 @@ cat /volume4/root4/AppData/MyHomeApp/logs/app.log
 ## Expected Result
 
 You should see:
-- ✅ **Dashboard page** with 4 sub-app cards
+- ✅ **Dashboard page** with 3 sub-app cards
 - ✅ **Services page** with links to your 5 services
-- ✅ **Bookmarks page** showing "coming soon"
 - ✅ **Dark theme** optimized for TV viewing
 - ✅ **Navigation** working between pages
 
@@ -123,9 +122,9 @@ After deployment, your NAS should have:
 ```
 /volume4/root4/AppData/MyHomeApp/
 ├── database/              # Auto-created by app
-│   ├── bookmarks/        # For Phase 2
-│   ├── anime/           # For Phase 3
-│   └── services/        # For Phase 3
+│   ├── anime/           # Anime data
+│   ├── services/        # Services data
+│   └── savings/         # Savings data
 └── config/               # Auto-created by app
     └── app.json         # Auto-generated config
 ```
@@ -136,7 +135,7 @@ Once Phase 1 is working:
 1. ✅ Verify all navigation works
 2. ✅ Confirm services links open correctly
 3. ✅ Check that data directories are created
-4. 🚀 Ready for Phase 2 (Bookmark Manager implementation)
+4. 🚀 Ready for the next phase
 
 ## Useful Commands
 

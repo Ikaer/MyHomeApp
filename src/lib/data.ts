@@ -52,7 +52,6 @@ export function initializeDataDirectories(): void {
     ensureDirectoryExists(LOGS_PATH);
 
     // Create sub-app directories
-    ensureDirectoryExists(path.join(DATA_PATH, 'bookmarks'));
     ensureDirectoryExists(path.join(DATA_PATH, 'anime'));
     ensureDirectoryExists(path.join(DATA_PATH, 'services'));
     ensureDirectoryExists(path.join(DATA_PATH, 'savings'));
@@ -163,14 +162,6 @@ export function getSubApps(): SubApp[] {
         description: 'Quick access to all your services',
         icon: '🔗',
         route: '/services',
-        enabled: true
-      },
-      {
-        id: 'bookmarks',
-        name: 'Bookmarks',
-        description: 'Manage your bookmarks',
-        icon: '🔖',
-        route: '/bookmarks',
         enabled: true
       },
       {

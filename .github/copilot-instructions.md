@@ -15,7 +15,6 @@ MyHomeApp is a unified dashboard application for Synology NAS management, built 
 ### Subapp Organization
 The project is organized around domain-specific subapps:
 - **Services**: Quick access dashboard to NAS services
-- **Bookmarks**: Full CRUD bookmark management with categories and tags
 - **Anime**:  MyAnimeList integration for anime tracking
 - **Savings**: Personal finance tracking and management
 
@@ -24,21 +23,17 @@ The project is organized around domain-specific subapps:
 src/
 ├── components/
 │   ├── shared/           # Cross-subapp components (TreeView, etc.)
-│   ├── bookmarks/        # Bookmark-specific components
 │   ├── anime/            # Anime tracking components
 │   └── savings/          # Savings management components
 ├── models/
 │   ├── shared/           # Common types and interfaces
-│   ├── bookmarks/        # Bookmark domain models
 │   ├── anime/            # Anime tracking models
 │   └── savings/          # Savings management models
 ├── pages/
 │   ├── api/
-│   │   ├── bookmarks/    # Bookmark API endpoints
 │   │   └── services/     # Service API endpoints
 │   │   └── anime/        # Anime API endpoints
 │   │   └── savings/      # Savings API endpoints
-│   ├── bookmarks.tsx     # Bookmark management page
 │   └── services.tsx      # Services dashboard
 │   └── anime.tsx         # Anime tracking page
 │   └── savings.tsx       # Savings management page
@@ -50,20 +45,19 @@ src/
 ### Import Patterns
 ```typescript
 // Prefer domain-specific imports
-import { BookmarkCard } from '@/components/bookmarks';
-import { Bookmark } from '@/models/bookmarks';
+import { ServiceCard } from '@/components/services';
+import { ServiceLink } from '@/models/services';
 
 // Shared components
 import { TreeView } from '@/components/shared';
 
 // Central model imports when needed
-import type { Bookmark, ServiceLink } from '@/models';
+import type { ServiceLink, SubApp } from '@/models';
 ```
 
 ### API Route Structure
 Follow RESTful conventions within subapp contexts:
 ```
-/api/bookmarks/*         # All bookmark operations
 /api/services/*         # All service operations
 /api/anime/*            # All anime tracking operations
 /api/savings/*          # All savings management operations
@@ -104,7 +98,7 @@ Follow RESTful conventions within subapp contexts:
 ### CSS Modules
 - Use CSS Modules for component-specific styling
 - File naming: `ComponentName.module.css`
-- Class naming: camelCase (`bookmarkCard`, `rootCard`)
+- Class naming: camelCase (`serviceCard`, `rootCard`)
 - CSS Modules typings are generated via `typed-css-modules`.
 - Use `npm run dev` (runs Next dev + CSS typings watcher).
 - `npm run build` runs `css:types` automatically via `prebuild`.
@@ -218,18 +212,6 @@ export default function Component({ prop1, prop2 }: ComponentProps) {
 
 ### Key Interfaces
 ```typescript
-// Bookmark domain
-interface Bookmark {
-  id: string;
-  title: string;
-  url: string;
-  description?: string;
-  category: string;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
 // Services domain
 interface ServiceLink {
   id: string;
