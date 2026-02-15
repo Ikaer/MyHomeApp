@@ -8,7 +8,5 @@ export * from '@/models';
 
 // Legacy direct exports for backward compatibility
 export type {
-  SubApp,
-  ServiceLink,
-  AppConfig
+  SubApp
 } from '@/models';

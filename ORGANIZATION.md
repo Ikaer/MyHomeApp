@@ -10,18 +10,20 @@ src/
 │   ├── shared/             # Shared components used across subapps
 │   │   ├── TreeView.tsx    # Hierarchical tree component
 │   │   └── index.ts        # Exports for shared components
-│   └── services/           # Services app specific components
-│       └── index.ts
+│   ├── anime/              # Anime app specific components
+│   └── savings/            # Savings app specific components
 ├── models/
 │   ├── shared/             # Common types and interfaces
 │   │   └── index.ts        # API responses, pagination, etc.
-│   ├── services/           # Services domain models
-│   │   └── index.ts        # ServiceLink, AppConfig, etc.
+│   ├── anime/              # Anime domain models
+│   └── savings/            # Savings domain models
 │   └── index.ts            # Central export (re-exports all subdomains)
 ├── pages/
 │   ├── api/
-│   │   └── services/       # Future services API endpoints
-│   └── services.tsx       # Services app page
+│   │   ├── anime/          # Anime API endpoints
+│   │   └── savings/        # Savings API endpoints
+│   ├── anime.tsx          # Anime app page
+│   └── savings.tsx        # Savings app page
 └── types/                  # Legacy compatibility (deprecated)
     └── index.ts            # Re-exports from models/
 ```
@@ -29,7 +31,7 @@ src/
 ## Organizational Principles
 
 ### 1. **Subapp-Centric Organization**
-Each major feature (services) has its own:
+Each major feature (anime, savings) has its own:
 - Component directory with app-specific UI components
 - Model directory with domain-specific types and interfaces
 - API directory with related endpoints grouped under a common route prefix
@@ -40,21 +42,22 @@ Common components and types that are used across multiple subapps are placed in 
 ### 3. **Clear Import Paths**
 ```typescript
 // Subapp-specific imports
-import { ServiceCard } from '@/components/services';
-import { ServiceLink } from '@/models/services';
+import { AnimeTable } from '@/components/anime';
+import { AnimeEntry } from '@/models/anime';
 
 // Shared component imports  
 import { TreeView } from '@/components/shared';
 import { ApiResponse } from '@/models/shared';
 
 // Central imports (when you need multiple domains)
-import { ServiceLink, SubApp } from '@/models';
+import { AnimeEntry, SubApp } from '@/models';
 ```
 
 ### 4. **API Route Organization**
 API routes follow REST conventions within subapp contexts:
 ```
-/api/services/*      # All service-related endpoints
+/api/anime/*         # All anime-related endpoints
+/api/savings/*       # All savings-related endpoints
 ```
 
 ## Migration Benefits

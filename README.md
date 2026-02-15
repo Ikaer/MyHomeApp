@@ -70,7 +70,6 @@ Once deployed, access the application at:
 - ✅ Basic Next.js setup with TypeScript
 - ✅ Dark theme optimized for TV/4K displays
 - ✅ Main dashboard with sub-app cards
-- ✅ Services page with quick links
 - ✅ JSON-based data layer
 - ✅ Docker containerization
 - ✅ Proper volume mounts for data persistence
@@ -81,7 +80,7 @@ Once deployed, access the application at:
 /volume4/root4/AppData/MyHomeApp/
 ├── database/           # JSON data files
 │   ├── anime/         # Anime list data (Phase 3)
-│   └── services/      # Service data
+│   └── savings/       # Savings data
 └── config/            # App configuration
     └── app.json       # Main config file
 ```
@@ -93,7 +92,3 @@ Once deployed, access the application at:
 - Verify port 12344 is not already in use
 - Check Docker logs: `docker logs myhomeapp`
 
-### Services not accessible
-- Verify service URLs in the config
-- Check network connectivity between containers
-- Ensure services are running on specified ports

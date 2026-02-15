@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { AppConfig, SubApp } from '@/types';
+import { SubApp } from '@/types';
 
 const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const CONFIG_PATH = process.env.CONFIG_PATH || '/app/config';
@@ -53,7 +53,6 @@ export function initializeDataDirectories(): void {
 
     // Create sub-app directories
     ensureDirectoryExists(path.join(DATA_PATH, 'anime'));
-    ensureDirectoryExists(path.join(DATA_PATH, 'services'));
     ensureDirectoryExists(path.join(DATA_PATH, 'savings'));
 
     logToFile('INFO', 'Data directories initialized successfully');
@@ -92,78 +91,10 @@ export function writeJsonFile<T>(filePath: string, data: T): boolean {
   }
 }
 
-// Get app configuration
-export function getAppConfig(): AppConfig {
-  try {
-    const configPath = path.join(CONFIG_PATH, 'app.json');
-    const defaultConfig: AppConfig = {
-      services: [
-        {
-          id: 'dsm',
-          name: 'DSM',
-          url: 'http://syno:5000',
-          icon: '🖥️',
-          description: 'Synology Disk Station Manager'
-        },
-        {
-          id: 'portainer',
-          name: 'Portainer',
-          url: 'http://syno:9000/',
-          icon: '🐳',
-          description: 'Docker Container Management'
-        },
-        {
-          id: 'sonarr',
-          name: 'Sonarr',
-          url: 'http://syno:8989/',
-          icon: '📺',
-          description: 'TV Series Management'
-        },
-        {
-          id: 'qbittorrent',
-          name: 'QbitTorrent',
-          url: 'http://syno:8088/',
-          icon: '⬇️',
-          description: 'Torrent Client'
-        },
-        {
-          id: 'jackett',
-          name: 'Jackett',
-          url: 'http://syno:9117/',
-          icon: '🔍',
-          description: 'Indexer Proxy'
-        }
-      ],
-      dataPath: DATA_PATH,
-      version: '1.0.0'
-    };
-
-    const config = readJsonFile(configPath, defaultConfig);
-
-    // Write default config if it doesn't exist
-    if (!fs.existsSync(configPath)) {
-      writeJsonFile(configPath, defaultConfig);
-    }
-
-    return config;
-  } catch (error) {
-    logToFile('ERROR', 'Failed to get app config', error);
-    throw error;
-  }
-}
-
 // Get available sub-applications
 export function getSubApps(): SubApp[] {
   try {
     const subApps = [
-      {
-        id: 'services',
-        name: 'Services',
-        description: 'Quick access to all your services',
-        icon: '🔗',
-        route: '/services',
-        enabled: true
-      },
       {
         id: 'anime',
         name: 'Anime List',

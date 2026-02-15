@@ -53,14 +53,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
       props: {
         subApps: [
           {
-            id: 'services',
-            name: 'Services',
-            description: 'Quick access to all your services',
-            icon: '🔗',
-            route: '/services',
-            enabled: true
-          },
-          {
             id: 'error',
             name: 'Configuration Error',
             description: 'Check container logs for details',

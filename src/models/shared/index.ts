@@ -30,4 +30,13 @@ export interface SearchParams {
 }
 export type LiteralSubset<K, T extends K> = T;
 
+export interface SubApp {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  route: string;
+  enabled: boolean;
+}
+
 export * from './automatedTasks';

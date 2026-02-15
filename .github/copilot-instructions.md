@@ -8,13 +8,12 @@ This file contains instructions for GitHub Copilot to understand the MyHomeApp p
 
 ## Project Overview
 
-MyHomeApp is a unified dashboard application for Synology NAS management, built with Next.js 14, TypeScript, and deployed via Docker. The app provides quick access to services and data management tools through a subapp-based architecture.
+MyHomeApp is a unified dashboard application for Synology NAS management, built with Next.js 14, TypeScript, and deployed via Docker. The app provides data management tools through a subapp-based architecture.
 
 ## Architecture & Patterns
 
 ### Subapp Organization
 The project is organized around domain-specific subapps:
-- **Services**: Quick access dashboard to NAS services
 - **Anime**:  MyAnimeList integration for anime tracking
 - **Savings**: Personal finance tracking and management
 
@@ -31,10 +30,8 @@ src/
 │   └── savings/          # Savings management models
 ├── pages/
 │   ├── api/
-│   │   └── services/     # Service API endpoints
 │   │   └── anime/        # Anime API endpoints
 │   │   └── savings/      # Savings API endpoints
-│   └── services.tsx      # Services dashboard
 │   └── anime.tsx         # Anime tracking page
 │   └── savings.tsx       # Savings management page
 └── lib/                  # Utility functions and data operations
@@ -45,20 +42,19 @@ src/
 ### Import Patterns
 ```typescript
 // Prefer domain-specific imports
-import { ServiceCard } from '@/components/services';
-import { ServiceLink } from '@/models/services';
+import { AnimeTable } from '@/components/anime';
+import { AnimeEntry } from '@/models/anime';
 
 // Shared components
 import { TreeView } from '@/components/shared';
 
 // Central model imports when needed
-import type { ServiceLink, SubApp } from '@/models';
+import type { AnimeEntry, SubApp } from '@/models';
 ```
 
 ### API Route Structure
 Follow RESTful conventions within subapp contexts:
 ```
-/api/services/*         # All service operations
 /api/anime/*            # All anime tracking operations
 /api/savings/*          # All savings management operations
 ```
@@ -98,7 +94,7 @@ Follow RESTful conventions within subapp contexts:
 ### CSS Modules
 - Use CSS Modules for component-specific styling
 - File naming: `ComponentName.module.css`
-- Class naming: camelCase (`serviceCard`, `rootCard`)
+- Class naming: camelCase (`animeTable`, `rootCard`)
 - CSS Modules typings are generated via `typed-css-modules`.
 - Use `npm run dev` (runs Next dev + CSS typings watcher).
 - `npm run build` runs `css:types` automatically via `prebuild`.
@@ -212,13 +208,11 @@ export default function Component({ prop1, prop2 }: ComponentProps) {
 
 ### Key Interfaces
 ```typescript
-// Services domain
-interface ServiceLink {
-  id: string;
-  name: string;
-  url: string;
-  icon: string;
-  description?: string;
+// Anime domain
+interface AnimeEntry {
+  id: number;
+  title: string;
+  status?: string;
 }
 ```
 
