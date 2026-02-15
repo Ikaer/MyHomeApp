@@ -8,7 +8,6 @@ This document outlines the organizational structure of the MyHomeApp project, or
 src/
 ├── components/
 │   ├── shared/             # Shared components used across subapps
-│   │   ├── TreeView.tsx    # Hierarchical tree component
 │   │   └── index.ts        # Exports for shared components
 │   ├── anime/              # Anime app specific components
 │   └── savings/            # Savings app specific components
@@ -46,7 +45,7 @@ import { AnimeTable } from '@/components/anime';
 import { AnimeEntry } from '@/models/anime';
 
 // Shared component imports  
-import { TreeView } from '@/components/shared';
+import { CollapsibleSection, Modal } from '@/components/shared';
 import { ApiResponse } from '@/models/shared';
 
 // Central imports (when you need multiple domains)
@@ -60,15 +59,7 @@ API routes follow REST conventions within subapp contexts:
 /api/savings/*       # All savings-related endpoints
 ```
 
-## Migration Benefits
-
-### ✅ **Before vs After**
-
-| Before | After |
-|--------|-------|
-| `@/components/TreeView` | `@/components/shared/TreeView` |
-
-### 🎯 **Achieved Goals**
+## Achieved Goals
 - **Scalability**: Easy to add new subapps without cluttering existing structure
 - **Maintainability**: Changes to one subapp don't affect others
 - **Discoverability**: Clear naming conventions make it obvious where to find/add code

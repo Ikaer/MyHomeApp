@@ -21,7 +21,7 @@ The project is organized around domain-specific subapps:
 ```
 src/
 ├── components/
-│   ├── shared/           # Cross-subapp components (TreeView, etc.)
+│   ├── shared/           # Cross-subapp components (Modal, etc.)
 │   ├── anime/            # Anime tracking components
 │   └── savings/          # Savings management components
 ├── models/
@@ -46,7 +46,7 @@ import { AnimeTable } from '@/components/anime';
 import { AnimeEntry } from '@/models/anime';
 
 // Shared components
-import { TreeView } from '@/components/shared';
+import { CollapsibleSection, Modal } from '@/components/shared';
 
 // Central model imports when needed
 import type { AnimeEntry, SubApp } from '@/models';
