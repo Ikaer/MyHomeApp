@@ -16,7 +16,6 @@ MyHomeApp is a unified dashboard application for Synology NAS management, built 
 The project is organized around domain-specific subapps:
 - **Services**: Quick access dashboard to NAS services
 - **Bookmarks**: Full CRUD bookmark management with categories and tags
-- **Files**: File explorer with TreeView and directory browsing
 - **Anime**:  MyAnimeList integration for anime tracking
 - **Savings**: Personal finance tracking and management
 
@@ -26,23 +25,23 @@ src/
 ├── components/
 │   ├── shared/           # Cross-subapp components (TreeView, etc.)
 │   ├── bookmarks/        # Bookmark-specific components
-│   ├── files/            # File explorer components
 │   ├── anime/            # Anime tracking components
 │   └── savings/          # Savings management components
 ├── models/
 │   ├── shared/           # Common types and interfaces
 │   ├── bookmarks/        # Bookmark domain models
-│   ├── files/            # File system models
 │   ├── anime/            # Anime tracking models
 │   └── savings/          # Savings management models
 ├── pages/
 │   ├── api/
 │   │   ├── bookmarks/    # Bookmark API endpoints
-│   │   ├── files/        # File system API endpoints
 │   │   └── services/     # Service API endpoints
+│   │   └── anime/        # Anime API endpoints
+│   │   └── savings/      # Savings API endpoints
 │   ├── bookmarks.tsx     # Bookmark management page
-│   ├── files.tsx         # File explorer page
 │   └── services.tsx      # Services dashboard
+│   └── anime.tsx         # Anime tracking page
+│   └── savings.tsx       # Savings management page
 └── lib/                  # Utility functions and data operations
 ```
 
@@ -51,30 +50,28 @@ src/
 ### Import Patterns
 ```typescript
 // Prefer domain-specific imports
-import { FileExplorer } from '@/components/files';
 import { BookmarkCard } from '@/components/bookmarks';
-import { FileRoot } from '@/models/files';
 import { Bookmark } from '@/models/bookmarks';
 
 // Shared components
 import { TreeView } from '@/components/shared';
 
 // Central model imports when needed
-import type { FileRoot, Bookmark } from '@/models';
+import type { Bookmark, ServiceLink } from '@/models';
 ```
 
 ### API Route Structure
 Follow RESTful conventions within subapp contexts:
 ```
 /api/bookmarks/*         # All bookmark operations
-/api/files/*            # All file operations
 /api/services/*         # All service operations
+/api/anime/*            # All anime tracking operations
+/api/savings/*          # All savings management operations
 ```
 
 ### Component Organization
 - Each subapp has its own component directory
 - Components include corresponding CSS modules when needed
-- Index files provide clean exports: `export { FileExplorer } from './FileExplorer';`
 - Shared components go in `components/shared/`
 
 ### Data Storage
@@ -107,7 +104,7 @@ Follow RESTful conventions within subapp contexts:
 ### CSS Modules
 - Use CSS Modules for component-specific styling
 - File naming: `ComponentName.module.css`
-- Class naming: camelCase (`fileExplorer`, `rootCard`)
+- Class naming: camelCase (`bookmarkCard`, `rootCard`)
 - CSS Modules typings are generated via `typed-css-modules`.
 - Use `npm run dev` (runs Next dev + CSS typings watcher).
 - `npm run build` runs `css:types` automatically via `prebuild`.
@@ -233,14 +230,13 @@ interface Bookmark {
   updatedAt: string;
 }
 
-// File system domain
-interface FileRoot {
+// Services domain
+interface ServiceLink {
   id: string;
   name: string;
-  path: string;
+  url: string;
+  icon: string;
   description?: string;
-  createdAt: string;
-  updatedAt: string;
 }
 ```
 

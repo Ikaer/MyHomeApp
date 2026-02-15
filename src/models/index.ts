@@ -6,7 +6,6 @@
 // Re-export all subapp models
 export * from './anime';
 export * from './bookmarks';
-export * from './files';
 export * from './services';
 export * from './shared';
 export * from './savings';
@@ -18,11 +17,6 @@ export type {
   Bookmark,
   BookmarkCategory
 } from './bookmarks';
-
-export type {
-  FileSystemItem,
-  FileRoot
-} from './files';
 
 export type {
   SubApp,

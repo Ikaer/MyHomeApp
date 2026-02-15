@@ -87,12 +87,6 @@ Once deployed, access the application at:
     └── app.json       # Main config file
 ```
 
-## Next Steps (Phase 2)
-
-- Implement bookmark manager functionality
-- Add bookmark CRUD operations
-- Implement search and categorization
-
 ## Troubleshooting
 
 ### Container won't start

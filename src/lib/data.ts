@@ -182,14 +182,6 @@ export function getSubApps(): SubApp[] {
         enabled: true // Enabled in Phase 3
       },
       {
-        id: 'files',
-        name: 'File Explorer',
-        description: 'Browse your NAS files',
-        icon: '📁',
-        route: '/files',
-        enabled: true // Will be enabled in Phase 3
-      },
-      {
         id: 'savings',
         name: 'Savings',
         description: 'Manage your financial investments',

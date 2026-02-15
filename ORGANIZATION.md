@@ -12,9 +12,6 @@ src/
 │   │   └── index.ts        # Exports for shared components
 │   ├── bookmarks/          # Bookmark app specific components
 │   │   └── index.ts
-│   ├── files/              # File explorer app specific components
-│   │   ├── FileExplorer.tsx
-│   │   └── index.ts
 │   └── services/           # Services app specific components
 │       └── index.ts
 ├── models/
@@ -22,8 +19,6 @@ src/
 │   │   └── index.ts        # API responses, pagination, etc.
 │   ├── bookmarks/          # Bookmark domain models
 │   │   └── index.ts        # Bookmark, BookmarkCategory, etc.
-│   ├── files/              # File system domain models
-│   │   └── index.ts        # FileRoot, FileSystemItem, etc.
 │   ├── services/           # Services domain models
 │   │   └── index.ts        # ServiceLink, AppConfig, etc.
 │   └── index.ts            # Central export (re-exports all subdomains)
@@ -34,14 +29,8 @@ src/
 │   │   │   ├── [id].ts     # GET/PUT/DELETE /api/bookmarks/:id
 │   │   │   ├── categories/ # Bookmark categories
 │   │   │   └── export/     # Bookmark export functionality
-│   │   ├── files/          # File system API endpoints
-│   │   │   ├── browse.ts   # POST /api/files/browse
-│   │   │   └── roots/      # File root management
-│   │   │       ├── index.ts    # GET/POST /api/files/roots
-│   │   │       └── [id].ts     # GET/PUT/DELETE /api/files/roots/:id
 │   │   └── services/       # Future services API endpoints
 │   ├── bookmarks.tsx       # Bookmarks app page
-│   ├── files.tsx          # File explorer app page
 │   └── services.tsx       # Services app page
 └── types/                  # Legacy compatibility (deprecated)
     └── index.ts            # Re-exports from models/
@@ -50,7 +39,7 @@ src/
 ## Organizational Principles
 
 ### 1. **Subapp-Centric Organization**
-Each major feature (bookmarks, files, services) has its own:
+Each major feature (bookmarks, services) has its own:
 - Component directory with app-specific UI components
 - Model directory with domain-specific types and interfaces
 - API directory with related endpoints grouped under a common route prefix
@@ -61,22 +50,21 @@ Common components and types that are used across multiple subapps are placed in 
 ### 3. **Clear Import Paths**
 ```typescript
 // Subapp-specific imports
-import { FileExplorer } from '@/components/files';
-import { FileRoot } from '@/models/files';
+import { BookmarkCard } from '@/components/bookmarks';
+import { Bookmark } from '@/models/bookmarks';
 
 // Shared component imports  
 import { TreeView } from '@/components/shared';
 import { ApiResponse } from '@/models/shared';
 
 // Central imports (when you need multiple domains)
-import { FileRoot, Bookmark } from '@/models';
+import { Bookmark, ServiceLink } from '@/models';
 ```
 
 ### 4. **API Route Organization**
 API routes follow REST conventions within subapp contexts:
 ```
 /api/bookmarks/*     # All bookmark-related endpoints
-/api/files/*         # All file-related endpoints  
 /api/services/*      # All service-related endpoints
 ```
 
@@ -86,11 +74,7 @@ API routes follow REST conventions within subapp contexts:
 
 | Before | After |
 |--------|-------|
-| `/api/file-roots` | `/api/files/roots` |
-| `/api/filesystem/browse` | `/api/files/browse` |
-| `@/components/FileExplorer` | `@/components/files/FileExplorer` |
 | `@/components/TreeView` | `@/components/shared/TreeView` |
-| `@/models/filesystem` | `@/models/files` |
 
 ### 🎯 **Achieved Goals**
 - **Scalability**: Easy to add new subapps without cluttering existing structure
