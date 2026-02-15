@@ -1,8 +1,8 @@
 import React from 'react';
-import { Line, LineChart, YAxis } from 'recharts';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import styles from './PositionsTable.module.css';
 import { PositionsTableProps } from './types';
+import SparklineChart from './SparklineChart';
 
 export default function PositionsTable({
   positions,
@@ -112,30 +112,11 @@ export default function PositionsTable({
               <td>{formatCurrency(pos.currentPrice)}</td>
               <td className={styles.sparklineCell}>
                 {pos.isin && sparklineData[pos.isin]?.length ? (
-                  <div className={styles.sparklineChart}>
-                    <LineChart
-                      width={140}
-                      height={42}
-                      data={sparklineData[pos.isin]}
-                      margin={{ top: 4, right: 4, left: 4, bottom: 4 }}
-                    >
-                      <YAxis
-                        hide
-                        domain={([dataMin, dataMax]) => {
-                          const range = Math.max(dataMax - dataMin, 0.01);
-                          return [dataMin - range * 0.1, dataMax + range * 0.1];
-                        }}
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="value"
-                        stroke="#93c5fd"
-                        strokeWidth={2}
-                        dot={false}
-                        isAnimationActive={false}
-                      />
-                    </LineChart>
-                  </div>
+                  <SparklineChart
+                    points={sparklineData[pos.isin]}
+                    averagePurchasePrice={pos.averagePurchasePrice}
+                    formatCurrency={formatCurrency}
+                  />
                 ) : (
                   <span className={styles.sparklineEmpty}>—</span>
                 )}
