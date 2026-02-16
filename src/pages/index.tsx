@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
 import SubAppCard from '@/components/SubAppCard';
+import { CardGrid } from '@/components/shared';
 import { SubApp } from '@/types';
 import { getSubApps, initializeDataDirectories } from '@/lib/data';
 
@@ -19,11 +20,11 @@ export default function Home({ subApps }: HomeProps) {
       </Head>
 
       <div>
-        <div className="card-grid">
+        <CardGrid>
           {subApps.map((subApp) => (
             <SubAppCard key={subApp.id} subApp={subApp} />
           ))}
-        </div>
+        </CardGrid>
       </div>
     </>
   );

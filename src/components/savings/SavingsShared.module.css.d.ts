@@ -1,5 +1,4 @@
 declare const styles: {
-  readonly "accountCard": string;
   readonly "accountGrid": string;
   readonly "accountName": string;
   readonly "button": string;

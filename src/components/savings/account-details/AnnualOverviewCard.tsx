@@ -1,4 +1,5 @@
 import React from 'react';
+import { Card } from '@/components/shared';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { AnnualOverviewRow } from './types';
 
@@ -11,7 +12,7 @@ interface AnnualOverviewCardProps {
 
 export default function AnnualOverviewCard({ rows, formatCurrency, formatPercent, onEdit }: AnnualOverviewCardProps) {
   return (
-    <div className={sharedStyles.accountCard} style={{ cursor: 'default' }}>
+    <Card>
       <h2 className={sharedStyles.accountName}>Annual Overview</h2>
       {rows.length === 0 ? (
         <div className={sharedStyles.emptyState} style={{ padding: '1.5rem 0' }}>
@@ -51,6 +52,6 @@ export default function AnnualOverviewCard({ rows, formatCurrency, formatPercent
           </table>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Card } from '@/components/shared';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { AccountSummary } from '@/models/savings';
 
@@ -10,7 +11,7 @@ interface PerformanceCardProps {
 
 export default function PerformanceCard({ summary, formatCurrency, formatPercent }: PerformanceCardProps) {
   return (
-    <div className={sharedStyles.accountCard} style={{ cursor: 'default' }}>
+    <Card>
       <h2 className={sharedStyles.accountName}>Performance</h2>
       <div className={sharedStyles.statsGrid} style={{ marginTop: '1rem' }}>
         <div className={sharedStyles.statItem}>
@@ -30,6 +31,6 @@ export default function PerformanceCard({ summary, formatCurrency, formatPercent
           </span>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

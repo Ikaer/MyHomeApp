@@ -15,6 +15,7 @@ import pageStyles from './savings/SavingsPage.module.css';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, AccountValuation, NetWorthSummary, ACCOUNT_TYPE_LABELS, AccountType } from '@/models/savings';
 import CreateAccountModal from '@/components/savings/CreateAccountModal';
+import { Card } from '@/components/shared';
 
 interface HistoricalWealthRecord {
     timestamp: string;
@@ -132,7 +133,7 @@ export default function SavingsPage() {
                 <>
                     {/* Net Worth Banner */}
                     {netWorth && (
-                        <div className={sharedStyles.accountCard} style={{ marginBottom: '2rem', cursor: 'default' }}>
+                        <Card style={{ marginBottom: '2rem' }}>
                             <h2 className={sharedStyles.accountName} style={{ marginBottom: '0.5rem' }}>
                                 Total Net Worth
                             </h2>
@@ -178,7 +179,7 @@ export default function SavingsPage() {
                                     </ResponsiveContainer>
                                 </div>
                             )}
-                        </div>
+                        </Card>
                     )}
 
                     {accounts.length === 0 ? (
@@ -226,7 +227,7 @@ function AccountCard({
     const isPositive = (valuation?.totalGainLoss ?? 0) >= 0;
 
     return (
-        <div className={sharedStyles.accountCard}>
+        <Card>
             <div className={pageStyles.accountHeader}>
                 <div>
                     <h2 className={sharedStyles.accountName}>{account.name}</h2>
@@ -282,6 +283,6 @@ function AccountCard({
                     View Details →
                 </Link>
             </div>
-        </div>
+        </Card>
     );
 }

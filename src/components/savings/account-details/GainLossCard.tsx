@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
+import { Card } from '@/components/shared';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { HistoryChartPoint } from './types';
 
@@ -18,7 +19,7 @@ interface GainLossCardProps {
 
 export default function GainLossCard({ loading, data }: GainLossCardProps) {
   return (
-    <div className={sharedStyles.accountCard} style={{ cursor: 'default' }}>
+    <Card>
       <h2 className={sharedStyles.accountName}>Gain/Loss %</h2>
       {loading ? (
         <div className={sharedStyles.chartEmpty}>Loading history...</div>
@@ -56,6 +57,6 @@ export default function GainLossCard({ loading, data }: GainLossCardProps) {
           </ResponsiveContainer>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, BalanceRecord } from '@/models/savings';
-import { Modal } from '@/components/shared';
+import { Card, Modal } from '@/components/shared';
 
 interface BalanceAccountDetailsProps {
     account: SavingsAccount;
@@ -143,7 +143,7 @@ export default function BalanceAccountDetails({ account, onBack }: BalanceAccoun
             {/* Summary Cards */}
             <div className={sharedStyles.accountGrid}>
                 {/* Current Value Card */}
-                <div className={sharedStyles.accountCard} style={{ cursor: 'default' }}>
+                <Card>
                     <h3 className={sharedStyles.statLabel}>Current Balance</h3>
                     <div style={{ fontSize: '2rem', fontWeight: 700, color: '#f3f4f6', marginTop: '0.5rem' }}>
                         {latest ? formatCurrency(latest.balance) : '—'}
@@ -153,11 +153,11 @@ export default function BalanceAccountDetails({ account, onBack }: BalanceAccoun
                             as of {latest.date}
                         </div>
                     )}
-                </div>
+                </Card>
 
                 {/* Config Info Card (if applicable) */}
                 {configInfo.length > 0 && (
-                    <div className={sharedStyles.accountCard} style={{ cursor: 'default' }}>
+                    <Card>
                         <h3 className={sharedStyles.statLabel}>Account Parameters</h3>
                         <div className={sharedStyles.statsGrid} style={{ marginTop: '0.75rem' }}>
                             {configInfo.map(item => (
@@ -167,7 +167,7 @@ export default function BalanceAccountDetails({ account, onBack }: BalanceAccoun
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </Card>
                 )}
             </div>
 

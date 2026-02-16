@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, DepositRecord, InteressementConfig } from '@/models/savings';
-import { Modal } from '@/components/shared';
+import { Card, Modal } from '@/components/shared';
 
 interface InteressementDetailsProps {
     account: SavingsAccount;
@@ -236,13 +236,13 @@ export default function InteressementDetails({ account, onBack }: InteressementD
 
             {/* Summary Cards */}
             <div className={sharedStyles.accountGrid}>
-                <div className={sharedStyles.accountCard} style={{ cursor: 'default' }}>
+                <Card>
                     <h3 className={sharedStyles.statLabel}>Total Current Value</h3>
                     <div style={{ fontSize: '2rem', fontWeight: 700, color: '#f3f4f6', marginTop: '0.5rem' }}>
                         {formatCurrency(totalCurrentValue)}
                     </div>
-                </div>
-                <div className={sharedStyles.accountCard} style={{ cursor: 'default' }}>
+                </Card>
+                <Card>
                     <div className={sharedStyles.statsGrid}>
                         <div className={sharedStyles.statItem}>
                             <span className={sharedStyles.statLabel}>Total Deposited</span>
@@ -255,7 +255,7 @@ export default function InteressementDetails({ account, onBack }: InteressementD
                             </span>
                         </div>
                     </div>
-                </div>
+                </Card>
             </div>
 
             {/* Deposits Table */}

@@ -1,3 +1,5 @@
+import { Card } from '@/components/shared';
+import styles from './SubAppCard.module.css';
 import { SubApp } from '@/types';
 
 interface SubAppCardProps {
@@ -22,27 +24,25 @@ export default function SubAppCard({ subApp }: SubAppCardProps) {
 
   if (!subApp.enabled) {
     return (
-      <div className="card">
-        <span className="card-icon">{subApp.icon}</span>
-        <h3 className="card-title">{subApp.name}</h3>
-        <p className="card-description">{subApp.description}</p>
+      <Card>
+        <span className={styles.cardIcon}>{subApp.icon}</span>
+        <h3 className={styles.cardTitle}>{subApp.name}</h3>
+        <p className={styles.cardDescription}>{subApp.description}</p>
         <span className={`status ${status.className}`}>
           {status.text}
         </span>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div className="card">
-      <a href={subApp.route} className="card-link">
-        <span className="card-icon">{subApp.icon}</span>
-        <h3 className="card-title">{subApp.name}</h3>
-        <p className="card-description">{subApp.description}</p>
-        <span className={`status ${status.className}`}>
-          {status.text}
-        </span>
-      </a>
-    </div>
+    <Card href={subApp.route}>
+      <span className={styles.cardIcon}>{subApp.icon}</span>
+      <h3 className={styles.cardTitle}>{subApp.name}</h3>
+      <p className={styles.cardDescription}>{subApp.description}</p>
+      <span className={`status ${status.className}`}>
+        {status.text}
+      </span>
+    </Card>
   );
 }
