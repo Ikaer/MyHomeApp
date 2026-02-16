@@ -18,7 +18,7 @@ const AccountSection: React.FC<AccountSectionProps> = ({
   onDisconnect,
 }) => {
   return (
-    <div className={styles.accountSection}>
+    <div className={styles.accountsSection}>
       {isAuthLoading ? (
         <button disabled className={styles.button}>Loading...</button>
       ) : authState.isAuthenticated ? (

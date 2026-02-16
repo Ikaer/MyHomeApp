@@ -1,5 +1,5 @@
 declare const styles: {
-  readonly "accountSection": string;
+  readonly "accountsSection": string;
   readonly "button": string;
   readonly "connectButton": string;
   readonly "connectedAccount": string;

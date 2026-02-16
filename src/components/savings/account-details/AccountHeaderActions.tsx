@@ -21,9 +21,9 @@ export default function AccountHeaderActions({
 }: AccountHeaderActionsProps) {
   return (
     <div className={styles.header}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+      <div className={styles.headerLayout}>
         <button className={sharedStyles.secondaryButton} onClick={onBack}>← Go to accounts</button>
-        <div style={{ width: '2rem' }} />
+        <div className={styles.itemsSeparator} />
         <button className={sharedStyles.button} onClick={onAddTransaction}>
           + Add Transaction
         </button>
