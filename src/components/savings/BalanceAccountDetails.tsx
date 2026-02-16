@@ -119,7 +119,7 @@ export default function BalanceAccountDetails({ account, onBack }: BalanceAccoun
                         </div>
                     </div>
                     <div className={sharedStyles.formActions}>
-                        <Button type="button" variant="secondary" onClick={() => setShowAddModal(false)}>
+                        <Button variant="secondary" onClick={() => setShowAddModal(false)}>
                             Cancel
                         </Button>
                         <Button type="submit" disabled={saving}>

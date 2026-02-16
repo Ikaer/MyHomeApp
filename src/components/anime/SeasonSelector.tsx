@@ -33,11 +33,11 @@ const SeasonSelector: React.FC<SeasonSelectorProps> = ({ value, onChange }) => {
 
   const presets = (
     <div className={styles.row}>
-      <Button type="button" variant="secondary" size="xs" onClick={() => addUnique([infos.current])}>Current</Button>
-      <Button type="button" variant="secondary" size="xs" onClick={() => addUnique([infos.current, infos.previous])}>Current + Prev</Button>
-      <Button type="button" variant="secondary" size="xs" onClick={() => addUnique([infos.next])}>Next</Button>
-      <Button type="button" variant="secondary" size="xs" onClick={() => onChange([])}>Clear</Button>
-      <Button type="button" variant="secondary" size="xs" onClick={() => setShowAdd(s => !s)}>
+      <Button variant="secondary" size="xs" onClick={() => addUnique([infos.current])}>Current</Button>
+      <Button variant="secondary" size="xs" onClick={() => addUnique([infos.current, infos.previous])}>Current + Prev</Button>
+      <Button variant="secondary" size="xs" onClick={() => addUnique([infos.next])}>Next</Button>
+      <Button variant="secondary" size="xs" onClick={() => onChange([])}>Clear</Button>
+      <Button variant="secondary" size="xs" onClick={() => setShowAdd(s => !s)}>
         {showAdd ? 'Close' : '+ Add'}
       </Button>
     </div>
@@ -61,7 +61,7 @@ const SeasonSelector: React.FC<SeasonSelectorProps> = ({ value, onChange }) => {
             Year:
             <input type="number" value={year} onChange={(e) => setYear(parseInt(e.target.value || currentYear.toString(), 10))} style={{width: 90}} />
           </label>
-          <Button type="button" variant="secondary" size="xs" onClick={() => addUnique([{ year, season }])}>Add</Button>
+          <Button variant="secondary" size="xs" onClick={() => addUnique([{ year, season }])}>Add</Button>
         </div>
       )}
       {value.length > 0 && (
@@ -69,7 +69,7 @@ const SeasonSelector: React.FC<SeasonSelectorProps> = ({ value, onChange }) => {
           {value.map((s, idx) => (
             <span key={idx} className={`${styles.chip} ${styles.chipActive}`}>
               {s.season} {s.year}
-              <Button type="button" variant="secondary" size="xs" className={styles.remove} onClick={() => remove(s)}>×</Button>
+              <Button variant="secondary" size="xs" className={styles.remove} onClick={() => remove(s)}>×</Button>
             </span>
           ))}
         </div>

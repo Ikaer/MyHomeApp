@@ -260,7 +260,7 @@ export default function CreateAccountModal({ open, onClose, onCreated }: CreateA
                 </div>
 
                 <div className={sharedStyles.formActions}>
-                    <Button type="button" variant="secondary" onClick={handleClose}>
+                    <Button variant="secondary" onClick={handleClose}>
                         Cancel
                     </Button>
                     <Button type="submit" disabled={saving}>

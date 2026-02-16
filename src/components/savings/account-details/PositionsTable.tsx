@@ -131,7 +131,6 @@ export default function PositionsTable({
               </td>
               <td>
                 <Button
-                  type="button"
                   variant="secondary"
                   size="sm"
                   onClick={() => onOpenAssetCharts(pos.isin || null)}

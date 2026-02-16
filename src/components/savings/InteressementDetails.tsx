@@ -213,7 +213,7 @@ export default function InteressementDetails({ account, onBack }: InteressementD
                         </div>
                     )}
                     <div className={sharedStyles.formActions}>
-                        <Button type="button" variant="secondary" onClick={() => { setShowAddModal(false); resetForm(); }}>
+                        <Button variant="secondary" onClick={() => { setShowAddModal(false); resetForm(); }}>
                             Cancel
                         </Button>
                         <Button type="submit" disabled={saving}>

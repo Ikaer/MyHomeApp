@@ -219,7 +219,7 @@ export default function TransactionForm({
                 </div>
 
                 <div className={sharedStyles.formActions}>
-                    <Button type="button" variant="secondary" onClick={onClose}>
+                    <Button variant="secondary" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button type="submit">

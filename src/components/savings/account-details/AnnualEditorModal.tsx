@@ -29,7 +29,7 @@ export default function AnnualEditorModal({
       size="sm"
       footer={
         <>
-          <Button type="button" variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
           <Button type="button" onClick={onSave}>

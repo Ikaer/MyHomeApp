@@ -143,7 +143,6 @@ export default function TransactionsTable({
               <td>{formatCurrency(t.totalAmount)}</td>
               <td>
                 <Button
-                  type="button"
                   variant="secondary"
                   size="sm"
                   onClick={() => onEditTransaction(t)}

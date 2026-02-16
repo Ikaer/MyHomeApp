@@ -39,7 +39,6 @@ export default function AnnualOverviewCard({ rows, formatCurrency, formatPercent
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <Button
-                      type="button"
                       variant="secondary"
                       size="sm"
                       onClick={() => onEdit(entry.year, entry.endValue)}
