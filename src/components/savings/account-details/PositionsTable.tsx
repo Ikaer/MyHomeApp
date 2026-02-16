@@ -4,6 +4,7 @@ import { Button } from '@/components/shared';
 import styles from './PositionsTable.module.css';
 import { PositionsTableProps } from './types';
 import SparklineChart from './SparklineChart';
+import { SortableHeaderButton } from '@/components/shared/table';
 
 export default function PositionsTable({
   positions,
@@ -20,82 +21,61 @@ export default function PositionsTable({
         <thead>
           <tr>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${positionsSort.key === 'asset' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Asset"
+                isActive={positionsSort.key === 'asset'}
+                direction={positionsSort.direction}
                 onClick={() => onToggleSort('asset')}
-              >
-                Asset
-                <span className={sharedStyles.sortIndicator}>
-                  {positionsSort.key === 'asset' ? (positionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${positionsSort.key === 'quantity' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Quantity"
+                isActive={positionsSort.key === 'quantity'}
+                direction={positionsSort.direction}
                 onClick={() => onToggleSort('quantity')}
-              >
-                Quantity
-                <span className={sharedStyles.sortIndicator}>
-                  {positionsSort.key === 'quantity' ? (positionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${positionsSort.key === 'avgPrice' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Avg. Price"
+                isActive={positionsSort.key === 'avgPrice'}
+                direction={positionsSort.direction}
                 onClick={() => onToggleSort('avgPrice')}
-              >
-                Avg. Price
-                <span className={sharedStyles.sortIndicator}>
-                  {positionsSort.key === 'avgPrice' ? (positionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${positionsSort.key === 'currentPrice' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Curr. Price"
+                isActive={positionsSort.key === 'currentPrice'}
+                direction={positionsSort.direction}
                 onClick={() => onToggleSort('currentPrice')}
-              >
-                Curr. Price
-                <span className={sharedStyles.sortIndicator}>
-                  {positionsSort.key === 'currentPrice' ? (positionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th>Market Trend</th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${positionsSort.key === 'value' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Value"
+                isActive={positionsSort.key === 'value'}
+                direction={positionsSort.direction}
                 onClick={() => onToggleSort('value')}
-              >
-                Value
-                <span className={sharedStyles.sortIndicator}>
-                  {positionsSort.key === 'value' ? (positionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${positionsSort.key === 'gainLoss' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Gain/Loss"
+                isActive={positionsSort.key === 'gainLoss'}
+                direction={positionsSort.direction}
                 onClick={() => onToggleSort('gainLoss')}
-              >
-                Gain/Loss
-                <span className={sharedStyles.sortIndicator}>
-                  {positionsSort.key === 'gainLoss' ? (positionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${positionsSort.key === 'gainLossPct' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Gain/Loss %"
+                isActive={positionsSort.key === 'gainLossPct'}
+                direction={positionsSort.direction}
                 onClick={() => onToggleSort('gainLossPct')}
-              >
-                Gain/Loss %
-                <span className={sharedStyles.sortIndicator}>
-                  {positionsSort.key === 'gainLossPct' ? (positionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th>Charts</th>
           </tr>

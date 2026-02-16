@@ -17,9 +17,6 @@ declare const styles: {
   readonly "negative": string;
   readonly "positive": string;
   readonly "select": string;
-  readonly "sortActive": string;
-  readonly "sortButton": string;
-  readonly "sortIndicator": string;
   readonly "sortableHeader": string;
   readonly "statItem": string;
   readonly "statLabel": string;

@@ -1,6 +1,7 @@
 import React from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { Button } from '@/components/shared';
+import { SortableHeaderButton } from '@/components/shared/table';
 import { TransactionsTableProps } from './types';
 
 export default function TransactionsTable({
@@ -16,114 +17,84 @@ export default function TransactionsTable({
         <thead>
           <tr>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${transactionsSort.key === 'date' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Date"
+                isActive={transactionsSort.key === 'date'}
+                direction={transactionsSort.direction}
                 onClick={() => onToggleSort('date')}
-              >
-                Date
-                <span className={sharedStyles.sortIndicator}>
-                  {transactionsSort.key === 'date' ? (transactionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${transactionsSort.key === 'type' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Type"
+                isActive={transactionsSort.key === 'type'}
+                direction={transactionsSort.direction}
                 onClick={() => onToggleSort('type')}
-              >
-                Type
-                <span className={sharedStyles.sortIndicator}>
-                  {transactionsSort.key === 'type' ? (transactionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${transactionsSort.key === 'asset' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Asset"
+                isActive={transactionsSort.key === 'asset'}
+                direction={transactionsSort.direction}
                 onClick={() => onToggleSort('asset')}
-              >
-                Asset
-                <span className={sharedStyles.sortIndicator}>
-                  {transactionsSort.key === 'asset' ? (transactionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${transactionsSort.key === 'ticker' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Ticker"
+                isActive={transactionsSort.key === 'ticker'}
+                direction={transactionsSort.direction}
                 onClick={() => onToggleSort('ticker')}
-              >
-                Ticker
-                <span className={sharedStyles.sortIndicator}>
-                  {transactionsSort.key === 'ticker' ? (transactionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${transactionsSort.key === 'isin' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="ISIN"
+                isActive={transactionsSort.key === 'isin'}
+                direction={transactionsSort.direction}
                 onClick={() => onToggleSort('isin')}
-              >
-                ISIN
-                <span className={sharedStyles.sortIndicator}>
-                  {transactionsSort.key === 'isin' ? (transactionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${transactionsSort.key === 'quantity' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Quantity"
+                isActive={transactionsSort.key === 'quantity'}
+                direction={transactionsSort.direction}
                 onClick={() => onToggleSort('quantity')}
-              >
-                Quantity
-                <span className={sharedStyles.sortIndicator}>
-                  {transactionsSort.key === 'quantity' ? (transactionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${transactionsSort.key === 'price' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Price"
+                isActive={transactionsSort.key === 'price'}
+                direction={transactionsSort.direction}
                 onClick={() => onToggleSort('price')}
-              >
-                Price
-                <span className={sharedStyles.sortIndicator}>
-                  {transactionsSort.key === 'price' ? (transactionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${transactionsSort.key === 'fees' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Fees"
+                isActive={transactionsSort.key === 'fees'}
+                direction={transactionsSort.direction}
                 onClick={() => onToggleSort('fees')}
-              >
-                Fees
-                <span className={sharedStyles.sortIndicator}>
-                  {transactionsSort.key === 'fees' ? (transactionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${transactionsSort.key === 'ttf' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="TTF"
+                isActive={transactionsSort.key === 'ttf'}
+                direction={transactionsSort.direction}
                 onClick={() => onToggleSort('ttf')}
-              >
-                TTF
-                <span className={sharedStyles.sortIndicator}>
-                  {transactionsSort.key === 'ttf' ? (transactionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th className={sharedStyles.sortableHeader}>
-              <button
-                className={`${sharedStyles.sortButton} ${transactionsSort.key === 'total' ? sharedStyles.sortActive : ''}`}
+              <SortableHeaderButton
+                label="Total"
+                isActive={transactionsSort.key === 'total'}
+                direction={transactionsSort.direction}
                 onClick={() => onToggleSort('total')}
-              >
-                Total
-                <span className={sharedStyles.sortIndicator}>
-                  {transactionsSort.key === 'total' ? (transactionsSort.direction === 'asc' ? '▲' : '▼') : ''}
-                </span>
-              </button>
+              />
             </th>
             <th>Actions</th>
           </tr>
