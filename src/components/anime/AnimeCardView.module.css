@@ -232,7 +232,6 @@
 
 .actionButton {
     flex: 1;
-    text-align: center;
 }
 
 .malActions {
@@ -265,9 +264,7 @@
     font-size: 0.8rem;
 }
 
-.epButton {
-    --button-square-size: 1.5rem;
-}
+
 
 
 .topActions {
@@ -304,11 +301,7 @@
     object-fit: contain;
 }
 
-.updateBtn {
-    width: 100%;
-    margin-top: 0.5rem;
-    font-weight: 600;
-}
+
 
 .emptyState {
     padding: 4rem;

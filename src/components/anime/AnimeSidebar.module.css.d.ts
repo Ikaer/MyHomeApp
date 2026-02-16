@@ -1,5 +1,4 @@
 declare const styles: {
-  readonly "active": string;
   readonly "activeSizeButton": string;
   readonly "activeView": string;
   readonly "button": string;

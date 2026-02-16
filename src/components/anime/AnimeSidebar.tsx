@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './AnimeSidebar.module.css';
 import { MALAuthState, UserAnimeStatus, ImageSize, VisibleColumns, StatsColumn, SortColumn, SortDirection, AnimeLayoutType } from '@/models/anime';
 import { SeasonInfo } from './SeasonSelector';
-import { CollapsibleSection } from '@/components/shared';
+import { Button, CollapsibleSection } from '@/components/shared';
 import {
   SortOrderSection,
   AccountSection,
@@ -101,20 +101,22 @@ const AnimeSidebar: React.FC<AnimeSidebarProps> = ({
           className={styles.searchInput}
         />
         <div className={styles.layoutSelector}>
-          <button
-            className={`${styles.layoutBtn} ${layout === 'table' ? styles.active : ''}`}
+          <Button
+            className={`${styles.layoutBtn}`}
             onClick={() => onLayoutChange('table')}
             title="Table View"
+            variant={layout === 'table' ? 'primary' : 'secondary'}
           >
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="3" y1="15" x2="21" y2="15" /><line x1="9" y1="9" x2="9" y2="21" /><line x1="15" y1="9" x2="15" y2="21" /></svg>
-          </button>
-          <button
-            className={`${styles.layoutBtn} ${layout === 'card' ? styles.active : ''}`}
+            Table
+          </Button>
+          <Button
+            className={`${styles.layoutBtn}`}
             onClick={() => onLayoutChange('card')}
             title="Card View"
+            variant={layout === 'card' ? 'primary' : 'secondary'}
           >
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" /></svg>
-          </button>
+            Card
+          </Button>
         </div>
       </div>
 

@@ -239,49 +239,6 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
     return genres.map(g => g.name).join(', ');
   };
 
-  const formatProviders = (anime: AnimeWithExtensions) => {
-    if (!anime.extensions?.providers || anime.extensions.providers.length === 0) {
-      return <span className={styles.noProviders}>No providers</span>;
-    }
-
-    return (
-      <div className={styles.providersList}>
-        {anime.extensions.providers.map((provider, index) => {
-          const detectedProvider = detectProviderFromUrl(provider.url);
-          return detectedProvider ? (
-            <a
-              key={index}
-              href={provider.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.providerLink}
-              title={`Watch on ${detectedProvider.name}`}
-            >
-              <Image
-                src={getProviderLogoPath(detectedProvider)}
-                alt={detectedProvider.name}
-                width={32}
-                height={32}
-                className={styles.providerLogo}
-              />
-            </a>
-          ) : (
-            <a
-              key={index}
-              href={provider.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.providerLinkText}
-              title={`Watch on ${provider.name}`}
-            >
-              {provider.name}
-            </a>
-          );
-        })}
-      </div>
-    );
-  };
-
   const renderMetric = (
     anime: AnimeWithExtensions,
     metric: 'rank' | 'popularity' | 'num_list_users' | 'num_scoring_users' | 'mean'
@@ -434,31 +391,29 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                     </select>
                   </div>
                   <div className={styles.malEpisodes}>
-                    <div className={styles.episodeButtons}>
-                      <Button
-                        variant="secondary"
-                        size="xs"
-                        square
-                        className={styles.episodeButton}
-                        onClick={() => handleEpisodeChange(anime.id, getDisplayEpisodes(anime) + 1)}
-                        title="Watch next episode"
-                      >
-                        +
-                      </Button>
-                      <Button
-                        variant="secondary"
-                        size="xs"
-                        square
-                        className={styles.episodeButton}
-                        onClick={() => handleEpisodeChange(anime.id, getDisplayEpisodes(anime) - 1)}
-                        title="Decrease episode count"
-                      >
-                        -
-                      </Button>
-                    </div>
-                    <span className={styles.episodeCounter}>
+
+                    <Button
+                      variant="secondary"
+                      size="xs"
+                      square
+                      onClick={() => handleEpisodeChange(anime.id, getDisplayEpisodes(anime) - 1)}
+                      title="Decrease episode count"
+                    >
+                      -
+                    </Button>
+                    <div className={styles.episodeCounter}>
                       {getDisplayEpisodes(anime)}/{anime.num_episodes || '?'}
-                    </span>
+                    </div>
+
+                    <Button
+                      variant="secondary"
+                      size="xs"
+                      square
+                      onClick={() => handleEpisodeChange(anime.id, getDisplayEpisodes(anime) + 1)}
+                      title="Watch next episode"
+                    >
+                      +
+                    </Button>
                   </div>
                 </td>
                 <td className={styles.linksCell}>
@@ -469,7 +424,6 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                       rel="noopener noreferrer"
                       variant="secondary"
                       size="xs"
-                      className={styles.malLink}
                     >
                       MAL
                     </Button>
@@ -478,7 +432,6 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                       variant="primary-positive"
                       size="xs"
                       square
-                      className={styles.searchButton}
                       title="Search providers manually on Google"
                     >
                       🔍
@@ -488,7 +441,6 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                       variant="secondary"
                       size="xs"
                       square
-                      className={styles.justWatchButton}
                       title="Search on JustWatch"
                     >
                       <Image
@@ -502,8 +454,7 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                     <Button
                       onClick={() => onHideToggle?.(anime.id, !anime.hidden)}
                       variant={anime.hidden ? 'primary-positive' : 'primary-negative'}
-                      size="xs"
-                      className={anime.hidden ? styles.showButton : styles.hideButton}
+                      size="sm"
                       title={anime.hidden ? 'Show this anime' : 'Hide this anime'}
                     >
                       {anime.hidden ? 'Unhide' : 'Hide'}
@@ -512,8 +463,7 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                       <Button
                         onClick={() => handleUpdateMAL(anime.id)}
                         variant="primary"
-                        size="xs"
-                        className={styles.updateButton}
+                        size="sm"
                         title="Update MAL status"
                       >
                         Update

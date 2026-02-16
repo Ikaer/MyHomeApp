@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { AnimeWithExtensions, ImageSize, StatsColumn, VisibleColumns } from '@/models/anime';
-import { formatSeason, formatUserStatus } from '@/lib/animeUtils';
+import {  formatUserStatus } from '@/lib/animeUtils';
 import { generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
 import { Button } from '@/components/shared';
 import styles from './AnimeCardView.module.css';
@@ -206,7 +206,6 @@ export default function AnimeCardView({
                                 <div className={styles.malRow}>
                                     <div className={styles.episodes}>
                                             <Button
-                                            className={styles.epButton}
                                                 variant="secondary"
                                                 size="xs"
                                                 square
@@ -216,7 +215,6 @@ export default function AnimeCardView({
                                             </Button>
                                         <span>{getDisplayEpisodes(anime)} / {anime.num_episodes || '?'}</span>
                                             <Button
-                                            className={styles.epButton}
                                                 variant="secondary"
                                                 size="xs"
                                                 square
@@ -228,7 +226,6 @@ export default function AnimeCardView({
                                 </div>
                                 {pendingUpdates.has(anime.id) && (
                                         <Button
-                                            className={styles.updateBtn}
                                             variant="primary"
                                             size="xs"
                                             onClick={() => handleUpdateMAL(anime.id)}

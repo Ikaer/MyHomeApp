@@ -11,7 +11,6 @@ declare const styles: {
   readonly "currentlyAiring": string;
   readonly "dropped": string;
   readonly "emptyState": string;
-  readonly "epButton": string;
   readonly "episodes": string;
   readonly "finishedAiring": string;
   readonly "imageContainer": string;
@@ -45,7 +44,6 @@ declare const styles: {
   readonly "status": string;
   readonly "title": string;
   readonly "topActions": string;
-  readonly "updateBtn": string;
   readonly "watching": string;
 };
 export = styles;
