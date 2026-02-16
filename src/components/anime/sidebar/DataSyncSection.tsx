@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './DataSyncSection.module.css';
 import { MALAuthState } from '@/models/anime';
+import { Button } from '@/components/shared';
 
 interface DataSyncSectionProps {
   authState: MALAuthState;
@@ -22,20 +23,19 @@ const DataSyncSection: React.FC<DataSyncSectionProps> = ({
   return (
     <div className={styles.dataSyncSection}>
       <div className={styles.buttonGroup}>
-        <button 
-          onClick={onSync} 
-          disabled={!authState.isAuthenticated || isSyncing || isBigSyncing} 
-          className={styles.button}
+        <Button
+          onClick={onSync}
+          disabled={!authState.isAuthenticated || isSyncing || isBigSyncing}
         >
           {isSyncing ? 'Syncing...' : 'Sync Data'}
-        </button>
-        <button 
-          onClick={onBigSync} 
-          disabled={!authState.isAuthenticated || isSyncing || isBigSyncing} 
-          className={`${styles.button} ${styles.bigSyncButton}`}
+        </Button>
+        <Button
+          onClick={onBigSync}
+          disabled={!authState.isAuthenticated || isSyncing || isBigSyncing}
+          variant="primary-negative"
         >
           {isBigSyncing ? 'Big Syncing...' : 'Big Sync'}
-        </button>
+        </Button>
       </div>
       {syncError && <div className={styles.error}>{syncError}</div>}
     </div>

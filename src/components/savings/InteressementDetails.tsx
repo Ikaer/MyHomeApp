@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, DepositRecord, InteressementConfig } from '@/models/savings';
-import { Card, Modal } from '@/components/shared';
+import { Button, Card, Modal } from '@/components/shared';
 
 interface InteressementDetailsProps {
     account: SavingsAccount;
@@ -213,12 +213,12 @@ export default function InteressementDetails({ account, onBack }: InteressementD
                         </div>
                     )}
                     <div className={sharedStyles.formActions}>
-                        <button type="button" className={sharedStyles.secondaryButton} onClick={() => { setShowAddModal(false); resetForm(); }}>
+                        <Button type="button" variant="secondary" onClick={() => { setShowAddModal(false); resetForm(); }}>
                             Cancel
-                        </button>
-                        <button type="submit" className={sharedStyles.button} disabled={saving}>
+                        </Button>
+                        <Button type="submit" disabled={saving}>
                             {saving ? 'Saving...' : 'Save'}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </Modal>
@@ -226,12 +226,12 @@ export default function InteressementDetails({ account, onBack }: InteressementD
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <button className={sharedStyles.secondaryButton} onClick={onBack}>← Back</button>
+                    <Button variant="secondary" onClick={onBack}>← Back</Button>
                     <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#f3f4f6', margin: 0 }}>{account.name}</h1>
                 </div>
-                <button className={sharedStyles.button} onClick={openAdd}>
+                <Button onClick={openAdd}>
                     + Add Deposit
-                </button>
+                </Button>
             </div>
 
             {/* Summary Cards */}
@@ -323,12 +323,17 @@ export default function InteressementDetails({ account, onBack }: InteressementD
                                             </td>
                                             <td>
                                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                    <button className={sharedStyles.secondaryButton} onClick={() => openEdit(dep)} style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem' }}>
+                                                    <Button variant="secondary" size="sm" onClick={() => openEdit(dep)}>
                                                         Edit
-                                                    </button>
-                                                    <button className={sharedStyles.secondaryButton} onClick={() => handleDelete(dep.id)} style={{ padding: '0.3rem 0.6rem', fontSize: '0.75rem', color: '#ef4444' }}>
+                                                    </Button>
+                                                    <Button
+                                                        variant="secondary"
+                                                        size="sm"
+                                                        onClick={() => handleDelete(dep.id)}
+                                                        style={{ color: '#ef4444' }}
+                                                    >
                                                         Del
-                                                    </button>
+                                                    </Button>
                                                 </div>
                                             </td>
                                         </tr>

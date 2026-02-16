@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { AnimeWithExtensions, SortColumn, SortDirection, ImageSize, VisibleColumns } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
 import { formatSeason, formatUserStatus } from '@/lib/animeUtils';
+import { Button } from '@/components/shared';
 import styles from './AnimeTable.module.css';
 
 const formatNumber = (num?: number) => {
@@ -434,20 +435,24 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                   </div>
                   <div className={styles.malEpisodes}>
                     <div className={styles.episodeButtons}>
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="xs"
                         className={styles.episodeButton}
                         onClick={() => handleEpisodeChange(anime.id, getDisplayEpisodes(anime) + 1)}
                         title="Watch next episode"
                       >
                         +
-                      </button>
-                      <button
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="xs"
                         className={styles.episodeButton}
                         onClick={() => handleEpisodeChange(anime.id, getDisplayEpisodes(anime) - 1)}
                         title="Decrease episode count"
                       >
                         -
-                      </button>
+                      </Button>
                     </div>
                     <span className={styles.episodeCounter}>
                       {getDisplayEpisodes(anime)}/{anime.num_episodes || '?'}
@@ -456,23 +461,29 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                 </td>
                 <td className={styles.linksCell}>
                   <div className={styles.actionsButtonGroup}>
-                    <a
+                    <Button
                       href={`https://myanimelist.net/anime/${anime.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
+                      variant="secondary"
+                      size="xs"
                       className={styles.malLink}
                     >
                       MAL
-                    </a>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleManualSearch(anime)}
+                      variant="primary-positive"
+                      size="xs"
                       className={styles.searchButton}
                       title="Search providers manually on Google"
                     >
                       🔍
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => handleJustWatchSearch(anime)}
+                      variant="secondary"
+                      size="xs"
                       className={styles.justWatchButton}
                       title="Search on JustWatch"
                     >
@@ -483,22 +494,26 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                         height={16}
                         className={styles.justWatchIcon}
                       />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => onHideToggle?.(anime.id, !anime.hidden)}
+                      variant={anime.hidden ? 'primary-positive' : 'primary-negative'}
+                      size="xs"
                       className={anime.hidden ? styles.showButton : styles.hideButton}
                       title={anime.hidden ? 'Show this anime' : 'Hide this anime'}
                     >
                       {anime.hidden ? 'Unhide' : 'Hide'}
-                    </button>
+                    </Button>
                     {hasPendingUpdates(anime.id) && (
-                      <button
+                      <Button
                         onClick={() => handleUpdateMAL(anime.id)}
+                        variant="primary"
+                        size="xs"
                         className={styles.updateButton}
                         title="Update MAL status"
                       >
                         Update
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </td>

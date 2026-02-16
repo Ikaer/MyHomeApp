@@ -1,5 +1,5 @@
 import React from 'react';
-import sharedStyles from '@/components/savings/SavingsShared.module.css';
+import { Button } from '@/components/shared';
 import styles from './AccountHeaderActions.module.css';
 
 interface AccountHeaderActionsProps {
@@ -22,14 +22,14 @@ export default function AccountHeaderActions({
   return (
     <div className={styles.header}>
       <div className={styles.headerLayout}>
-        <button className={sharedStyles.secondaryButton} onClick={onBack}>← Go to accounts</button>
+        <Button variant="secondary" onClick={onBack}>← Go to accounts</Button>
         <div className={styles.itemsSeparator} />
-        <button className={sharedStyles.button} onClick={onAddTransaction}>
+        <Button onClick={onAddTransaction}>
           + Add Transaction
-        </button>
-        <button className={sharedStyles.secondaryButton} onClick={onRefreshPrices}>Refresh Prices</button>
-        <button className={sharedStyles.secondaryButton} onClick={onCopyContext}>Copy Context</button>
-        <button className={sharedStyles.secondaryButton} onClick={onShowCharts}>All Charts</button>
+        </Button>
+        <Button variant="secondary" onClick={onRefreshPrices}>Refresh Prices</Button>
+        <Button variant="secondary" onClick={onCopyContext}>Copy Context</Button>
+        <Button variant="secondary" onClick={onShowCharts}>All Charts</Button>
       </div>
       <h1 className={styles.title}>{title}</h1>
     </div>

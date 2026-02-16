@@ -21,14 +21,6 @@
   background: #374151;
   border-color: #4B5563;
 }
-.presetBtn {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  cursor: pointer;
-}
 .chipsList {
   display: flex;
   flex-wrap: wrap;
@@ -42,4 +34,8 @@
 .remove {
   margin-left: 6px;
   opacity: 0.8;
+  background: transparent;
+  border: none;
+  padding: 0;
+  min-width: auto;
 }

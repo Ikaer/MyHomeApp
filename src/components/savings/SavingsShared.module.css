@@ -126,10 +126,6 @@
     color: #93c5fd;
 }
 
-.table td button.secondaryButton {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.8rem;
-}
 
 .emptyState {
     text-align: center;
@@ -149,34 +145,6 @@
     color: #9ca3af;
 }
 
-.button {
-    background: #3b82f6;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.button:hover {
-    background: #2563eb;
-}
-
-.secondaryButton {
-    background: rgba(55, 65, 81, 0.5);
-    color: #d1d5db;
-    border: 1px solid rgba(75, 85, 99, 0.5);
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-.secondaryButton:hover {
-    background: rgba(75, 85, 99, 0.7);
-}
 
 .chartsGrid {
     display: grid;

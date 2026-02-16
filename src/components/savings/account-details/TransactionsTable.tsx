@@ -1,5 +1,6 @@
 import React from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
+import { Button } from '@/components/shared';
 import { TransactionsTableProps } from './types';
 
 export default function TransactionsTable({
@@ -141,13 +142,14 @@ export default function TransactionsTable({
               <td>{formatCurrency(t.ttf)}</td>
               <td>{formatCurrency(t.totalAmount)}</td>
               <td>
-                <button
+                <Button
                   type="button"
-                  className={sharedStyles.secondaryButton}
+                  variant="secondary"
+                  size="sm"
                   onClick={() => onEditTransaction(t)}
                 >
                   Edit
-                </button>
+                </Button>
               </td>
             </tr>
           ))}

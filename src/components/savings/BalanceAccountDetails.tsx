@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, BalanceRecord } from '@/models/savings';
-import { Card, Modal } from '@/components/shared';
+import { Button, Card, Modal } from '@/components/shared';
 
 interface BalanceAccountDetailsProps {
     account: SavingsAccount;
@@ -119,12 +119,12 @@ export default function BalanceAccountDetails({ account, onBack }: BalanceAccoun
                         </div>
                     </div>
                     <div className={sharedStyles.formActions}>
-                        <button type="button" className={sharedStyles.secondaryButton} onClick={() => setShowAddModal(false)}>
+                        <Button type="button" variant="secondary" onClick={() => setShowAddModal(false)}>
                             Cancel
-                        </button>
-                        <button type="submit" className={sharedStyles.button} disabled={saving}>
+                        </Button>
+                        <Button type="submit" disabled={saving}>
                             {saving ? 'Saving...' : 'Save'}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </Modal>
@@ -132,12 +132,12 @@ export default function BalanceAccountDetails({ account, onBack }: BalanceAccoun
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <button className={sharedStyles.secondaryButton} onClick={onBack}>← Back</button>
+                    <Button variant="secondary" onClick={onBack}>← Back</Button>
                     <h1 style={{ fontSize: '2rem', fontWeight: 700, color: '#f3f4f6', margin: 0 }}>{account.name}</h1>
                 </div>
-                <button className={sharedStyles.button} onClick={() => setShowAddModal(true)}>
+                <Button onClick={() => setShowAddModal(true)}>
                     + Record Balance
-                </button>
+                </Button>
             </div>
 
             {/* Summary Cards */}

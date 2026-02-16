@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import styles from './SeasonSelector.module.css';
 import { getSeasonInfos } from '@/lib/animeUtils';
+import { Button } from '@/components/shared';
 
 type Season = 'winter' | 'spring' | 'summer' | 'fall';
 export type SeasonInfo = { year: number; season: Season };
@@ -32,11 +33,13 @@ const SeasonSelector: React.FC<SeasonSelectorProps> = ({ value, onChange }) => {
 
   const presets = (
     <div className={styles.row}>
-      <button type="button" className={styles.presetBtn} onClick={() => addUnique([infos.current])}>Current</button>
-      <button type="button" className={styles.presetBtn} onClick={() => addUnique([infos.current, infos.previous])}>Current + Prev</button>
-      <button type="button" className={styles.presetBtn} onClick={() => addUnique([infos.next])}>Next</button>
-      <button type="button" className={styles.presetBtn} onClick={() => onChange([])}>Clear</button>
-      <button type="button" className={styles.presetBtn} onClick={() => setShowAdd(s => !s)}>{showAdd ? 'Close' : '+ Add'}</button>
+      <Button type="button" variant="secondary" size="xs" onClick={() => addUnique([infos.current])}>Current</Button>
+      <Button type="button" variant="secondary" size="xs" onClick={() => addUnique([infos.current, infos.previous])}>Current + Prev</Button>
+      <Button type="button" variant="secondary" size="xs" onClick={() => addUnique([infos.next])}>Next</Button>
+      <Button type="button" variant="secondary" size="xs" onClick={() => onChange([])}>Clear</Button>
+      <Button type="button" variant="secondary" size="xs" onClick={() => setShowAdd(s => !s)}>
+        {showAdd ? 'Close' : '+ Add'}
+      </Button>
     </div>
   );
 
@@ -58,7 +61,7 @@ const SeasonSelector: React.FC<SeasonSelectorProps> = ({ value, onChange }) => {
             Year:
             <input type="number" value={year} onChange={(e) => setYear(parseInt(e.target.value || currentYear.toString(), 10))} style={{width: 90}} />
           </label>
-          <button type="button" className={styles.presetBtn} onClick={() => addUnique([{ year, season }])}>Add</button>
+          <Button type="button" variant="secondary" size="xs" onClick={() => addUnique([{ year, season }])}>Add</Button>
         </div>
       )}
       {value.length > 0 && (
@@ -66,7 +69,7 @@ const SeasonSelector: React.FC<SeasonSelectorProps> = ({ value, onChange }) => {
           {value.map((s, idx) => (
             <span key={idx} className={`${styles.chip} ${styles.chipActive}`}>
               {s.season} {s.year}
-              <button type="button" className={styles.remove} onClick={() => remove(s)}>×</button>
+              <Button type="button" variant="secondary" size="xs" className={styles.remove} onClick={() => remove(s)}>×</Button>
             </span>
           ))}
         </div>

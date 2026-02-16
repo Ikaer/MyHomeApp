@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal } from '@/components/shared';
+import { Button, Modal } from '@/components/shared';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 
 interface AnnualEditorModalProps {
@@ -29,12 +29,12 @@ export default function AnnualEditorModal({
       size="sm"
       footer={
         <>
-          <button type="button" className={sharedStyles.secondaryButton} onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
-          </button>
-          <button type="button" className={sharedStyles.button} onClick={onSave}>
+          </Button>
+          <Button type="button" onClick={onSave}>
             Save
-          </button>
+          </Button>
         </>
       }
     >

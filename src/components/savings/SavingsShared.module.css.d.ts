@@ -1,7 +1,6 @@
 declare const styles: {
   readonly "accountGrid": string;
   readonly "accountName": string;
-  readonly "button": string;
   readonly "chartContainer": string;
   readonly "chartEmpty": string;
   readonly "chartPanel": string;
@@ -17,7 +16,6 @@ declare const styles: {
   readonly "label": string;
   readonly "negative": string;
   readonly "positive": string;
-  readonly "secondaryButton": string;
   readonly "select": string;
   readonly "sortActive": string;
   readonly "sortButton": string;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal } from '@/components/shared';
+import { Button, Modal } from '@/components/shared';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { AccountType, ACCOUNT_TYPE_LABELS, SavingsAccount, AccountConfig } from '@/models/savings';
 
@@ -260,12 +260,12 @@ export default function CreateAccountModal({ open, onClose, onCreated }: CreateA
                 </div>
 
                 <div className={sharedStyles.formActions}>
-                    <button type="button" className={sharedStyles.secondaryButton} onClick={handleClose}>
+                    <Button type="button" variant="secondary" onClick={handleClose}>
                         Cancel
-                    </button>
-                    <button type="submit" className={sharedStyles.button} disabled={saving}>
+                    </Button>
+                    <Button type="submit" disabled={saving}>
                         {saving ? 'Creating...' : 'Create Account'}
-                    </button>
+                    </Button>
                 </div>
             </form>
         </Modal>

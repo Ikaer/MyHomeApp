@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
 import {
     CartesianGrid,
     Line,
@@ -15,7 +14,7 @@ import pageStyles from './savings/SavingsPage.module.css';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, AccountValuation, NetWorthSummary, ACCOUNT_TYPE_LABELS, AccountType } from '@/models/savings';
 import CreateAccountModal from '@/components/savings/CreateAccountModal';
-import { Card } from '@/components/shared';
+import { Button, Card } from '@/components/shared';
 
 interface HistoricalWealthRecord {
     timestamp: string;
@@ -121,9 +120,9 @@ export default function SavingsPage() {
                     <h1 className={pageStyles.title}>Savings Management</h1>
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button className={sharedStyles.button} onClick={() => setShowCreateModal(true)}>
+                    <Button onClick={() => setShowCreateModal(true)}>
                         + New Account
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -185,9 +184,9 @@ export default function SavingsPage() {
                     {accounts.length === 0 ? (
                         <div className={sharedStyles.emptyState}>
                             <p>No savings accounts found.</p>
-                            <button className={sharedStyles.button} onClick={() => setShowCreateModal(true)}>
+                            <Button onClick={() => setShowCreateModal(true)}>
                                 + Create Your First Account
-                            </button>
+                            </Button>
                         </div>
                     ) : (
                         <div className={sharedStyles.accountGrid}>
@@ -279,9 +278,9 @@ function AccountCard({
             )}
 
             <div style={{ marginTop: '1rem', textAlign: 'right' }}>
-                <Link href={`/savings/${account.id}`} className={sharedStyles.secondaryButton}>
+                <Button href={`/savings/${account.id}`} variant="secondary">
                     View Details →
-                </Link>
+                </Button>
             </div>
         </Card>
     );

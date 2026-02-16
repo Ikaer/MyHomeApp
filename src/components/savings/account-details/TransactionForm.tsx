@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal } from '@/components/shared';
+import { Button, Modal } from '@/components/shared';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { Transaction, TransactionType } from '@/models/savings';
 
@@ -219,12 +219,12 @@ export default function TransactionForm({
                 </div>
 
                 <div className={sharedStyles.formActions}>
-                    <button type="button" className={sharedStyles.secondaryButton} onClick={onClose}>
+                    <Button type="button" variant="secondary" onClick={onClose}>
                         Cancel
-                    </button>
-                    <button type="submit" className={sharedStyles.button}>
+                    </Button>
+                    <Button type="submit">
                         {mode === 'edit' ? 'Save Changes' : 'Add Transaction'}
-                    </button>
+                    </Button>
                 </div>
             </form>
         </Modal>

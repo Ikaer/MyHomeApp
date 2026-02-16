@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './AccountSection.module.css';
 import { MALAuthState } from '@/models/anime';
+import { Button } from '@/components/shared';
 
 interface AccountSectionProps {
   authState: MALAuthState;
@@ -20,18 +21,18 @@ const AccountSection: React.FC<AccountSectionProps> = ({
   return (
     <div className={styles.accountsSection}>
       {isAuthLoading ? (
-        <button disabled className={styles.button}>Loading...</button>
+        <Button variant="secondary" disabled>Loading...</Button>
       ) : authState.isAuthenticated ? (
         <div className={styles.connectedAccount}>
           <span>Connected as <strong>{authState.user?.name}</strong></span>
-          <button onClick={onDisconnect} className={`${styles.button} ${styles.disconnectButton}`}>
+          <Button variant="primary-negative" onClick={onDisconnect}>
             Disconnect
-          </button>
+          </Button>
         </div>
       ) : (
-        <button onClick={onConnect} className={`${styles.button} ${styles.connectButton}`}>
+        <Button onClick={onConnect}>
           Connect to MyAnimeList
-        </button>
+        </Button>
       )}
       {authError && <div className={styles.error}>{authError}</div>}
     </div>

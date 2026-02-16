@@ -1,5 +1,6 @@
 import React from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
+import { Button } from '@/components/shared';
 import styles from './PositionsTable.module.css';
 import { PositionsTableProps } from './types';
 import SparklineChart from './SparklineChart';
@@ -129,13 +130,14 @@ export default function PositionsTable({
                 {pos.unrealizedGainLossPercentage >= 0 ? '+' : ''}{formatPercent(pos.unrealizedGainLossPercentage)}
               </td>
               <td>
-                <button
+                <Button
                   type="button"
-                  className={sharedStyles.secondaryButton}
+                  variant="secondary"
+                  size="sm"
                   onClick={() => onOpenAssetCharts(pos.isin || null)}
                 >
                   All charts
-                </button>
+                </Button>
               </td>
             </tr>
           ))}

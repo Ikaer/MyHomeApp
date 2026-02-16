@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from '@/components/shared';
+import { Button, Card } from '@/components/shared';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { AnnualOverviewRow } from './types';
 
@@ -38,13 +38,14 @@ export default function AnnualOverviewCard({ rows, formatCurrency, formatPercent
                     {entry.xirr === undefined ? '—' : `${entry.xirr >= 0 ? '+' : ''}${formatPercent(entry.xirr * 100)}`}
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <button
+                    <Button
                       type="button"
-                      className={sharedStyles.secondaryButton}
+                      variant="secondary"
+                      size="sm"
                       onClick={() => onEdit(entry.year, entry.endValue)}
                     >
                       Edit
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               ))}

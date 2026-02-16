@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import layoutStyles from './SavingsLayout.module.css';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
@@ -8,6 +7,7 @@ import { SavingsAccount } from '@/models/savings';
 import SavingsAccountDetails from '@/components/savings/SavingsAccountDetails';
 import BalanceAccountDetails from '@/components/savings/BalanceAccountDetails';
 import InteressementDetails from '@/components/savings/InteressementDetails';
+import { Button } from '@/components/shared';
 
 export default function SavingsAccountPage() {
     const router = useRouter();
@@ -55,9 +55,9 @@ export default function SavingsAccountPage() {
                 </Head>
                 <div className={sharedStyles.emptyState}>
                     <p>Account not found.</p>
-                    <Link href="/savings" className={sharedStyles.secondaryButton}>
+                    <Button href="/savings" variant="secondary">
                         ← Back to Savings
-                    </Link>
+                    </Button>
                 </div>
             </div>
         );
