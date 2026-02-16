@@ -11,6 +11,7 @@
   text-decoration: none;
   padding: 0.75rem 1.5rem;
   font-size: 0.95rem;
+  --button-square-size: 2.5rem;
 }
 
 .buttonPrimary {
@@ -54,12 +55,21 @@
   padding: 0.4rem 0.75rem;
   font-size: 0.8rem;
   border-radius: 0.4rem;
+  --button-square-size: 2.25rem;
 }
 
 .buttonXs {
   padding: 0.25rem 0.5rem;
   font-size: 0.75rem;
   border-radius: 0.35rem;
+  --button-square-size: 2rem;
+}
+
+.buttonSquare {
+  padding: 0;
+  width: var(--button-square-size);
+  height: var(--button-square-size);
+  flex-shrink: 0;
 }
 
 .button:disabled,

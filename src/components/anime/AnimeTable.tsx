@@ -438,6 +438,7 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                       <Button
                         variant="secondary"
                         size="xs"
+                        square
                         className={styles.episodeButton}
                         onClick={() => handleEpisodeChange(anime.id, getDisplayEpisodes(anime) + 1)}
                         title="Watch next episode"
@@ -447,6 +448,7 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                       <Button
                         variant="secondary"
                         size="xs"
+                        square
                         className={styles.episodeButton}
                         onClick={() => handleEpisodeChange(anime.id, getDisplayEpisodes(anime) - 1)}
                         title="Decrease episode count"
@@ -475,6 +477,7 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                       onClick={() => handleManualSearch(anime)}
                       variant="primary-positive"
                       size="xs"
+                      square
                       className={styles.searchButton}
                       title="Search providers manually on Google"
                     >
@@ -484,6 +487,7 @@ export default function AnimeTable({ animes, imageSize, visibleColumns, sortColu
                       onClick={() => handleJustWatchSearch(anime)}
                       variant="secondary"
                       size="xs"
+                      square
                       className={styles.justWatchButton}
                       title="Search on JustWatch"
                     >

@@ -232,21 +232,7 @@
 
 .actionButton {
     flex: 1;
-    padding: 0.4rem;
-    border-radius: 4px;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    font-size: 0.75rem;
-    cursor: pointer;
     text-align: center;
-    text-decoration: none;
-    transition: background 0.2s;
-}
-
-.actionButton:hover {
-    background: var(--accent-primary);
-    color: white;
 }
 
 .malActions {
@@ -280,21 +266,9 @@
 }
 
 .epButton {
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #374151;
-    border: none;
-    border-radius: 4px;
-    color: white;
-    cursor: pointer;
+    --button-square-size: 1.5rem;
 }
 
-.epButton:hover {
-    background: #4b5563;
-}
 
 .topActions {
     position: absolute;
@@ -308,14 +282,9 @@
 
 .searchBtn,
 .justWatchBtn {
-    width: 32px;
-    height: 32px;
+    --button-square-size: 2rem;
     border-radius: 6px;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
     transition: all 0.2s ease;
     background: rgba(31, 41, 55, 0.8);
     backdrop-filter: blur(4px);
@@ -338,17 +307,7 @@
 .updateBtn {
     width: 100%;
     margin-top: 0.5rem;
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 0.4rem;
-    border-radius: 4px;
     font-weight: 600;
-    cursor: pointer;
-}
-
-.updateBtn:hover {
-    background: #1d4ed8;
 }
 
 .emptyState {

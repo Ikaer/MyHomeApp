@@ -21,6 +21,7 @@ interface ButtonProps {
   rel?: string;
   external?: boolean;
   title?: string;
+  square?: boolean;
 }
 
 const combineClassNames = (...classNames: Array<string | undefined>) => {
@@ -40,7 +41,8 @@ export default function Button({
   target,
   rel,
   external,
-  title
+  title,
+  square = false
 }: ButtonProps) {
   const variantClass = (() => {
     switch (variant) {
@@ -56,7 +58,13 @@ export default function Button({
   })();
 
   const sizeClass = size === 'xs' ? styles.buttonXs : size === 'sm' ? styles.buttonSmall : undefined;
-  const buttonClassName = combineClassNames(styles.button, variantClass, sizeClass, className);
+  const buttonClassName = combineClassNames(
+    styles.button,
+    variantClass,
+    sizeClass,
+    square ? styles.buttonSquare : undefined,
+    className
+  );
 
   if (href) {
     const isExternal = external || href.startsWith('http') || target === '_blank';

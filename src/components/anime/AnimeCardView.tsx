@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { AnimeWithExtensions, ImageSize, StatsColumn, VisibleColumns } from '@/models/anime';
 import { formatSeason, formatUserStatus } from '@/lib/animeUtils';
 import { generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
+import { Button } from '@/components/shared';
 import styles from './AnimeCardView.module.css';
 
 interface MALStatusUpdate {
@@ -150,16 +151,22 @@ export default function AnimeCardView({
                         </div>
                         <div className={styles.overlay}>
                             <div className={styles.topActions}>
-                                <button
+                                    <Button
                                     onClick={() => handleManualSearch(anime)}
-                                    className={styles.searchBtn}
+                                        className={styles.searchBtn}
+                                        variant="secondary"
+                                        size="xs"
+                                        square
                                     title="Search on Google"
                                 >
                                     🔍
-                                </button>
-                                <button
+                                    </Button>
+                                    <Button
                                     onClick={() => handleJustWatchSearch(anime)}
                                     className={styles.justWatchBtn}
+                                        variant="secondary"
+                                        size="xs"
+                                        square
                                     title="Search on JustWatch"
                                 >
                                     <Image
@@ -169,7 +176,7 @@ export default function AnimeCardView({
                                         height={20}
                                         className={styles.justWatchIcon}
                                     />
-                                </button>
+                                    </Button>
                             </div>
                             <div className={styles.malActions}>
                                 <div className={styles.malRow}>
@@ -198,19 +205,36 @@ export default function AnimeCardView({
                                 </div>
                                 <div className={styles.malRow}>
                                     <div className={styles.episodes}>
-                                        <button
+                                            <Button
                                             className={styles.epButton}
+                                                variant="secondary"
+                                                size="xs"
+                                                square
                                             onClick={() => updateMALStatus(anime.id, 'num_episodes_watched', Math.max(0, getDisplayEpisodes(anime) - 1))}
-                                        >-</button>
+                                            >
+                                                -
+                                            </Button>
                                         <span>{getDisplayEpisodes(anime)} / {anime.num_episodes || '?'}</span>
-                                        <button
+                                            <Button
                                             className={styles.epButton}
+                                                variant="secondary"
+                                                size="xs"
+                                                square
                                             onClick={() => updateMALStatus(anime.id, 'num_episodes_watched', getDisplayEpisodes(anime) + 1)}
-                                        >+</button>
+                                            >
+                                                +
+                                            </Button>
                                     </div>
                                 </div>
                                 {pendingUpdates.has(anime.id) && (
-                                    <button className={styles.updateBtn} onClick={() => handleUpdateMAL(anime.id)}>Update MAL</button>
+                                        <Button
+                                            className={styles.updateBtn}
+                                            variant="primary"
+                                            size="xs"
+                                            onClick={() => handleUpdateMAL(anime.id)}
+                                        >
+                                            Update MAL
+                                        </Button>
                                 )}
                             </div>
                         </div>
@@ -234,13 +258,24 @@ export default function AnimeCardView({
                             )}
                         </div>
                         <div className={styles.actions}>
-                            <a href={`https://myanimelist.net/anime/${anime.id}`} target="_blank" rel="noopener noreferrer" className={styles.actionButton}>MAL</a>
-                            <button
+                            <Button
+                                href={`https://myanimelist.net/anime/${anime.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                variant="secondary"
+                                size="xs"
+                                className={styles.actionButton}
+                            >
+                                MAL
+                            </Button>
+                            <Button
                                 onClick={() => onHideToggle?.(anime.id, !anime.hidden)}
+                                variant={anime.hidden ? 'primary-positive' : 'primary-negative'}
+                                size="xs"
                                 className={styles.actionButton}
                             >
                                 {anime.hidden ? 'Unhide' : 'Hide'}
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>

@@ -5,6 +5,7 @@ declare const styles: {
   readonly "buttonPrimary": string;
   readonly "buttonSecondary": string;
   readonly "buttonSmall": string;
+  readonly "buttonSquare": string;
   readonly "buttonXs": string;
 };
 export = styles;
