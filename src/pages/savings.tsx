@@ -248,6 +248,14 @@ function AccountCard({
                             <span className={sharedStyles.statLabel}>Current Value</span>
                             <span className={sharedStyles.statValue}>{formatCurrency(valuation.currentValue)}</span>
                         </div>
+                        <div className={sharedStyles.statItem}>
+                            <span className={sharedStyles.statLabel}>
+                                Last Updated{valuation.isEstimated ? ' (est.)' : ''}
+                            </span>
+                            <span className={sharedStyles.statValue} style={{ fontSize: '0.9rem' }}>
+                                {valuation.lastUpdated || '—'}
+                            </span>
+                        </div>
                         {hasGainLoss && (
                             <div className={sharedStyles.statItem}>
                                 <span className={sharedStyles.statLabel}>Gain/Loss</span>
@@ -258,16 +266,6 @@ function AccountCard({
                                             ({isPositive ? '+' : ''}{valuation.gainLossPercentage.toFixed(2)}%)
                                         </span>
                                     )}
-                                </span>
-                            </div>
-                        )}
-                        {valuation.lastUpdated && (
-                            <div className={sharedStyles.statItem}>
-                                <span className={sharedStyles.statLabel}>
-                                    Last Updated{valuation.isEstimated ? ' (est.)' : ''}
-                                </span>
-                                <span className={sharedStyles.statValue} style={{ fontSize: '0.9rem' }}>
-                                    {valuation.lastUpdated}
                                 </span>
                             </div>
                         )}
