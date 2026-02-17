@@ -226,58 +226,60 @@ function AccountCard({
     const isPositive = (valuation?.totalGainLoss ?? 0) >= 0;
 
     return (
-        <Card>
-            <div className={pageStyles.accountHeader}>
-                <div>
-                    <h2 className={sharedStyles.accountName}>{account.name}</h2>
-                    <span className={pageStyles.accountType}>{typeLabel}</span>
+        <Card className={pageStyles.accountCard}>
+            <div className={pageStyles.accountCardBody}>
+                <div className={pageStyles.accountHeader}>
+                    <div>
+                        <h2 className={sharedStyles.accountName}>{account.name}</h2>
+                        <span className={pageStyles.accountType}>{typeLabel}</span>
+                    </div>
+                    <button
+                        className={`${pageStyles.defaultToggle} ${account.isDefault ? pageStyles.defaultActive : ''}`}
+                        onClick={onSetDefault}
+                        title={account.isDefault ? 'Default account' : 'Set as default'}
+                    >
+                        {account.isDefault ? '★' : '☆'}
+                    </button>
                 </div>
-                <button
-                    className={`${pageStyles.defaultToggle} ${account.isDefault ? pageStyles.defaultActive : ''}`}
-                    onClick={onSetDefault}
-                    title={account.isDefault ? 'Default account' : 'Set as default'}
-                >
-                    {account.isDefault ? '★' : '☆'}
-                </button>
+
+                {valuation ? (
+                    <div className={sharedStyles.statsGrid}>
+                        <div className={sharedStyles.statItem}>
+                            <span className={sharedStyles.statLabel}>Current Value</span>
+                            <span className={sharedStyles.statValue}>{formatCurrency(valuation.currentValue)}</span>
+                        </div>
+                        {hasGainLoss && (
+                            <div className={sharedStyles.statItem}>
+                                <span className={sharedStyles.statLabel}>Gain/Loss</span>
+                                <span className={`${sharedStyles.statValue} ${isPositive ? sharedStyles.positive : sharedStyles.negative}`}>
+                                    {isPositive ? '+' : ''}{formatCurrency(valuation.totalGainLoss)}
+                                    {valuation.gainLossPercentage !== 0 && (
+                                        <span style={{ fontSize: '0.85em', marginLeft: '0.5rem' }}>
+                                            ({isPositive ? '+' : ''}{valuation.gainLossPercentage.toFixed(2)}%)
+                                        </span>
+                                    )}
+                                </span>
+                            </div>
+                        )}
+                        {valuation.lastUpdated && (
+                            <div className={sharedStyles.statItem}>
+                                <span className={sharedStyles.statLabel}>
+                                    Last Updated{valuation.isEstimated ? ' (est.)' : ''}
+                                </span>
+                                <span className={sharedStyles.statValue} style={{ fontSize: '0.9rem' }}>
+                                    {valuation.lastUpdated}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div style={{ padding: '1rem 0', color: '#9ca3af', fontSize: '0.875rem' }}>
+                        Loading valuation...
+                    </div>
+                )}
             </div>
 
-            {valuation ? (
-                <div className={sharedStyles.statsGrid}>
-                    <div className={sharedStyles.statItem}>
-                        <span className={sharedStyles.statLabel}>Current Value</span>
-                        <span className={sharedStyles.statValue}>{formatCurrency(valuation.currentValue)}</span>
-                    </div>
-                    {hasGainLoss && (
-                        <div className={sharedStyles.statItem}>
-                            <span className={sharedStyles.statLabel}>Gain/Loss</span>
-                            <span className={`${sharedStyles.statValue} ${isPositive ? sharedStyles.positive : sharedStyles.negative}`}>
-                                {isPositive ? '+' : ''}{formatCurrency(valuation.totalGainLoss)}
-                                {valuation.gainLossPercentage !== 0 && (
-                                    <span style={{ fontSize: '0.85em', marginLeft: '0.5rem' }}>
-                                        ({isPositive ? '+' : ''}{valuation.gainLossPercentage.toFixed(2)}%)
-                                    </span>
-                                )}
-                            </span>
-                        </div>
-                    )}
-                    {valuation.lastUpdated && (
-                        <div className={sharedStyles.statItem}>
-                            <span className={sharedStyles.statLabel}>
-                                Last Updated{valuation.isEstimated ? ' (est.)' : ''}
-                            </span>
-                            <span className={sharedStyles.statValue} style={{ fontSize: '0.9rem' }}>
-                                {valuation.lastUpdated}
-                            </span>
-                        </div>
-                    )}
-                </div>
-            ) : (
-                <div style={{ padding: '1rem 0', color: '#9ca3af', fontSize: '0.875rem' }}>
-                    Loading valuation...
-                </div>
-            )}
-
-            <div style={{ marginTop: '1rem', textAlign: 'right' }}>
+            <div className={pageStyles.accountActions}>
                 <Button href={`/savings/${account.id}`} variant="secondary">
                     View Details →
                 </Button>

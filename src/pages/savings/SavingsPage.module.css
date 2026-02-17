@@ -56,3 +56,27 @@
     border-radius: 9999px;
     font-weight: 500;
 }
+
+.accountCard {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.accountCardBody {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    flex: 1;
+}
+
+.accountActions {
+    margin-top: auto;
+    padding-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid rgba(75, 85, 99, 0.25);
+    background: rgba(17, 24, 39, 0.2);
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+}
