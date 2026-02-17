@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
-import detailsStyles from './SavingsAccountDetails.module.css';
-import { SavingsAccount, Transaction } from '@/models/savings';
+import { SavingsAccount } from '@/models/savings';
 import TransactionForm from './account-details/TransactionForm';
 import AccountHeaderActions from './account-details/AccountHeaderActions';
 import PerformanceCard from './account-details/PerformanceCard';
@@ -33,6 +32,7 @@ import { useAccountHistory } from '@/hooks/savings/useAccountHistory';
 import { useAssetHistory } from '@/hooks/savings/useAssetHistory';
 import { useAnnualValueEditor } from '@/hooks/savings/useAnnualValueEditor';
 import { useTransactionEditor } from '@/hooks/savings/useTransactionEditor';
+import { Tabs } from '@/components/shared';
 import {
   getActiveAssetInfo,
   mapAssetChartData,
@@ -249,22 +249,15 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
         />
       </div>
 
-      <div className={detailsStyles.tabHeader} style={{ borderBottom: '1px solid rgba(75, 85, 99, 0.3)', paddingBottom: '0.5rem' }}>
-        <div className="tab-bar">
-          <button
-            className={`tab-button ${activeTab === 'positions' ? 'active' : ''}`}
-            onClick={() => setActiveTab('positions')}
-          >
-            Positions
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'transactions' ? 'active' : ''}`}
-            onClick={() => setActiveTab('transactions')}
-          >
-            Transactions
-          </button>
-        </div>
-      </div>
+      <Tabs
+        items={[
+          { id: 'positions', label: 'Positions' },
+          { id: 'transactions', label: 'Transactions' }
+        ]}
+        active={activeTab}
+        onChange={setActiveTab}
+        ariaLabel="Account details tabs"
+      />
 
       {activeTab === 'positions' ? (
         <PositionsTable
