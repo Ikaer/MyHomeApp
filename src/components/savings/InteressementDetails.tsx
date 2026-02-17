@@ -16,7 +16,9 @@ export default function InteressementDetails({ account, onBack }: InteressementD
     const [deposits, setDeposits] = useState<DepositRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
+    const [showBalanceModal, setShowBalanceModal] = useState(false);
     const [editingDeposit, setEditingDeposit] = useState<DepositRecord | null>(null);
+    const [balanceDeposit, setBalanceDeposit] = useState<DepositRecord | null>(null);
     const [saving, setSaving] = useState(false);
 
     // Form state
@@ -26,8 +28,8 @@ export default function InteressementDetails({ account, onBack }: InteressementD
     const [depositDate, setDepositDate] = useState('');
     const [depositAmount, setDepositAmount] = useState('');
     const [strategy, setStrategy] = useState('');
-    const [currentValue, setCurrentValue] = useState('');
-    const [valueDate, setValueDate] = useState(new Date().toISOString().split('T')[0]);
+    const [balanceValue, setBalanceValue] = useState('');
+    const [balanceValueDate, setBalanceValueDate] = useState(new Date().toISOString().split('T')[0]);
 
     const formatCurrency = (val: number) =>
         new Intl.NumberFormat('fr-FR', { style: 'currency', currency: account.currency }).format(val);
@@ -55,17 +57,21 @@ export default function InteressementDetails({ account, onBack }: InteressementD
         return d.toISOString().split('T')[0];
     };
 
-    const resetForm = () => {
+    const resetDepositForm = () => {
         setDepositDate('');
         setDepositAmount('');
         setStrategy('');
-        setCurrentValue('');
-        setValueDate(new Date().toISOString().split('T')[0]);
         setEditingDeposit(null);
     };
 
+    const resetBalanceForm = () => {
+        setBalanceValue('');
+        setBalanceValueDate(new Date().toISOString().split('T')[0]);
+        setBalanceDeposit(null);
+    };
+
     const openAdd = () => {
-        resetForm();
+        resetDepositForm();
         setShowAddModal(true);
     };
 
@@ -74,15 +80,19 @@ export default function InteressementDetails({ account, onBack }: InteressementD
         setDepositDate(deposit.deposit_date);
         setDepositAmount(deposit.deposit_amount.toString());
         setStrategy(deposit.strategy);
-        setCurrentValue(deposit.current_value.toString());
-        setValueDate(deposit.value_date);
         setShowAddModal(true);
+    };
+
+    const openRecordBalance = (deposit: DepositRecord) => {
+        setBalanceDeposit(deposit);
+        setBalanceValue(deposit.current_value.toString());
+        setBalanceValueDate(new Date().toISOString().split('T')[0]);
+        setShowBalanceModal(true);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const amount = parseFloat(depositAmount);
-        const value = parseFloat(currentValue);
         if (isNaN(amount)) {
             alert('Please enter a valid deposit amount.');
             return;
@@ -96,8 +106,8 @@ export default function InteressementDetails({ account, onBack }: InteressementD
             deposit_amount: amount,
             strategy,
             lock_end_date: computeLockEndDate(depositDate),
-            current_value: isNaN(value) ? amount : value,
-            value_date: valueDate,
+            current_value: editingDeposit?.current_value ?? amount,
+            value_date: editingDeposit?.value_date ?? depositDate,
         };
 
         try {
@@ -110,7 +120,7 @@ export default function InteressementDetails({ account, onBack }: InteressementD
 
             if (res.ok) {
                 setShowAddModal(false);
-                resetForm();
+                resetDepositForm();
                 fetchDeposits();
             } else {
                 const err = await res.json();
@@ -118,6 +128,47 @@ export default function InteressementDetails({ account, onBack }: InteressementD
             }
         } catch (error) {
             console.error('Error saving deposit:', error);
+            alert('An error occurred.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleRecordBalance = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!balanceDeposit) return;
+
+        const value = parseFloat(balanceValue);
+        if (isNaN(value)) {
+            alert('Please enter a valid current value.');
+            return;
+        }
+
+        setSaving(true);
+
+        const deposit: DepositRecord = {
+            ...balanceDeposit,
+            current_value: value,
+            value_date: balanceValueDate,
+        };
+
+        try {
+            const res = await fetch(`/api/savings/deposits/${account.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(deposit),
+            });
+
+            if (res.ok) {
+                setShowBalanceModal(false);
+                resetBalanceForm();
+                fetchDeposits();
+            } else {
+                const err = await res.json();
+                alert(`Failed: ${err.error}`);
+            }
+        } catch (error) {
+            console.error('Error saving balance:', error);
             alert('An error occurred.');
         } finally {
             setSaving(false);
@@ -148,7 +199,7 @@ export default function InteressementDetails({ account, onBack }: InteressementD
         <div>
             <Modal
                 open={showAddModal}
-                onClose={() => { setShowAddModal(false); resetForm(); }}
+                onClose={() => { setShowAddModal(false); resetDepositForm(); }}
                 title={editingDeposit ? 'Edit Deposit' : 'Add Deposit'}
                 size="md"
             >
@@ -186,26 +237,6 @@ export default function InteressementDetails({ account, onBack }: InteressementD
                                 placeholder="e.g. Dynamique (Actions)"
                             />
                         </div>
-                        <div className={sharedStyles.formGroup}>
-                            <label className={sharedStyles.label}>Current Value (EUR)</label>
-                            <input
-                                className={sharedStyles.input}
-                                type="number"
-                                step="0.01"
-                                value={currentValue}
-                                onChange={e => setCurrentValue(e.target.value)}
-                                placeholder="From provider UI"
-                            />
-                        </div>
-                        <div className={sharedStyles.formGroup}>
-                            <label className={sharedStyles.label}>Value Date</label>
-                            <input
-                                className={sharedStyles.input}
-                                type="date"
-                                value={valueDate}
-                                onChange={e => setValueDate(e.target.value)}
-                            />
-                        </div>
                     </div>
                     {depositDate && (
                         <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: '#9ca3af' }}>
@@ -213,7 +244,49 @@ export default function InteressementDetails({ account, onBack }: InteressementD
                         </div>
                     )}
                     <div className={sharedStyles.formActions}>
-                        <Button variant="secondary" onClick={() => { setShowAddModal(false); resetForm(); }}>
+                        <Button variant="secondary" onClick={() => { setShowAddModal(false); resetDepositForm(); }}>
+                            Cancel
+                        </Button>
+                        <Button type="submit" disabled={saving}>
+                            {saving ? 'Saving...' : 'Save'}
+                        </Button>
+                    </div>
+                </form>
+            </Modal>
+
+            <Modal
+                open={showBalanceModal}
+                onClose={() => { setShowBalanceModal(false); resetBalanceForm(); }}
+                title="Record Balance"
+                size="sm"
+            >
+                <form onSubmit={handleRecordBalance}>
+                    <div className={sharedStyles.formGrid}>
+                        <div className={sharedStyles.formGroup}>
+                            <label className={sharedStyles.label}>Current Value (EUR)</label>
+                            <input
+                                className={sharedStyles.input}
+                                type="number"
+                                step="0.01"
+                                value={balanceValue}
+                                onChange={e => setBalanceValue(e.target.value)}
+                                placeholder="From provider UI"
+                                required
+                            />
+                        </div>
+                        <div className={sharedStyles.formGroup}>
+                            <label className={sharedStyles.label}>Value Date</label>
+                            <input
+                                className={sharedStyles.input}
+                                type="date"
+                                value={balanceValueDate}
+                                onChange={e => setBalanceValueDate(e.target.value)}
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div className={sharedStyles.formActions}>
+                        <Button variant="secondary" onClick={() => { setShowBalanceModal(false); resetBalanceForm(); }}>
                             Cancel
                         </Button>
                         <Button type="submit" disabled={saving}>
@@ -325,6 +398,9 @@ export default function InteressementDetails({ account, onBack }: InteressementD
                                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                     <Button variant="secondary" size="sm" onClick={() => openEdit(dep)}>
                                                         Edit
+                                                    </Button>
+                                                    <Button variant="secondary" size="sm" onClick={() => openRecordBalance(dep)}>
+                                                        Record Balance
                                                     </Button>
                                                     <Button
                                                         variant="secondary"
