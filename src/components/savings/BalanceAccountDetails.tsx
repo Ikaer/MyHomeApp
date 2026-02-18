@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, BalanceRecord } from '@/models/savings';
-import { Button, Card, Modal } from '@/components/shared';
+import { Button, Card } from '@/components/shared';
+import RecordBalanceModal from './RecordBalanceModal';
 
 interface BalanceAccountDetailsProps {
     account: SavingsAccount;
@@ -16,9 +17,6 @@ export default function BalanceAccountDetails({ account, onBack }: BalanceAccoun
     const [balances, setBalances] = useState<BalanceRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
-    const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
-    const [newBalance, setNewBalance] = useState('');
-    const [saving, setSaving] = useState(false);
 
     const formatCurrency = (val: number) =>
         new Intl.NumberFormat('fr-FR', { style: 'currency', currency: account.currency }).format(val);
@@ -40,39 +38,6 @@ export default function BalanceAccountDetails({ account, onBack }: BalanceAccoun
         fetchBalances();
     }, [fetchBalances]);
 
-    const handleAddBalance = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const parsed = parseFloat(newBalance);
-        if (isNaN(parsed)) {
-            alert('Please enter a valid balance.');
-            return;
-        }
-
-        setSaving(true);
-        try {
-            const res = await fetch(`/api/savings/balances/${account.id}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ date: newDate, balance: parsed }),
-            });
-
-            if (res.ok) {
-                setShowAddModal(false);
-                setNewBalance('');
-                setNewDate(new Date().toISOString().split('T')[0]);
-                fetchBalances();
-            } else {
-                const err = await res.json();
-                alert(`Failed: ${err.error}`);
-            }
-        } catch (error) {
-            console.error('Error adding balance:', error);
-            alert('An error occurred.');
-        } finally {
-            setSaving(false);
-        }
-    };
-
     const latest = balances.length > 0 ? balances[0] : null;
 
     // Account-type specific info
@@ -92,42 +57,12 @@ export default function BalanceAccountDetails({ account, onBack }: BalanceAccoun
 
     return (
         <div>
-            <Modal open={showAddModal} onClose={() => setShowAddModal(false)} title="Record Balance" size="sm">
-                <form onSubmit={handleAddBalance}>
-                    <div className={sharedStyles.formGrid}>
-                        <div className={sharedStyles.formGroup}>
-                            <label className={sharedStyles.label}>Date</label>
-                            <input
-                                className={sharedStyles.input}
-                                type="date"
-                                value={newDate}
-                                onChange={e => setNewDate(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className={sharedStyles.formGroup}>
-                            <label className={sharedStyles.label}>Balance (EUR)</label>
-                            <input
-                                className={sharedStyles.input}
-                                type="number"
-                                step="0.01"
-                                value={newBalance}
-                                onChange={e => setNewBalance(e.target.value)}
-                                placeholder="e.g. 23050.00"
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div className={sharedStyles.formActions}>
-                        <Button variant="secondary" onClick={() => setShowAddModal(false)}>
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={saving}>
-                            {saving ? 'Saving...' : 'Save'}
-                        </Button>
-                    </div>
-                </form>
-            </Modal>
+            <RecordBalanceModal
+                account={account}
+                open={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                onSuccess={fetchBalances}
+            />
 
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>

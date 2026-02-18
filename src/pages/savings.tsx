@@ -14,12 +14,20 @@ import pageStyles from './savings/SavingsPage.module.css';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, AccountValuation, NetWorthSummary, ACCOUNT_TYPE_LABELS, AccountType } from '@/models/savings';
 import CreateAccountModal from '@/components/savings/CreateAccountModal';
+import RecordBalanceModal from '@/components/savings/RecordBalanceModal';
 import { Button, Card } from '@/components/shared';
 
 interface HistoricalWealthRecord {
     timestamp: string;
     total: number;
     accountsCount: number;
+}
+
+// Account types that support balance recording
+const BALANCE_SUPPORTED_TYPES: AccountType[] = ['CompteCourant', 'PEL', 'LivretA', 'AssuranceVie'];
+
+function supportsBalanceRecording(accountType: AccountType): boolean {
+    return BALANCE_SUPPORTED_TYPES.includes(accountType);
 }
 
 export default function SavingsPage() {
@@ -199,6 +207,7 @@ export default function SavingsPage() {
                                         valuation={valuation}
                                         onSetDefault={() => setDefaultAccount(account.id)}
                                         formatCurrency={formatCurrency}
+                                        onBalanceRecorded={fetchData}
                                     />
                                 );
                             })}
@@ -215,18 +224,30 @@ function AccountCard({
     valuation,
     onSetDefault,
     formatCurrency,
+    onBalanceRecorded,
 }: {
     account: SavingsAccount;
     valuation?: AccountValuation;
     onSetDefault: () => void;
     formatCurrency: (val: number) => string;
+    onBalanceRecorded?: () => void;
 }) {
+    const [showBalanceModal, setShowBalanceModal] = useState(false);
+
     const typeLabel = ACCOUNT_TYPE_LABELS[account.type] || account.type;
     const hasGainLoss = valuation && valuation.totalGainLoss !== 0;
     const isPositive = (valuation?.totalGainLoss ?? 0) >= 0;
+    const supportsBalance = supportsBalanceRecording(account.type);
 
     return (
         <Card className={pageStyles.accountCard}>
+            <RecordBalanceModal
+                account={account}
+                open={showBalanceModal}
+                onClose={() => setShowBalanceModal(false)}
+                onSuccess={onBalanceRecorded}
+            />
+
             <div className={pageStyles.accountCardBody}>
                 <div className={pageStyles.accountHeader}>
                     <div>
@@ -278,6 +299,11 @@ function AccountCard({
             </div>
 
             <div className={pageStyles.accountActions}>
+                {supportsBalance && (
+                    <Button variant="secondary" onClick={() => setShowBalanceModal(true)}>
+                        + Record Balance
+                    </Button>
+                )}
                 <Button href={`/savings/${account.id}`} variant="secondary">
                     View Details →
                 </Button>
