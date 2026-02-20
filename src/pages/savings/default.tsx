@@ -36,6 +36,7 @@ export default function SavingsDefaultRedirect() {
         <div className={layoutStyles.savingsContainer}>
             <Head>
                 <title>MyHomeApp - Savings</title>
+                <link rel="icon" href="/savings-favicon.svg" />
             </Head>
             <div className={sharedStyles.emptyState}>Loading default account...</div>
         </div>

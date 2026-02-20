@@ -328,6 +328,7 @@ export default function AnimePage() {
       <Head>
         <title>Anime List - MyHomeApp</title>
         <meta name="description" content="Track seasonal anime with MyAnimeList integration" />
+        <link rel="icon" href="/anime-favicon.svg" />
       </Head>
       <AnimePageLayout sidebar={sidebar}>
         <div className="anime-main-content">

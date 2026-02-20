@@ -16,7 +16,7 @@ export default function Home({ subApps }: HomeProps) {
         <title>MyHomeApp - Dashboard</title>
         <meta name="description" content="Personal home server dashboard" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/atom-favicon.svg" />
       </Head>
 
       <div>

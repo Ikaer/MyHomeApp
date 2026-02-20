@@ -115,6 +115,7 @@ export default function SavingsPage() {
         <div className={layoutStyles.savingsContainer}>
             <Head>
                 <title>MyHomeApp - Savings</title>
+                <link rel="icon" href="/money-favicon.svg" />
             </Head>
 
             <CreateAccountModal

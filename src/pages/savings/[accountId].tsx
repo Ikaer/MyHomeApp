@@ -41,6 +41,7 @@ export default function SavingsAccountPage() {
             <div className={layoutStyles.savingsContainer}>
                 <Head>
                     <title>MyHomeApp - Savings</title>
+                    <link rel="icon" href="/savings-favicon.svg" />
                 </Head>
                 <div className={sharedStyles.emptyState}>Loading account...</div>
             </div>
@@ -52,6 +53,7 @@ export default function SavingsAccountPage() {
             <div className={layoutStyles.savingsContainer}>
                 <Head>
                     <title>MyHomeApp - Savings</title>
+                    <link rel="icon" href="/savings-favicon.svg" />
                 </Head>
                 <div className={sharedStyles.emptyState}>
                     <p>Account not found.</p>
@@ -105,6 +107,7 @@ export default function SavingsAccountPage() {
         <div className={layoutStyles.savingsContainer}>
             <Head>
                 <title>MyHomeApp - {account.name}</title>
+                <link rel="icon" href="/savings-favicon.svg" />
             </Head>
             {renderDetails()}
         </div>
