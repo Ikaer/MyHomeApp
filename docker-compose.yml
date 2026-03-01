@@ -26,7 +26,6 @@ services:
       - CRON_SECRET=mysecretcronjobkey # Change this in production
       - QDRANT_URL=http://qdrant:6333
       - OLLAMA_URL=http://192.168.1.19:11434
-      - DOCLING_URL=http://myhomeapp-docling:8000
     restart: unless-stopped
     container_name: myhomeapp
     user: "0:0"  # Run as root to fix permission issues
@@ -48,20 +47,3 @@ services:
       sh -c "apk add --no-cache curl && printf '0 2 * * * curl -X POST -H \"Authorization: Bearer mysecretcronjobkey\" -H \"Content-Type: application/json\" -d \"{\\\"origin\\\":\\\"docker cron job\\\"}\" http://myhomeapp:3000/api/actions/perform-automated-tasks\n' > /etc/crontabs/root && crond -f -d 8"
     restart: unless-stopped
     container_name: myhomeapp-cron
-
-  docling-sidecar:
-    profiles:
-      - rag
-    build: ./docling-sidecar
-    container_name: myhomeapp-docling
-    volumes:
-      - /volume1:/nas/volume1:ro
-      - /volume2:/nas/volume2:ro
-      - /volume3:/nas/volume3:ro
-      - /volume4:/nas/volume4:ro
-      - /volume5:/nas/volume5:ro
-      - docling-models:/root/.cache   # persist Docling model cache across restarts
-    restart: unless-stopped
-
-volumes:
-  docling-models:
