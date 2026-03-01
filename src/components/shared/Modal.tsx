@@ -1,4 +1,5 @@
 import React, { ReactNode, useEffect, useId } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './Modal.module.css';
 
 type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -56,7 +57,7 @@ export default function Modal({
       ? styles.sizeXl
       : styles.sizeMd;
 
-  return (
+  return createPortal(
     <div
       className={styles.overlay}
       onClick={closeOnOverlayClick ? onClose : undefined}
@@ -95,6 +96,7 @@ export default function Modal({
         <div className={`${styles.body} ${bodyClassName}`}>{children}</div>
         {footer && <div className={styles.footer}>{footer}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

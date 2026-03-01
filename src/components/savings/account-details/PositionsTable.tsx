@@ -52,6 +52,7 @@ export default function PositionsTable({
                 onClick={() => onToggleSort('currentPrice')}
               />
             </th>
+            <th>Diff</th>
             <th>Market Trend</th>
             <th className={sharedStyles.sortableHeader}>
               <SortableHeaderButton
@@ -91,6 +92,9 @@ export default function PositionsTable({
               <td>{pos.quantity.toFixed(2)}</td>
               <td>{formatCurrency(pos.averagePurchasePrice)}</td>
               <td>{formatCurrency(pos.currentPrice)}</td>
+              <td className={(pos.currentPrice - pos.averagePurchasePrice) >= 0 ? sharedStyles.positive : sharedStyles.negative}>
+                {(pos.currentPrice - pos.averagePurchasePrice) >= 0 ? '+' : ''}{formatCurrency(pos.currentPrice - pos.averagePurchasePrice)}
+              </td>
               <td className={styles.sparklineCell}>
                 {pos.isin && sparklineData[pos.isin]?.length ? (
                   <SparklineChart

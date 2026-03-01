@@ -185,6 +185,17 @@
     background: rgba(55, 65, 81, 0.8);
 }
 
+.prefillRow {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.prefillRow > select {
+    flex: 1;
+}
+
 .formActions {
     display: flex;
     justify-content: flex-end;

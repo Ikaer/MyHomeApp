@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal } from '@/components/shared';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
-import { Transaction, TransactionType } from '@/models/savings';
+import { AssetPosition, Transaction, TransactionType } from '@/models/savings';
 
 interface TransactionFormProps {
     open?: boolean;
     mode?: 'add' | 'edit';
     initialTransaction?: Transaction | null;
+    positions?: AssetPosition[];
     onSave: (transaction: Transaction) => void;
     onClose: () => void;
 }
@@ -15,9 +16,23 @@ export default function TransactionForm({
     open = true,
     mode = 'add',
     initialTransaction,
+    positions = [],
     onSave,
     onClose
 }: TransactionFormProps) {
+    const [selectedPositionIsin, setSelectedPositionIsin] = useState('');
+
+    const handlePrefill = () => {
+        const position = positions.find(p => p.isin === selectedPositionIsin);
+        if (!position) return;
+        setFormData(prev => ({
+            ...prev,
+            assetName: position.name,
+            ticker: position.ticker,
+            isin: position.isin
+        }));
+    };
+
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split('T')[0],
         type: 'Buy' as TransactionType,
@@ -102,9 +117,32 @@ export default function TransactionForm({
             open={open}
             title={mode === 'edit' ? 'Edit Transaction' : 'Add Transaction'}
             onClose={onClose}
-            size="md"
+            size="lg"
         >
             <form onSubmit={handleSubmit}>
+                {positions.length > 0 && mode === 'add' && (
+                    <div className={sharedStyles.prefillRow}>
+                        <select
+                            className={sharedStyles.select}
+                            value={selectedPositionIsin}
+                            onChange={e => setSelectedPositionIsin(e.target.value)}
+                        >
+                            <option value="">Prefill from existing position...</option>
+                            {positions.map(pos => (
+                                <option key={pos.isin} value={pos.isin}>
+                                    {pos.name} ({pos.ticker})
+                                </option>
+                            ))}
+                        </select>
+                        <Button
+                            variant="secondary"
+                            onClick={handlePrefill}
+                            disabled={!selectedPositionIsin}
+                        >
+                            Prefill
+                        </Button>
+                    </div>
+                )}
                 <div className={sharedStyles.formGrid}>
                     <div className={sharedStyles.formGroup}>
                         <label className={sharedStyles.label}>Date</label>

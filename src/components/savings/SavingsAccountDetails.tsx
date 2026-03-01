@@ -186,6 +186,7 @@ export default function SavingsAccountDetails({ account, onBack }: SavingsAccoun
         open={isTransactionEditorOpen}
         mode={transactionEditorMode}
         initialTransaction={editingTransaction}
+        positions={data?.positions}
         onSave={saveTransaction}
         onClose={closeTransactionEditor}
       />

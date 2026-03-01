@@ -16,6 +16,7 @@ declare const styles: {
   readonly "label": string;
   readonly "negative": string;
   readonly "positive": string;
+  readonly "prefillRow": string;
   readonly "select": string;
   readonly "sortableHeader": string;
   readonly "statItem": string;
