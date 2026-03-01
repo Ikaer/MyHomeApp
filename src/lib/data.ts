@@ -54,6 +54,7 @@ export function initializeDataDirectories(): void {
     // Create sub-app directories
     ensureDirectoryExists(path.join(DATA_PATH, 'anime'));
     ensureDirectoryExists(path.join(DATA_PATH, 'savings'));
+    ensureDirectoryExists(path.join(DATA_PATH, 'rag'));
 
     logToFile('INFO', 'Data directories initialized successfully');
   } catch (error) {
@@ -109,6 +110,14 @@ export function getSubApps(): SubApp[] {
         description: 'Manage your financial investments',
         icon: '💰',
         route: '/savings/default',
+        enabled: true
+      },
+      {
+        id: 'rag',
+        name: 'Documents',
+        description: 'Ask questions about your personal files',
+        icon: '🔍',
+        route: '/rag',
         enabled: true
       }
     ];

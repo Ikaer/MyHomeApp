@@ -35,6 +35,9 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Required by visionExtractor (pdf2pic uses pdftoppm for scanned PDF → image)
+RUN apk add --no-cache poppler-utils
+
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 

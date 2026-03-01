@@ -7,7 +7,7 @@
 export * from './anime';
 export * from './shared';
 export * from './savings';
-export * from './anime';
+export * from './rag';
 
 // Legacy compatibility - keeping the old structure for now
 // TODO: Remove these when all imports are updated

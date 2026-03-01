@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "npx concurrently -k \"npm run dev:next\" \"npm run css:types:watch\"",
+    "dev": "npx concurrently -k --kill-signal SIGKILL -n next,css,docling -c cyan,magenta,yellow \"npm run dev:next\" \"npm run css:types:watch\" \"npm run dev:docling\"",
     "dev:next": "next dev",
+    "dev:docling": "cd docling-sidecar && python -m pip install -r requirements.txt -q --no-warn-script-location && python -m uvicorn main:app --reload --port 8000 --log-level debug",
     "prebuild": "npm run css:types",
     "build": "next build",
     "start": "next start",
@@ -14,6 +15,8 @@
   },
   "dependencies": {
     "next": "14.0.0",
+    "pdf-parse": "^2.4.5",
+    "pdf2pic": "^3.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "recharts": "^3.7.0",
@@ -22,6 +25,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "concurrently": "^8.2.2",
