@@ -51,7 +51,7 @@ function getSourceExtensions(source: RagSource): Set<string> {
 
 // ── File type detection ───────────────────────────────────────────────────────
 
-function getFileType(filePath: string): 'pdf' | 'image' | 'text' {
+export function getFileType(filePath: string): 'pdf' | 'image' | 'text' {
   const ext = path.extname(filePath).toLowerCase();
   if (ext === '.pdf') return 'pdf';
   if (['.png', '.jpg', '.jpeg'].includes(ext)) return 'image';
@@ -60,7 +60,7 @@ function getFileType(filePath: string): 'pdf' | 'image' | 'text' {
 
 // ── Core extraction pipeline for one file ────────────────────────────────────
 
-interface FileExtraction {
+export interface FileExtraction {
   segments: { text: string; page?: number }[];
   /**
    * When true, each segment is embedded as-is without further chunking.
@@ -70,7 +70,7 @@ interface FileExtraction {
   skipChunking?: boolean;
 }
 
-async function extractFile(
+export async function extractFile(
   filePath: string,
   fileType: 'pdf' | 'image' | 'text',
   typeOfSource?: string,

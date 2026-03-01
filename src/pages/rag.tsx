@@ -1,9 +1,19 @@
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
-import { RagPageLayout, IngestPanel, ChatInterface } from '@/components/rag';
+import { RagPageLayout, IngestPanel, ChatInterface, IngestPreview } from '@/components/rag';
 import type { SourceOption } from '@/components/rag';
+import { Tabs } from '@/components/shared';
+import type { TabItem } from '@/components/shared/Tabs';
+
+type RagTab = 'chat' | 'ingest-preview';
+
+const TAB_ITEMS: TabItem<RagTab>[] = [
+  { id: 'chat', label: 'Chat' },
+  { id: 'ingest-preview', label: 'Ingestion Preview' },
+];
 
 export default function RagPage() {
+  const [activeTab, setActiveTab] = useState<RagTab>('chat');
   const [sources, setSources] = useState<SourceOption[]>([]);
 
   useEffect(() => {
@@ -28,9 +38,20 @@ export default function RagPage() {
       <Head>
         <title>RAG — MyHomeApp</title>
       </Head>
-      <RagPageLayout sidebar={<IngestPanel />}>
-        <ChatInterface sources={sources} />
-      </RagPageLayout>
+      {activeTab === 'chat' ? (
+        <RagPageLayout
+          sidebar={<IngestPanel />}
+          tabs={<Tabs items={TAB_ITEMS} active={activeTab} onChange={setActiveTab} />}
+        >
+          <ChatInterface sources={sources} />
+        </RagPageLayout>
+      ) : (
+        <RagPageLayout
+          tabs={<Tabs items={TAB_ITEMS} active={activeTab} onChange={setActiveTab} />}
+        >
+          <IngestPreview />
+        </RagPageLayout>
+      )}
     </>
   );
 }

@@ -65,9 +65,21 @@ export function buildRagPrompt(question: string, parentDocs: ParentDoc[]): Promp
     }
 
     const structuredBlock = formatStructuredDataForPrompt(doc.structuredData);
+    const hasStructuredData = structuredBlock.length > 0;
     const header = doc.identifierPrefix
       ? `--- Document: ${doc.fileName} ---\n${doc.identifierPrefix}\n${structuredBlock ? structuredBlock + '\n' : ''}`
       : `--- Document: ${doc.fileName} ---\n${structuredBlock ? structuredBlock + '\n' : ''}`;
+
+    // When structured data (key figures) exists, the authoritative values are
+    // already in the header. Sending the full OCR text wastes tokens and
+    // confuses the model with garbled characters. Include only a short excerpt
+    // for minimal context (e.g. employer name, layout hint).
+    const RAW_TEXT_EXCERPT_CHARS = 200;
+    const effectiveText = hasStructuredData
+      ? (doc.fullText.length > RAW_TEXT_EXCERPT_CHARS
+          ? doc.fullText.slice(0, RAW_TEXT_EXCERPT_CHARS) + '\n[...raw text omitted — key figures above are authoritative]'
+          : doc.fullText)
+      : doc.fullText;
 
     const budget = Math.min(perDocBudget, MAX_CONTEXT_CHARS - totalChars - header.length);
     if (budget <= 100) {
@@ -75,18 +87,18 @@ export function buildRagPrompt(question: string, parentDocs: ParentDoc[]): Promp
       break;
     }
 
-    const truncated = doc.fullText.length > budget;
+    const truncated = effectiveText.length > budget;
     const text = truncated
-      ? doc.fullText.slice(0, budget) + `\n[...document truncated at ${budget} chars]`
-      : doc.fullText;
+      ? effectiveText.slice(0, budget) + `\n[...document truncated at ${budget} chars]`
+      : effectiveText;
 
     contextParts.push(`${header}${text}\n`);
-    const charsUsed = Math.min(doc.fullText.length, budget);
+    const charsUsed = Math.min(effectiveText.length, budget);
     totalChars += header.length + text.length;
     docStats.push({
       fileName: doc.fileName,
       charsUsed,
-      charsTruncated: truncated ? doc.fullText.length - charsUsed : 0,
+      charsTruncated: truncated ? effectiveText.length - charsUsed : 0,
     });
   }
 
