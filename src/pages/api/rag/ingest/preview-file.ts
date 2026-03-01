@@ -89,6 +89,9 @@ interface PreviewFileResponse {
     effectiveTextPreview: string;
   };
 
+  // Processing logs
+  logs: { level: 'log' | 'warn' | 'error'; message: string; timestamp: number }[];
+
   timings: {
     extraction_ms: number;
     identifiers_ms: number | null;
@@ -132,6 +135,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const totalStart = Date.now();
   const fileName = path.basename(filePath);
   const fileType = getFileType(filePath);
+
+  // Capture console logs during processing
+  const logs: { level: 'log' | 'warn' | 'error'; message: string; timestamp: number }[] = [];
+  const originalLog = console.log;
+  const originalWarn = console.warn;
+  const originalError = console.error;
+
+  const captureLog = (level: 'log' | 'warn' | 'error') => (...args: any[]) => {
+    const message = args.map(arg => 
+      typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+    ).join(' ');
+    logs.push({ level, message, timestamp: Date.now() });
+    // Also call original console method
+    if (level === 'log') originalLog(...args);
+    else if (level === 'warn') originalWarn(...args);
+    else originalError(...args);
+  };
+
+  console.log = captureLog('log');
+  console.warn = captureLog('warn');
+  console.error = captureLog('error');
 
   try {
     // ── Step 1: Text extraction ─────────────────────────────────────────────
@@ -253,6 +277,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         effectiveTextPreview: (headerBlock + '\n' + effectiveText).slice(0, 2000)
           + (headerBlock.length + effectiveText.length > 2000 ? '\n…' : ''),
       },
+      logs,
       timings: {
         extraction_ms: extractionMs,
         identifiers_ms: identifiersMs,
@@ -261,8 +286,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       },
     };
 
+    // Restore console methods
+    console.log = originalLog;
+    console.warn = originalWarn;
+    console.error = originalError;
+
     return res.status(200).json(response);
   } catch (error: any) {
+    // Restore console methods
+    console.log = originalLog;
+    console.warn = originalWarn;
+    console.error = originalError;
+
     console.error(`[preview-file] Error processing ${filePath}:`, error);
     return res.status(500).json({ error: error.message || 'Internal server error' });
   }

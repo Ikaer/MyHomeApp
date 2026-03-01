@@ -28,6 +28,13 @@ declare const styles: {
   readonly "kvValue": string;
   readonly "kvValueWarn": string;
   readonly "loading": string;
+  readonly "logEntry": string;
+  readonly "logError": string;
+  readonly "logLevel": string;
+  readonly "logList": string;
+  readonly "logLog": string;
+  readonly "logMessage": string;
+  readonly "logWarn": string;
   readonly "previewBtn": string;
   readonly "resultFileName": string;
   readonly "resultHeader": string;

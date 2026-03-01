@@ -194,7 +194,7 @@
 /* Result sections */
 .resultHeader {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
 }
@@ -418,4 +418,58 @@
 .timingValue {
   color: var(--text-primary);
   font-weight: 500;
+}
+
+/* Log list */
+.logList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.logEntry {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  line-height: 1.4;
+}
+
+.logLevel {
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.logMessage {
+  color: var(--text-secondary);
+  word-break: break-word;
+}
+
+.logLog {
+  background-color: var(--bg-tertiary);
+  border-left: 3px solid #3b82f6;
+}
+
+.logLog .logLevel {
+  color: #3b82f6;
+}
+
+.logWarn {
+  background-color: rgba(251, 191, 36, 0.1);
+  border-left: 3px solid #fbbf24;
+}
+
+.logWarn .logLevel {
+  color: #fbbf24;
+}
+
+.logError {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #ef4444;
+}
+
+.logError .logLevel {
+  color: #ef4444;
 }

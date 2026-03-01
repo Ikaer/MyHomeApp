@@ -48,6 +48,7 @@ interface PreviewFileResponse {
     effectiveTextCharCount: number;
     effectiveTextPreview: string;
   };
+  logs: { level: 'log' | 'warn' | 'error'; message: string; timestamp: number }[];
   timings: {
     extraction_ms: number;
     identifiers_ms: number | null;
@@ -309,11 +310,14 @@ function PreviewResults({
     <>
       {/* Header + timings */}
       <div className={styles.resultHeader}>
-        <h3 className={styles.resultFileName}>{result.fileName}</h3>
-        <div className={styles.resultMeta}>
-          <span className={styles.badge}>{result.fileType}</span>
-          <span className={styles.badge}>{result.typeOfSource}</span>
+        <div>
+          <h3 className={styles.resultFileName}>{result.fileName}</h3>
+          <div className={styles.resultMeta}>
+            <span className={styles.badge}>{result.fileType}</span>
+            <span className={styles.badge}>{result.typeOfSource}</span>
+          </div>
         </div>
+        <Button onClick={() => handleExport(result)}>Export JSON</Button>
       </div>
 
       <div className={styles.timings}>
@@ -442,8 +446,48 @@ function PreviewResults({
         <span className={styles.kvKey}>What the LLM sees:</span>
         <div className={styles.codeBlock}>{result.promptPreview.effectiveTextPreview}</div>
       </ResultSection>
+
+      {/* Processing Logs */}
+      <ResultSection
+        title="Processing Logs"
+        badge={`${result.logs.length} log(s)`}
+        defaultOpen
+      >
+        <div className={styles.logList}>
+          {result.logs.length === 0 ? (
+            <span className={styles.skippedText}>No logs captured</span>
+          ) : (
+            result.logs.map((log, i) => {
+              const levelClass = log.level === 'log' ? styles.logLog 
+                : log.level === 'warn' ? styles.logWarn 
+                : styles.logError;
+              return (
+                <div key={i} className={`${styles.logEntry} ${levelClass}`}>
+                  <span className={styles.logLevel}>[{log.level.toUpperCase()}]</span>
+                  <span className={styles.logMessage}>{log.message}</span>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </ResultSection>
     </>
   );
+}
+
+// ── Export helper ─────────────────────────────────────────────────────────────
+
+function handleExport(result: PreviewFileResponse) {
+  const json = JSON.stringify(result, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${result.fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}_preview_${Date.now()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 // ── Chunk list subcomponent ───────────────────────────────────────────────────

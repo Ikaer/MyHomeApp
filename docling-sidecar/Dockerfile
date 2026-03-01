@@ -15,7 +15,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Pre-download Docling models into the image layer so the container starts fast.
 # This adds ~2-3 GB to the image but avoids slow first-request model downloads.
-RUN python - <<'EOF'
+RUN python <<'EOF'
 from docling.document_converter import DocumentConverter
 import tempfile, os
 # Trigger model download by converting a tiny dummy PDF
