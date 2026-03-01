@@ -226,18 +226,24 @@
 .section {
   border: 1px solid var(--border-color);
   border-radius: 8px;
-  overflow: hidden;
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.6rem 0.85rem;
+  padding: 0.65rem 0.85rem;
+  min-height: 40px;
   background-color: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   user-select: none;
+  border-radius: 8px;
+  transition: background-color 0.15s;
+}
+
+.sectionHeaderOpen {
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .sectionHeader:hover {
@@ -254,17 +260,23 @@
 .sectionBadge {
   font-size: 0.75rem;
   color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 .sectionContent {
   padding: 0.75rem 0.85rem;
   background-color: var(--bg-primary);
+  border-radius: 0 0 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .sectionChevron {
   font-size: 0.7rem;
   color: var(--text-muted);
   margin-right: 0.4rem;
+  flex-shrink: 0;
 }
 
 /* Key-value pairs */
@@ -302,7 +314,27 @@
   white-space: pre-wrap;
   word-break: break-word;
   overflow: auto;
-  max-height: 300px;
+  max-height: 500px;
+}
+
+.codeBlockSmall {
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+}
+
+.skippedText {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.85rem;
 }
 
 /* Chunk list */

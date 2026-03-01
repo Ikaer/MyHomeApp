@@ -90,7 +90,10 @@ function ResultSection({
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className={styles.section}>
-      <div className={styles.sectionHeader} onClick={() => setOpen(v => !v)}>
+      <div
+        className={`${styles.sectionHeader} ${open ? styles.sectionHeaderOpen : ''}`}
+        onClick={() => setOpen(v => !v)}
+      >
         <h4 className={styles.sectionTitle}>
           <span className={styles.sectionChevron}>{open ? '▾' : '▸'}</span>
           {title}
@@ -347,7 +350,7 @@ function PreviewResults({
           <span className={styles.kvValue}>{result.extraction.skipChunking ? 'Yes' : 'No'}</span>
         </div>
         {result.extraction.segments.map((seg, i) => (
-          <div key={i} style={{ marginTop: '0.5rem' }}>
+          <div key={i}>
             <div className={styles.kvGrid}>
               <span className={styles.kvKey}>Segment {i}:</span>
               <span className={styles.kvValue}>{seg.charCount.toLocaleString()} chars{seg.page ? ` (page ${seg.page})` : ''}</span>
@@ -372,7 +375,7 @@ function PreviewResults({
         defaultOpen
       >
         {result.identifiers?.skipped ? (
-          <span className={styles.kvValue} style={{ fontStyle: 'italic' }}>Skipped (LLM call not made)</span>
+          <span className={styles.skippedText}>Skipped (LLM call not made)</span>
         ) : result.identifiers ? (
           <>
             <div className={styles.kvGrid}>
@@ -402,19 +405,19 @@ function PreviewResults({
         defaultOpen
       >
         {result.structuredData?.skipped ? (
-          <span className={styles.kvValue} style={{ fontStyle: 'italic' }}>Skipped (LLM call not made)</span>
+          <span className={styles.skippedText}>Skipped (LLM call not made)</span>
         ) : result.structuredData?.data ? (
           <>
-            <div className={styles.codeBlock}>{JSON.stringify(result.structuredData.data, null, 2)}</div>
+            <div className={styles.codeBlockSmall}>{JSON.stringify(result.structuredData.data, null, 2)}</div>
             {result.structuredData.formatted && (
-              <div style={{ marginTop: '0.5rem' }}>
+              <>
                 <span className={styles.kvKey}>Formatted for prompt:</span>
-                <div className={styles.codeBlock}>{result.structuredData.formatted}</div>
-              </div>
+                <div className={styles.codeBlockSmall}>{result.structuredData.formatted}</div>
+              </>
             )}
           </>
         ) : (
-          <span className={styles.kvValue} style={{ fontStyle: 'italic' }}>No structured data extracted (unsupported doc type or extraction returned empty)</span>
+          <span className={styles.skippedText}>No structured data extracted (unsupported doc type or extraction returned empty)</span>
         )}
       </ResultSection>
 
@@ -436,10 +439,8 @@ function PreviewResults({
               : '—'}
           </span>
         </div>
-        <div style={{ marginTop: '0.5rem' }}>
-          <span className={styles.kvKey}>What the LLM sees:</span>
-          <div className={styles.codeBlock}>{result.promptPreview.effectiveTextPreview}</div>
-        </div>
+        <span className={styles.kvKey}>What the LLM sees:</span>
+        <div className={styles.codeBlock}>{result.promptPreview.effectiveTextPreview}</div>
       </ResultSection>
     </>
   );

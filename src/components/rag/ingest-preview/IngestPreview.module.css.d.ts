@@ -11,6 +11,7 @@ declare const styles: {
   readonly "chunkStats": string;
   readonly "chunkText": string;
   readonly "codeBlock": string;
+  readonly "codeBlockSmall": string;
   readonly "emptyHint": string;
   readonly "emptyIcon": string;
   readonly "emptyState": string;
@@ -37,9 +38,11 @@ declare const styles: {
   readonly "sectionChevron": string;
   readonly "sectionContent": string;
   readonly "sectionHeader": string;
+  readonly "sectionHeaderOpen": string;
   readonly "sectionTitle": string;
   readonly "skipGroup": string;
   readonly "skipGroupTitle": string;
+  readonly "skippedText": string;
   readonly "spin": string;
   readonly "spinner": string;
   readonly "timingItem": string;
