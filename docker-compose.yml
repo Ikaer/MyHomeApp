@@ -50,6 +50,8 @@ services:
     container_name: myhomeapp-cron
 
   docling-sidecar:
+    profiles:
+      - rag
     build: ./docling-sidecar
     container_name: myhomeapp-docling
     volumes:
