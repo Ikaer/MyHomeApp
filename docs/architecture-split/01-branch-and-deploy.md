@@ -165,13 +165,13 @@ Make a small change in the v2 stack (e.g., hide an anime, record a balance) and 
 
 ## Checkpoint Validation
 
-- [ ] Branch `migration/monorepo` exists and is pushed
-- [ ] `MyHomeApp-v2/` data directories exist on NAS with copied data
-- [ ] `docker-compose.v2.yml` committed and pushed
-- [ ] Legacy stack still works on `:12344`
-- [ ] v2 stack works on `:12350`
-- [ ] Data isolation confirmed (changes in v2 don't appear in legacy)
-- [ ] Tag: `git tag migration-step-1-validated`
+- [x] Branch `migration/monorepo` exists and is pushed
+- [x] `MyHomeApp-v2/` data directories exist on NAS with copied data
+- [x] `docker-compose.v2.yml` committed and pushed
+- [x] Legacy stack still works on `:12344`
+- [x] v2 stack works on `:12350`
+- [x] Data isolation confirmed (changes in v2 don't appear in legacy)
+- [x] Tag: `git tag migration-step-1-validated`
 
 ---
 
