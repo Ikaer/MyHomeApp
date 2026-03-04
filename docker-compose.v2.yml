@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  myhomeapp:
+    image: myhomeapp-v2:${BUILD_VERSION:-latest}
+    build: 
+      context: .
+      args:
+        - BUILD_DATE=2026-03-04-v2
+    ports:
+      - "12350:3000"                    # Changed from 12344
+    volumes:
+      - /volume4/root4/AppData/MyHomeApp-v2/database:/app/data    # v2 data
+      - /volume4/root4/AppData/MyHomeApp-v2/config:/app/config
+      - /volume4/root4/AppData/MyHomeApp-v2/logs:/app/logs
+      - /volume1:/nas/volume1:ro
+      - /volume2:/nas/volume2:ro
+      - /volume3:/nas/volume3:ro
+      - /volume4:/nas/volume4:ro
+      - /volume5:/nas/volume5:ro
+    environment:
+      - NODE_ENV=production
+      - DATA_PATH=/app/data
+      - CONFIG_PATH=/app/config
+      - LOGS_PATH=/app/logs
+      - CRON_SECRET=mysecretcronjobkey
+      - QDRANT_URL=http://qdrant-v2:6333
+      - OLLAMA_URL=http://192.168.1.19:11434
+    restart: unless-stopped
+    container_name: myhomeapp-v2          # Changed
+    user: "0:0"
+
+  qdrant-v2:
+    image: qdrant/qdrant:latest
+    container_name: myhomeapp-v2-qdrant   # Changed
+    ports:
+      - "6334:6333"                       # Changed from 6333
+    volumes:
+      - /volume4/root4/AppData/MyHomeApp-v2/qdrant:/qdrant/storage  # v2 data
+    restart: unless-stopped
+
+  cron:
+    image: alpine:latest
+    depends_on:
+      - myhomeapp
+    command: >
+      sh -c "apk add --no-cache curl && printf '0 2 * * * curl -X POST -H \"Authorization: Bearer mysecretcronjobkey\" -H \"Content-Type: application/json\" -d \"{\\\"origin\\\":\\\"docker cron job v2\\\"}\" http://myhomeapp:3000/api/actions/perform-automated-tasks\n' > /etc/crontabs/root && crond -f -d 8"
+    restart: unless-stopped
+    container_name: myhomeapp-v2-cron     # Changed
