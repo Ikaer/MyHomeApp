@@ -1,0 +1,204 @@
+.accountGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.accountName {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
+    color: #f9fafb;
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.statItem {
+    display: flex;
+    flex-direction: column;
+}
+
+.statLabel {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.statValue {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f3f4f6;
+}
+
+.positive {
+    color: #10b981;
+}
+
+.negative {
+    color: #ef4444;
+}
+
+.tableContainer {
+    background: rgba(31, 41, 55, 0.3);
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(75, 85, 99, 0.2);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 1rem;
+    background: rgba(17, 24, 39, 0.5);
+    color: #9ca3af;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.sortableHeader {
+    padding: 0.5rem 1rem;
+}
+
+.table td {
+    padding: 1rem;
+    border-top: 1px solid rgba(75, 85, 99, 0.1);
+    color: #d1d5db;
+    font-size: 0.875rem;
+}
+
+.table td.positive {
+    color: #10b981;
+}
+
+.table td.negative {
+    color: #ef4444;
+}
+
+.ticker {
+    font-family: monospace;
+    background: rgba(55, 65, 81, 0.5);
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    color: #93c5fd;
+}
+
+
+.emptyState {
+    text-align: center;
+    padding: 4rem;
+    color: #9ca3af;
+}
+
+.chartContainer {
+    width: 100%;
+    height: 220px;
+    margin-top: 0.75rem;
+}
+
+.chartEmpty {
+    text-align: center;
+    padding: 1.5rem 0;
+    color: #9ca3af;
+}
+
+
+.chartsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.chartPanel {
+    background: rgba(17, 24, 39, 0.4);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(75, 85, 99, 0.25);
+    padding: 1rem;
+}
+
+.chartPanelTitle {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+.chartPanelBody {
+    width: 100%;
+    height: 200px;
+    margin-top: 0.75rem;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.formGroupFull {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #9ca3af;
+}
+
+.input,
+.select {
+    background: rgba(55, 65, 81, 0.5);
+    border: 1px solid rgba(75, 85, 99, 0.5);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    color: white;
+    font-size: 1rem;
+}
+
+.input:focus,
+.select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    background: rgba(55, 65, 81, 0.8);
+}
+
+.prefillRow {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.prefillRow > select {
+    flex: 1;
+}
+
+.formActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
