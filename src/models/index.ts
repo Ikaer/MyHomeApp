@@ -5,12 +5,8 @@
 
 // Re-export all subapp models
 export * from './anime';
-export * from './shared';
 export * from './savings';
 export * from './rag';
 
-// Legacy compatibility - keeping the old structure for now
-// TODO: Remove these when all imports are updated
-export type {
-  SubApp
-} from './shared';
+// Shared models now live in @myhomeapp/shared
+export * from '@myhomeapp/shared/models';

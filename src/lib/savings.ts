@@ -17,7 +17,7 @@ import {
     AssuranceVieConfig,
     InteressementConfig,
 } from '@/models/savings';
-import { readJsonFile, writeJsonFile, ensureDirectoryExists } from './data';
+import { readJsonFile, writeJsonFile, ensureDirectoryExists } from '@myhomeapp/shared/lib/data';
 
 const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const SAVINGS_DATA_PATH = path.join(DATA_PATH, 'savings');

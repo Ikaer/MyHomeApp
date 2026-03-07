@@ -3,7 +3,7 @@
  * Based on MyAnimeList API structure and user extensions
  */
 
-import { LiteralSubset } from "../shared";
+import { LiteralSubset } from "@myhomeapp/shared/models";
 
 // Base MAL anime data (from API)
 export interface MALAnime {
