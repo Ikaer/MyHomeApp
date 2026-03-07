@@ -185,7 +185,7 @@ services:
     ports:
       - "12353:3000"
     volumes:
-      - /volume4/root4/AppData/MyHomeApp-v2/database/rag:/app/data
+      - /volume4/root4/AppData/MyHomeApp-v2/database:/app/data
       - /volume4/root4/AppData/MyHomeApp-v2/config:/app/config
       - /volume4/root4/AppData/MyHomeApp-v2/logs/rag:/app/logs
       - /volume1:/nas/volume1:ro

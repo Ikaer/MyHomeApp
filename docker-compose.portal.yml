@@ -12,9 +12,9 @@ services:
       - "12350:3000"
     environment:
       - NODE_ENV=production
-      - ANIME_URL=http://myhomeapp-v2-anime:3000
-      - SAVINGS_URL=http://myhomeapp-v2-savings:3000
-      - RAG_URL=http://myhomeapp-v2-rag:3000
+      - ANIME_URL=http://syno:12351
+      - SAVINGS_URL=http://syno:12352
+      - RAG_URL=http://syno:12353
     restart: unless-stopped
     container_name: myhomeapp-v2-portal
     networks:
