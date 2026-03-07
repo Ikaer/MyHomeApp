@@ -11,7 +11,7 @@ services:
     ports:
       - "12352:3000"
     volumes:
-      - /volume4/root4/AppData/MyHomeApp-v2/database/savings:/app/data
+      - /volume4/root4/AppData/MyHomeApp-v2/database:/app/data
       - /volume4/root4/AppData/MyHomeApp-v2/config:/app/config
       - /volume4/root4/AppData/MyHomeApp-v2/logs/savings:/app/logs
     environment:

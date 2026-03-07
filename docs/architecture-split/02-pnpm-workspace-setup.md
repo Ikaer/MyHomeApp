@@ -234,15 +234,15 @@ pnpm run dev
 
 ## Checkpoint Validation
 
-- [ ] `pnpm install` succeeds
-- [ ] `pnpm run build` succeeds — no TypeScript errors
-- [ ] `pnpm run dev` starts — all pages load
-- [ ] Docker build succeeds: `docker build -t myhomeapp-test .`
-- [ ] Docker run works: `docker run -p 12399:3000 myhomeapp-test`
-- [ ] Commit with message: `migration(step-2): pnpm workspace + shared package`
-- [ ] Push to `migration/monorepo`
+- [x] `pnpm install` succeeds
+- [x] `pnpm run build` succeeds — no TypeScript errors
+- [x] `pnpm run dev` starts — all pages load
+- [x] Docker build succeeds: `docker build -t myhomeapp-test .`
+- [x] Docker run works: `docker run -p 12399:3000 myhomeapp-test`
+- [x] Commit with message: `migration(step-2): pnpm workspace + shared package`
+- [x] Push to `migration/monorepo`
 - [ ] Deploy in Portainer as `myhomeapp-v2` stack, verify all pages work
-- [ ] Tag: `git tag migration-step-2-validated`
+- [x] Tag: `git tag migration-step-2-validated`
 
 ---
 

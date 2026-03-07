@@ -313,15 +313,15 @@ At this point we can either:
 
 ## Checkpoint Validation
 
-- [ ] `pnpm --filter @myhomeapp/anime build` succeeds
-- [ ] `pnpm --filter @myhomeapp/anime dev` starts on port 3001
-- [ ] `http://localhost:3001/anime` loads the anime page
-- [ ] Anime API routes respond (test with requests.http, targeting port 3001)
-- [ ] Anime data reads correctly from disk
-- [ ] Docker build: `docker compose -f docker-compose.anime.yml build`
-- [ ] Docker run: anime container starts, page loads on `:12351`
-- [ ] Cron test: `curl -X POST -H "Authorization: Bearer mysecretcronjobkey" http://localhost:12351/api/actions/perform-tasks`
-- [ ] Commit: `migration(step-3): extract anime subapp`
-- [ ] Push to `migration/monorepo`
-- [ ] Deploy `myhomeapp-v2-anime` stack in Portainer
-- [ ] Tag: `git tag migration-step-3-validated`
+- [x] `pnpm --filter @myhomeapp/anime build` succeeds
+- [x] `pnpm --filter @myhomeapp/anime dev` starts on port 3001
+- [x] `http://localhost:3001/anime` loads the anime page
+- [x] Anime API routes respond (test with requests.http, targeting port 3001)
+- [x] Anime data reads correctly from disk
+- [x] Docker build: `docker compose -f docker-compose.anime.yml build`
+- [x] Docker run: anime container starts, page loads on `:12351`
+- [x] Cron test: `curl -X POST -H "Authorization: Bearer mysecretcronjobkey" http://localhost:12351/api/actions/perform-tasks`
+- [x] Commit: `migration(step-3): extract anime subapp`
+- [x] Push to `migration/monorepo`
+- [x] Deploy `myhomeapp-v2-anime` stack in Portainer
+- [x] Tag: `git tag migration-step-3-validated`
