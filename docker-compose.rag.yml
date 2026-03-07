@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  rag:
+    image: myhomeapp-rag:${BUILD_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: apps/rag/Dockerfile
+      args:
+        - BUILD_DATE=2026-03-07-v1
+    ports:
+      - "12353:3000"
+    volumes:
+      - /volume4/root4/AppData/MyHomeApp-v2/database:/app/data
+      - /volume4/root4/AppData/MyHomeApp-v2/config:/app/config
+      - /volume4/root4/AppData/MyHomeApp-v2/logs/rag:/app/logs
+      - /volume1:/nas/volume1:ro
+      - /volume2:/nas/volume2:ro
+      - /volume3:/nas/volume3:ro
+      - /volume4:/nas/volume4:ro
+      - /volume5:/nas/volume5:ro
+    environment:
+      - NODE_ENV=production
+      - DATA_PATH=/app/data
+      - CONFIG_PATH=/app/config
+      - LOGS_PATH=/app/logs
+      - QDRANT_URL=http://rag-qdrant:6333
+      - OLLAMA_URL=http://192.168.1.19:11434
+      - DOCLING_URL=http://rag-docling:8000
+    restart: unless-stopped
+    container_name: myhomeapp-v2-rag
+    user: "0:0"
+
+  rag-qdrant:
+    image: qdrant/qdrant:latest
+    container_name: myhomeapp-v2-qdrant
+    ports:
+      - "6334:6333"
+    volumes:
+      - /volume4/root4/AppData/MyHomeApp-v2/qdrant:/qdrant/storage
+    restart: unless-stopped
+
+  rag-docling:
+    build:
+      context: ./apps/rag/docling-sidecar
+    container_name: myhomeapp-v2-docling
+    ports:
+      - "8001:8000"
+    restart: unless-stopped
+
+  # RAG has no cron tasks currently — uncomment when scheduled ingestion/maintenance is needed
+  # rag-cron:
+  #   image: alpine:latest
+  #   depends_on: [rag]
+  #   command: ...
+  #   restart: unless-stopped
+  #   container_name: myhomeapp-v2-rag-cron
