@@ -4,7 +4,7 @@ const path = require('path');
 const nextConfig = {
   output: 'standalone',
   transpilePackages: ['@myhomeapp/shared'],
-  // basePath: '/anime',  // Uncomment if routed through portal
+  basePath: '/anime',
   experimental: {
     outputFileTracingRoot: path.join(__dirname, '../../'),
   },

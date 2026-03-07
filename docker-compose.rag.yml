@@ -30,6 +30,8 @@ services:
     restart: unless-stopped
     container_name: myhomeapp-v2-rag
     user: "0:0"
+    networks:
+      - myhomeapp-v2
 
   rag-qdrant:
     image: qdrant/qdrant:latest
@@ -55,3 +57,7 @@ services:
   #   command: ...
   #   restart: unless-stopped
   #   container_name: myhomeapp-v2-rag-cron
+
+networks:
+  myhomeapp-v2:
+    external: true

@@ -23,6 +23,8 @@ services:
     restart: unless-stopped
     container_name: myhomeapp-v2-anime
     user: "0:0"
+    networks:
+      - myhomeapp-v2
 
   anime-cron:
     image: alpine:latest
@@ -32,3 +34,7 @@ services:
       sh -c "apk add --no-cache curl && printf '0 2 * * * curl -s -X POST -H \"Authorization: Bearer mysecretcronjobkey\" -H \"Content-Type: application/json\" -d \"{\\\"origin\\\":\\\"anime cron job\\\"}\" http://anime:3000/api/actions/perform-tasks\n' > /etc/crontabs/root && crond -f -d 8"
     restart: unless-stopped
     container_name: myhomeapp-v2-anime-cron
+
+networks:
+  myhomeapp-v2:
+    external: true

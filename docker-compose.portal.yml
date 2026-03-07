@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  portal:
+    image: myhomeapp-portal:${BUILD_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: apps/portal/Dockerfile
+      args:
+        - BUILD_DATE=2026-03-07-v1
+    ports:
+      - "12350:3000"
+    environment:
+      - NODE_ENV=production
+      - ANIME_URL=http://myhomeapp-v2-anime:3000
+      - SAVINGS_URL=http://myhomeapp-v2-savings:3000
+      - RAG_URL=http://myhomeapp-v2-rag:3000
+    restart: unless-stopped
+    container_name: myhomeapp-v2-portal
+    networks:
+      - myhomeapp-v2
+
+networks:
+  myhomeapp-v2:
+    external: true
