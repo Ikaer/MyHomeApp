@@ -11,9 +11,9 @@ services:
     ports:
       - "12351:3000"
     volumes:
-      - /volume4/root4/AppData/MyHomeApp-v2/database/anime:/app/data
+      - /volume4/root4/AppData/MyHomeApp-v2/database:/app/data
       - /volume4/root4/AppData/MyHomeApp-v2/config:/app/config
-      - /volume4/root4/AppData/MyHomeApp-v2/logs/anime:/app/logs
+      - /volume4/root4/AppData/MyHomeApp-v2/logs:/app/logs
     environment:
       - NODE_ENV=production
       - DATA_PATH=/app/data
