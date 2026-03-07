@@ -95,21 +95,25 @@ export function writeJsonFile<T>(filePath: string, data: T): boolean {
 // Get available sub-applications
 export function getSubApps(): SubApp[] {
   try {
+    const animeUrl = process.env.ANIME_URL || 'http://localhost:3001';
+    const savingsUrl = process.env.SAVINGS_URL || 'http://localhost:3002';
+    const ragUrl = process.env.RAG_URL || 'http://localhost:3003';
+
     const subApps = [
       {
         id: 'anime',
         name: 'Anime List',
         description: 'Track your anime progress',
         icon: '📺',
-        route: '/anime',
-        enabled: true // Enabled in Phase 3
+        route: animeUrl,
+        enabled: true
       },
       {
         id: 'savings',
         name: 'Savings',
         description: 'Manage your financial investments',
         icon: '💰',
-        route: '/savings/default',
+        route: `${savingsUrl}/default`,
         enabled: true
       },
       {
@@ -117,7 +121,7 @@ export function getSubApps(): SubApp[] {
         name: 'Documents',
         description: 'Ask questions about your personal files',
         icon: '🔍',
-        route: '/rag',
+        route: ragUrl,
         enabled: true
       }
     ];
