@@ -2,6 +2,7 @@
   "name": "myhomeapp",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@9.15.0",
   "scripts": {
     "dev": "npx concurrently -k --kill-signal SIGKILL -n next,css,docling -c cyan,magenta,yellow \"npm run dev:next\" \"npm run css:types:watch\" \"npm run dev:docling\"",
     "dev:next": "next dev",
@@ -14,6 +15,7 @@
     "css:types:watch": "npx tcm -w -p \"src/**/*.module.css\" . --camelCase"
   },
   "dependencies": {
+    "@myhomeapp/shared": "workspace:*",
     "next": "14.0.0",
     "pdf-parse": "^2.4.5",
     "pdf2pic": "^3.2.0",

@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './DisplaySection.module.css';
 import { ImageSize } from '@/models/anime';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 
 interface DisplaySectionProps {
   imageSize: ImageSize;

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from './ChatInterface.module.css';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 import SourceReferences from './SourceReferences';
 import type { SourceReference, RagDebugInfo } from '@/models/rag';
 

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { AnimeWithExtensions, ImageSize, StatsColumn, VisibleColumns } from '@/models/anime';
 import {  formatUserStatus } from '@/lib/animeUtils';
 import { generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 import styles from './AnimeCardView.module.css';
 
 interface MALStatusUpdate {

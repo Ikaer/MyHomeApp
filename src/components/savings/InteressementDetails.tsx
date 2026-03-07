@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, DepositRecord, InteressementConfig } from '@/models/savings';
-import { Button, Card, Modal } from '@/components/shared';
+import { Button, Card, Modal } from '@myhomeapp/shared/components';
 
 interface InteressementDetailsProps {
     account: SavingsAccount;

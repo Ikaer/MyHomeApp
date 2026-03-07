@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import styles from './IngestPreview.module.css';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 import type { DocIdentifiers } from '@/models/rag';
 
 // ── Response types (mirrors API) ──────────────────────────────────────────────

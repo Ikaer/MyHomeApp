@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
-import { readJsonFile } from '@/lib/data';
+import { readJsonFile } from '@myhomeapp/shared/lib/data';
 
 interface HistoricalAssetRecord {
   timestamp: string;

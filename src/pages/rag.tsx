@@ -2,8 +2,8 @@ import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import { RagPageLayout, IngestPanel, ChatInterface, IngestPreview } from '@/components/rag';
 import type { SourceOption } from '@/components/rag';
-import { Tabs } from '@/components/shared';
-import type { TabItem } from '@/components/shared/Tabs';
+import { Tabs } from '@myhomeapp/shared/components';
+import type { TabItem } from '@myhomeapp/shared/components/Tabs';
 
 type RagTab = 'chat' | 'ingest-preview';
 

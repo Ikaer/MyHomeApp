@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './IngestPanel.module.css';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 import type { IngestJob } from '@/models/rag';
 
 interface SourceInfo {

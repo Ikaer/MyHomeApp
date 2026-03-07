@@ -1,10 +1,10 @@
 import React from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 import styles from './PositionsTable.module.css';
 import { PositionsTableProps } from './types';
 import SparklineChart from './SparklineChart';
-import { SortableHeaderButton } from '@/components/shared/table';
+import { SortableHeaderButton } from '@myhomeapp/shared/components/table';
 
 export default function PositionsTable({
   positions,

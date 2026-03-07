@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './DataSyncSection.module.css';
 import { MALAuthState } from '@/models/anime';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 
 interface DataSyncSectionProps {
   authState: MALAuthState;

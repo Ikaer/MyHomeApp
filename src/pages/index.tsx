@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import { GetServerSideProps } from 'next';
 import SubAppCard from '@/components/SubAppCard';
-import { CardGrid } from '@/components/shared';
+import { CardGrid } from '@myhomeapp/shared/components';
 import { SubApp } from '@/types';
-import { getSubApps, initializeDataDirectories } from '@/lib/data';
+import { getSubApps, initializeDataDirectories } from '@myhomeapp/shared/lib/data';
 
 interface HomeProps {
   subApps: SubApp[];

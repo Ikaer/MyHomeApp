@@ -1,7 +1,7 @@
 import React from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
-import { Button } from '@/components/shared';
-import { SortableHeaderButton } from '@/components/shared/table';
+import { Button } from '@myhomeapp/shared/components';
+import { SortableHeaderButton } from '@myhomeapp/shared/components/table';
 import { TransactionsTableProps } from './types';
 
 export default function TransactionsTable({

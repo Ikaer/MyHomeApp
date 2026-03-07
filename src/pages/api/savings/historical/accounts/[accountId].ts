@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
 import { getSavingsAccount } from '@/lib/savings';
-import { readJsonFile } from '@/lib/data';
+import { readJsonFile } from '@myhomeapp/shared/lib/data';
 
 interface HistoricalAccountRecord {
   timestamp: string;

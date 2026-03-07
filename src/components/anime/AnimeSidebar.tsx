@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './AnimeSidebar.module.css';
 import { MALAuthState, UserAnimeStatus, ImageSize, VisibleColumns, StatsColumn, SortColumn, SortDirection, AnimeLayoutType } from '@/models/anime';
 import { SeasonInfo } from './SeasonSelector';
-import { Button, CollapsibleSection } from '@/components/shared';
+import { Button, CollapsibleSection } from '@myhomeapp/shared/components';
 import {
   SortOrderSection,
   AccountSection,

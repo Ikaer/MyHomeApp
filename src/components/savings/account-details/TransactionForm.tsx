@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal } from '@/components/shared';
+import { Button, Modal } from '@myhomeapp/shared/components';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { AssetPosition, Transaction, TransactionType } from '@/models/savings';
 

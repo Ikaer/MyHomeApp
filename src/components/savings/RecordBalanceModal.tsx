@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount } from '@/models/savings';
-import { Button, Modal } from '@/components/shared';
+import { Button, Modal } from '@myhomeapp/shared/components';
 
 interface RecordBalanceModalProps {
     account: SavingsAccount;

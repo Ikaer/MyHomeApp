@@ -32,7 +32,7 @@ import { useAccountHistory } from '@/hooks/savings/useAccountHistory';
 import { useAssetHistory } from '@/hooks/savings/useAssetHistory';
 import { useAnnualValueEditor } from '@/hooks/savings/useAnnualValueEditor';
 import { useTransactionEditor } from '@/hooks/savings/useTransactionEditor';
-import { Tabs } from '@/components/shared';
+import { Tabs } from '@myhomeapp/shared/components';
 import {
   getActiveAssetInfo,
   mapAssetChartData,

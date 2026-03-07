@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import styles from './SeasonSelector.module.css';
 import { getSeasonInfos } from '@/lib/animeUtils';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 
 type Season = 'winter' | 'spring' | 'summer' | 'fall';
 export type SeasonInfo = { year: number; season: Season };

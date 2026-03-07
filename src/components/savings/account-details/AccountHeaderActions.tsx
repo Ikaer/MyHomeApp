@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 import styles from './AccountHeaderActions.module.css';
 
 interface AccountHeaderActionsProps {

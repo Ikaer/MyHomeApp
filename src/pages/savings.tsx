@@ -15,7 +15,7 @@ import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount, AccountValuation, NetWorthSummary, ACCOUNT_TYPE_LABELS, AccountType } from '@/models/savings';
 import CreateAccountModal from '@/components/savings/CreateAccountModal';
 import RecordBalanceModal from '@/components/savings/RecordBalanceModal';
-import { Button, Card } from '@/components/shared';
+import { Button, Card } from '@myhomeapp/shared/components';
 
 interface HistoricalWealthRecord {
     timestamp: string;

@@ -3,13 +3,13 @@ import path from 'path';
 import { randomUUID } from 'crypto';
 import { getMALAuthData, isMALTokenValid, performBigSync } from '@/lib/anime';
 import { storeHistoricalAssetsValues, storeHistoricalAccountsValues, storeHistoricalWealthValues } from '@/lib/savings';
-import { ensureDirectoryExists, readJsonFile, writeJsonFile } from '@/lib/data';
+import { ensureDirectoryExists, readJsonFile, writeJsonFile } from '@myhomeapp/shared/lib/data';
 import {
   AutomatedTaskRequest,
   AutomatedTaskExecution,
   TaskResult,
   AutomatedTaskHistory
-} from '@/models/shared/automatedTasks';
+} from '@myhomeapp/shared/models/automatedTasks';
 
 const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const AUTOMATED_TASKS_FILE = path.join(DATA_PATH, 'config', 'automated-tasks-history.json');

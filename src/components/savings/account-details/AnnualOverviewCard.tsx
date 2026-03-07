@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Card } from '@/components/shared';
+import { Button, Card } from '@myhomeapp/shared/components';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { AnnualOverviewRow } from './types';
 

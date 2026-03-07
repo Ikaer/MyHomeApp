@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './ViewsSection.module.css';
 import { VIEW_PRESETS } from '@/lib/animeUrlParams';
 import { useAnimeUrlState } from '@/hooks';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 
 const ViewsSection: React.FC = () => {
   const { applyPreset } = useAnimeUrlState();

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import path from 'path';
-import { readJsonFile } from '@/lib/data';
-import { AutomatedTaskHistory, AutomatedTaskExecution } from '@/models/shared/automatedTasks';
+import { readJsonFile } from '@myhomeapp/shared/lib/data';
+import { AutomatedTaskHistory, AutomatedTaskExecution } from '@myhomeapp/shared/models/automatedTasks';
 
 const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const AUTOMATED_TASKS_FILE = path.join(DATA_PATH, 'config', 'automated-tasks-history.json');

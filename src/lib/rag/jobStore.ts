@@ -8,7 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import type { IngestJob, IngestJobStatus, IngestJobProgress, IngestSummary } from '@/models/rag';
-import { ensureDirectoryExists } from '@/lib/data';
+import { ensureDirectoryExists } from '@myhomeapp/shared/lib/data';
 
 const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const JOBS_DIR = path.join(DATA_PATH, 'rag', 'jobs');

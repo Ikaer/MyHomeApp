@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { AnimeWithExtensions, SortColumn, SortDirection, ImageSize, VisibleColumns } from '@/models/anime';
 import { detectProviderFromUrl, getProviderLogoPath, generateGoogleORQuery, generateJustWatchQuery } from '@/lib/providers';
 import { formatSeason, formatUserStatus } from '@/lib/animeUtils';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 import styles from './AnimeTable.module.css';
 
 const formatNumber = (num?: number) => {

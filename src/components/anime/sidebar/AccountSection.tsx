@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './AccountSection.module.css';
 import { MALAuthState } from '@/models/anime';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 
 interface AccountSectionProps {
   authState: MALAuthState;

@@ -11,7 +11,7 @@
 import fs from 'fs';
 import path from 'path';
 import type { RagConfig, RagSource } from '@/models/rag';
-import { ensureDirectoryExists } from '@/lib/data';
+import { ensureDirectoryExists } from '@myhomeapp/shared/lib/data';
 
 const DATA_PATH = process.env.DATA_PATH || '/app/data';
 const CONFIG_PATH = path.join(DATA_PATH, 'rag', 'config.json');

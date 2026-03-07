@@ -14,8 +14,8 @@ Convert the repo from a single npm project to a pnpm workspace monorepo. Extract
 
 ## Prerequisites
 
-- [ ] Create branch `migration/monorepo` from `main`
-- [ ] Install pnpm globally: `npm install -g pnpm`
+- [x] Create branch `migration/monorepo` from `main`
+- [x] Install pnpm globally: `npm install -g pnpm`
 
 ---
 

@@ -7,7 +7,7 @@ import { SavingsAccount } from '@/models/savings';
 import SavingsAccountDetails from '@/components/savings/SavingsAccountDetails';
 import BalanceAccountDetails from '@/components/savings/BalanceAccountDetails';
 import InteressementDetails from '@/components/savings/InteressementDetails';
-import { Button } from '@/components/shared';
+import { Button } from '@myhomeapp/shared/components';
 
 export default function SavingsAccountPage() {
     const router = useRouter();

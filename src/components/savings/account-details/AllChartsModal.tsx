@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
-import { Modal } from '@/components/shared';
+import { Modal } from '@myhomeapp/shared/components';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { HistoryMetricPoint } from './types';
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from '@/components/shared';
+import { Card } from '@myhomeapp/shared/components';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { AccountSummary } from '@/models/savings';
 

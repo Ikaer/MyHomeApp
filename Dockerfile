@@ -1,4 +1,5 @@
 FROM node:18-alpine AS base
+RUN npm install -g pnpm
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -6,8 +7,11 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
-COPY package.json package-lock.json* ./
-RUN npm ci
+COPY pnpm-workspace.yaml ./
+COPY pnpm-lock.yaml ./
+COPY packages/shared/package.json ./packages/shared/
+COPY package.json ./
+RUN pnpm install --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -26,7 +30,7 @@ RUN echo "Source copied at: $(date)" >> /tmp/buildinfo
 # Next.js collects completely anonymous telemetry data about general usage.
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN npm run build
+RUN pnpm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner

@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis
 } from 'recharts';
-import { Card } from '@/components/shared';
+import { Card } from '@myhomeapp/shared/components';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { HistoryChartPoint } from './types';
 
