@@ -16,19 +16,19 @@ const nextConfig = {
       // Anime — basePath /anime handles all sub-routes and static assets automatically
       { source: '/anime', destination: `${ANIME_URL}/anime` },
       { source: '/anime/:path*', destination: `${ANIME_URL}/anime/:path*` },
-      { source: '/api/anime/:path*', destination: `${ANIME_URL}/api/anime/:path*` },
+      { source: '/api/anime/:path*', destination: `${ANIME_URL}/anime/api/anime/:path*` },
       { source: '/api/actions/perform-tasks/anime', destination: `${ANIME_URL}/api/actions/perform-tasks` },
 
       // Savings
       { source: '/savings', destination: `${SAVINGS_URL}/savings` },
       { source: '/savings/:path*', destination: `${SAVINGS_URL}/savings/:path*` },
-      { source: '/api/savings/:path*', destination: `${SAVINGS_URL}/api/savings/:path*` },
+      { source: '/api/savings/:path*', destination: `${SAVINGS_URL}/savings/api/savings/:path*` },
       { source: '/api/actions/perform-tasks/savings', destination: `${SAVINGS_URL}/api/actions/perform-tasks` },
 
       // RAG
       { source: '/rag', destination: `${RAG_URL}/rag` },
       { source: '/rag/:path*', destination: `${RAG_URL}/rag/:path*` },
-      { source: '/api/rag/:path*', destination: `${RAG_URL}/api/rag/:path*` },
+      { source: '/api/rag/:path*', destination: `${RAG_URL}/rag/api/rag/:path*` },
     ];
   },
 };
