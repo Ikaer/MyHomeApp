@@ -305,7 +305,7 @@ function AccountCard({
                         + Record Balance
                     </Button>
                 )}
-                <Button href={`/savings/${account.id}`} variant="secondary">
+                <Button href={`/${account.id}`} variant="secondary">
                     View Details →
                 </Button>
             </div>

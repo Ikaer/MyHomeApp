@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import layoutStyles from './SavingsLayout.module.css';
+import layoutStyles from './savings/SavingsLayout.module.css';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount } from '@/models/savings';
 import SavingsAccountDetails from '@/components/savings/SavingsAccountDetails';

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import layoutStyles from './SavingsLayout.module.css';
+import layoutStyles from './savings/SavingsLayout.module.css';
 import sharedStyles from '@/components/savings/SavingsShared.module.css';
 import { SavingsAccount } from '@/models/savings';
 
@@ -15,18 +15,18 @@ export default function SavingsDefaultRedirect() {
                 if (res.ok) {
                     const data: SavingsAccount[] = await res.json();
                     if (data.length === 0) {
-                        router.replace('/savings');
+                        router.replace('/');
                         return;
                     }
                     const defaultAccount = data.find(account => account.isDefault) ?? data[0];
-                    router.replace(`/savings/${defaultAccount.id}`);
+                    router.replace(`/${defaultAccount.id}`);
                     return;
                 }
             } catch (error) {
                 console.error('Failed to resolve default account:', error);
             }
 
-            router.replace('/savings');
+            router.replace('/');
         };
 
         resolveDefault();
